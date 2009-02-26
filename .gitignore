@@ -1,0 +1,10 @@
+release/
+debug/
+obj/
+moc/
+.cproject
+.project
+Makefile*
+*~
+Thumbs.db
+object_script.*
