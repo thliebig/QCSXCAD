@@ -21,6 +21,8 @@ SOURCES += QCSXCAD.cpp \
     QVTKStructure.cpp \
     VTKPrimitives.cpp
 VTK_DIR = c:\opt\vtk
+win32 {
+DEFINES = __GYM2XML__
 INCLUDEPATH += . \
     $$VTK_DIR\
     $$VTK_DIR\Common \
@@ -56,6 +58,30 @@ LIBS += $$VTK_BIN_DIR\libQVTK.dll \
     $$VTK_BIN_DIR\libvtkfreetype.dll \
     ..\CSXCAD\Release\libCSXCAD.dll \
     ..\Gym2XML\Release\libGym2XML.dll
+}
+unix { 
+    VERSION = 0.1.1
+    INCLUDEPATH += ../CSXCAD
+    LIBS += -L../CSXCAD -lCSXCAD
+    INCLUDEPATH += /usr/include/vtk-5.0
+    LIBS += -lvtkCommon \
+        -lvtkDICOMParser \
+        -lvtkFiltering \
+        -lvtkGenericFiltering \
+        -lvtkGraphics \
+        -lvtkHybrid \
+        -lvtkIO \
+        -lvtkImaging \
+        -lvtkNetCDF \
+        -lvtkParallel \
+        -lvtkRendering \
+        -lvtkVolumeRendering \
+        -lvtkWidgets \
+        -lvtkexoIIc \
+        -lvtkftgl \
+        -lvtksys \
+        -lQVTK
+}
 FORMS += 
 RESOURCES += resources.qrc
 DEFINES += BUILD_QCSXCAD_LIB

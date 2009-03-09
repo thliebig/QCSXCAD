@@ -1,5 +1,5 @@
 #include "QCSPropEditor.h"
-#include "iostream.h"
+#include "iostream"
 #include "time.h";
 
 QColorPushButton::QColorPushButton(const QString & text, QWidget * parent ) : QPushButton(text,parent)

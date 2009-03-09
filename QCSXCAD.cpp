@@ -6,7 +6,9 @@
 #include "QCSGridEditor.h"
 #include "QParameterGui.h"
 #include "vtkConfigure.h"
+#ifdef __GYM2XML__
 #include "Gym2XML.h"
+#endif
 #include <iostream>
 
 QCSXCAD::QCSXCAD(QWidget *parent) : QMainWindow(parent)
@@ -297,12 +299,16 @@ void QCSXCAD::ImportGeometry()
 		}
 		else if  (FD.selectedNameFilter()==gymFile)
 		{
+#ifdef __GYM2XML__
 			if (QMessageBox::warning(this,tr("Import gym-file"),tr("Import of gym-files is highly experimental. This may cause a crash of this application!\nContinue?"),QMessageBox::Ok,QMessageBox::Cancel)==QMessageBox::Ok)
 			{
 				Gym2XML converter(this);
 				converter.ReadGymFile(selectedFiles.at(0).toStdString().c_str());
 				GUIUpdate();
 			}
+#else
+			QMessageBox::warning(this,tr("Import gym-file"),tr("Import of gym-files is not supported in this version!!"),QMessageBox::Ok);
+#endif
 		}
 		else return;
 	}

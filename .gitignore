@@ -6,5 +6,7 @@ moc/
 .project
 Makefile*
 *~
+*.so*
 Thumbs.db
 object_script.*
+
