@@ -20,7 +20,6 @@ SOURCES += QCSXCAD.cpp \
     QParameterGui.cpp \
     QVTKStructure.cpp \
     VTKPrimitives.cpp
-VTK_DIR = c:\opt\vtk
 win32 {
 DEFINES += BUILD_QCSXCAD_LIB
 #DEFINES += __GYM2XML__
