@@ -9,4 +9,4 @@ Makefile*
 *.so*
 Thumbs.db
 object_script.*
-
+localPathes.pri
