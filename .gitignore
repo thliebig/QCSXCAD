@@ -7,6 +7,9 @@ moc/
 Makefile*
 *~
 *.so*
+*.o
+moc_*.cpp
 Thumbs.db
 object_script.*
+qrc_resources.cpp
 localPathes.pri

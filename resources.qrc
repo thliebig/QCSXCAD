@@ -1,6 +1,7 @@
 <!DOCTYPE RCC>
 <RCC version="1.0">
   <qresource>
+    <file>images/QCSXCAD_Icon.png</file>
     <file>images/accept.png</file>
     <file>images/failed.png</file>
     <file>images/hourglass.png</file>

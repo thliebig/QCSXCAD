@@ -45,6 +45,7 @@ public:
 	ParameterSet* GetParaSet();
 
 	static QString GetInfoString();
+	static QIcon GetLibIcon();
 
 signals:
 	void modified(bool val);

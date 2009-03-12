@@ -1,6 +1,8 @@
 TEMPLATE = lib
 CONFIG += release
 TARGET = QCSXCAD
+MOC_DIR = moc
+OBJECTS_DIR = obj
 QT += core \
     gui
 HEADERS += QCSXCAD.h \

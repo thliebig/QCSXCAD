@@ -112,6 +112,11 @@ QString QCSXCAD::GetInfoString()
 	return text;
 }
 
+QIcon QCSXCAD::GetLibIcon()
+{
+	return QIcon(":/images/QCSXCAD_Icon.png");
+}
+
 void QCSXCAD::aboutQCSXCAD(QWidget* parent)
 {
 	QDialog infoWidget(parent);
@@ -154,7 +159,11 @@ void QCSXCAD::aboutQCSXCAD(QWidget* parent)
 	DependGroup->setLayout(Glay);
 
 	QGridLayout *infoLayout = new QGridLayout();
-	infoLayout->addWidget(infoLbl,1,1,1,3);
+	QPushButton* iconButt = new QPushButton(QCSXCAD::GetLibIcon(),"");
+	iconButt->setFlat(true);
+	iconButt->setIconSize(QSize(128,128));
+	infoLayout->addWidget(iconButt,1,1);
+	infoLayout->addWidget(infoLbl,1,2,1,3);
 	infoLayout->addWidget(DependGroup,2,1,1,3);
 
 	QPushButton* OKBut = new QPushButton(tr("Ok"));
