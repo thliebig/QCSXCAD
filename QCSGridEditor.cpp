@@ -86,7 +86,7 @@ void QCSGridEditor::BuildInHomogenDisc()
 	lay->addWidget(new QLabel(tr("Create inhomogenous discretisation:")),0,0,1,3);
 
 	QCheckBox* DelOldGrid = new QCheckBox(tr("Clear old mesh"));
-	DelOldGrid->setChecked(false);
+	DelOldGrid->setChecked(true);
 	lay->addWidget(DelOldGrid,0,5);
 
 	lay->addWidget(new QLabel(tr("min")),1,1);
@@ -196,7 +196,7 @@ void QCSGridEditor::BuildHomogenDisc()
 
 	lay->addWidget(new QLabel(tr("Create homogenous discretisation:")),0,0,1,3);
 	QCheckBox* DelOldGrid = new QCheckBox(tr("Clear old mesh"));
-	DelOldGrid->setChecked(false);
+	DelOldGrid->setChecked(true);
 	lay->addWidget(DelOldGrid,0,3);
 
 	lay->addWidget(new QLabel(tr("Min")),1,1);
