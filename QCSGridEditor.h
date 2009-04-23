@@ -17,6 +17,7 @@ public:
 signals:
 	void OpacityChange(int);
 	void signalDetectEdges(int);
+	void GridChanged();
 
 public slots:
 	void Update();

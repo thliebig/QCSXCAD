@@ -75,6 +75,7 @@ QCSXCAD::QCSXCAD(QWidget *parent) : QMainWindow(parent)
 	QObject::connect(GridEditor,SIGNAL(OpacityChange(int)),DrawWidget,SLOT(setGridOpacity(int)));
 	QObject::connect(GridEditor,SIGNAL(OpacityChange(int)),StructureVTK,SLOT(SetGridOpacity(int)));
 	QObject::connect(GridEditor,SIGNAL(signalDetectEdges(int)),this,SLOT(DetectEdges(int)));
+	QObject::connect(GridEditor,SIGNAL(GridChanged()),StructureVTK,SLOT(RenderGrid()));
 
 	dock = new QDockWidget(tr("Rectilinear Grid"),this);
 	dock->setAllowedAreas(Qt::LeftDockWidgetArea);

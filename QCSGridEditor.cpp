@@ -485,6 +485,7 @@ void QCSGridEditor::Update()
 		NodeQty.at(i)->setText(QString("%1").arg(clGrid->GetQtyLines(i)));
 	}
 	UnitLength->setText(QString("%1").arg(clGrid->GetDeltaUnit()));
+	emit GridChanged();
 }
 
 void QCSGridEditor::SetOpacity(int val)
