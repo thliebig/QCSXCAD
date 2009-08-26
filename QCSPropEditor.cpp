@@ -199,7 +199,7 @@ QGroupBox* QCSPropEditor::BuildGeneral()
 	QGroupBox* box= new QGroupBox("General");
 	QGridLayout* grid = new QGridLayout();
 
-	Name = new QLineEdit(QString(clProp->GetName()));
+	Name = new QLineEdit(QString(clProp->GetName().c_str()));
 	grid->addWidget(new QLabel(tr("Name: ")),0,0);
 	grid->addWidget(Name,0,1);
 	grid->addWidget(new QLabel(QString(tr("ID: %1")).arg(clProp->GetID())),0,2);
@@ -275,7 +275,7 @@ void QCSPropEditor::GetValues()
 
 	propGB = BuildPropGroupBox(clProp);
 
-	Name->setText(QString(clProp->GetName()));
+	Name->setText(QString(clProp->GetName().c_str()));
 	TypeCB->setCurrentIndex(GetIndexOfType());
 	FCButton->SetColor(clProp->GetFillColor());
 	ECButton->SetColor(clProp->GetEdgeColor());
@@ -346,7 +346,7 @@ void QCSPropUnknownGB::SetValues()
 
 void QCSPropUnknownGB::GetValues()
 {
-	Property->setText(clProp->GetProperty());
+	Property->setText(clProp->GetProperty().c_str());
 }
 
 
@@ -405,17 +405,17 @@ void QCSPropMaterialGB::SetValues()
 
 void QCSPropMaterialGB::GetValues()
 {
-	const char* line = NULL;
+	string line;
 	line=clProp->GetEpsilonTerm();
-	if (line!=NULL) EpsLine->setText(line);
+	if (!line.empty()) EpsLine->setText(line.c_str());
 	else EpsLine->setText(QString("%1").arg(clProp->GetEpsilon()));
 
 	line=clProp->GetMueTerm();
-	if (line!=NULL) MueLine->setText(line);
+	if (!line.empty()) MueLine->setText(line.c_str());
 	else MueLine->setText(QString("%1").arg(clProp->GetMue()));
 
 	line=clProp->GetKappaTerm();
-	if (line!=NULL) KappaLine->setText(line);
+	if (!line.empty()) KappaLine->setText(line.c_str());
 	else KappaLine->setText(QString("%1").arg(clProp->GetKappa()));
 
 }
@@ -516,12 +516,12 @@ void QCSPropElectrodeGB::SetValues()
 
 void QCSPropElectrodeGB::GetValues()
 {
-	const char* line = NULL;
+	string line;
 
 	for (unsigned int i=0;i<3;++i)
 	{
 		line=clProp->GetExcitationString(i);
-		if (line!=NULL) Excitation[i]->setText(line);
+		if (!line.empty()) Excitation[i]->setText(line.c_str());
 		else Excitation[i]->setText(QString("%1").arg(clProp->GetExcitation(i)));
 	}
 
@@ -531,7 +531,7 @@ void QCSPropElectrodeGB::GetValues()
 
 	for (unsigned int i=0;i<3;++i)
 	{
-		FctLine[i]->setText(clProp->GetWeightFct(i));
+		FctLine[i]->setText(clProp->GetWeightFct(i).c_str());
 		//VarLine[i]->setText(clProp->GetWeightVars(i));
 	}
 }

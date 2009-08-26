@@ -130,7 +130,7 @@ void QCSPrimEditor::UpdatePropertyCB()
 		QString str;
 		CSProperties* prop=clCS->GetProperty(i);
 		if (prop==NULL) break;
-		str=QString(prop->GetName());
+		str=QString(prop->GetName().c_str());
 		switch (prop->GetType())
 		{
 			case CSProperties::UNKNOWN:
@@ -222,7 +222,7 @@ void QCSPrimBoxLayout::SetValues()
 		line=Lines[i]->text();
 		dVal=line.toDouble(&bOk);
 		if (bOk) ps->SetValue(dVal);
-		else ps->SetValue(line.toLatin1().data());
+		else ps->SetValue(line.toStdString());
 	}	
 }
 
@@ -232,7 +232,7 @@ void QCSPrimBoxLayout::GetValues()
 	for (size_t i=0; i< 6; ++i)
 	{
 		ps=clBox->GetCoordPS(i);
-		if (ps->GetMode()) Lines[i]->setText(ps->GetString());
+		if (ps->GetMode()) Lines[i]->setText(ps->GetString().c_str());
 		else Lines[i]->setText(QString("%1").arg(ps->GetValue()));
 	}
 }
@@ -288,12 +288,12 @@ void QCSPrimSphereLayout::GetValues()
 	for (size_t i=0; i< 3; ++i)
 	{
 		ps=clSphere->GetCoordPS(i);
-		if (ps->GetMode()) Lines[i]->setText(ps->GetString());
+		if (ps->GetMode()) Lines[i]->setText(ps->GetString().c_str());
 		else Lines[i]->setText(QString("%1").arg(ps->GetValue()));
 	}
 	
 	ps=clSphere->GetRadiusPS();
-	if (ps->GetMode()) Lines[3]->setText(ps->GetString());
+	if (ps->GetMode()) Lines[3]->setText(ps->GetString().c_str());
 	else Lines[3]->setText(QString("%1").arg(ps->GetValue()));
 }
 
@@ -357,11 +357,11 @@ void QCSPrimCylinderLayout::GetValues()
 	for (size_t i=0; i< 6; ++i)
 	{
 		ps=clCylinder->GetCoordPS(i);
-		if (ps->GetMode()) Lines[i]->setText(ps->GetString());
+		if (ps->GetMode()) Lines[i]->setText(ps->GetString().c_str());
 		else Lines[i]->setText(QString("%1").arg(ps->GetValue()));
 	}
 	ps=clCylinder->GetRadiusPS();
-	if (ps->GetMode()) Lines[6]->setText(ps->GetString());
+	if (ps->GetMode()) Lines[6]->setText(ps->GetString().c_str());
 	else Lines[6]->setText(QString("%1").arg(ps->GetValue()));
 }
 
@@ -496,7 +496,7 @@ void QCSPrimUserDefinedLayout::GetValues()
 	{
 		ps=clUserDef->GetCoordShiftPS(i);
 		if (ps==NULL) return;
-		if (ps->GetMode()) CoordShift[i]->setText(ps->GetString());
+		if (ps->GetMode()) CoordShift[i]->setText(ps->GetString().c_str());
 		else CoordShift[i]->setText(QString("%1").arg(ps->GetValue()));
 	}
 }

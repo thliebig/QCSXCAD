@@ -60,7 +60,7 @@ bool QParameter::Edit()
 	QGridLayout* lay = new QGridLayout();
 	
 	lay->addWidget(new QLabel(tr("Name: ")),0,0);
-	QLineEdit* eName= new QLineEdit(clPara->GetName());
+	QLineEdit* eName= new QLineEdit(clPara->GetName().c_str());
 	lay->addWidget(eName,0,1);
 	
 	lay->addWidget(new QLabel(tr("Value: ")),1,0);
@@ -90,7 +90,7 @@ bool QParameter::Edit()
 			QMessageBox::warning(this,tr("Edit Parameter"),tr("Parameter-Name is invalid!"));
 			return false;
 		}
-		clPara->SetName(eName->text().toAscii());
+		clPara->SetName(eName->text().toStdString());
 		clPara->SetValue(eValue->text().toDouble());
 		Update();
 		return true;
@@ -101,7 +101,7 @@ bool QParameter::Edit()
 void QParameter::Update()
 {
 	//Name->setText(clPara->GetName());
-	setTitle(clPara->GetName());
+	setTitle(clPara->GetName().c_str());
 	Value->setText(QString("%1").arg(clPara->GetValue()));
 	if (clPara->GetSweep()) SweepCB->setCheckState(Qt::Checked);
 	else SweepCB->setCheckState(Qt::Unchecked);
@@ -137,7 +137,7 @@ bool QLinearParameter::Edit()
 	QGridLayout* lay = new QGridLayout();
 	
 	lay->addWidget(new QLabel(tr("Name: ")),0,0);
-	QLineEdit* eName= new QLineEdit(LP->GetName());
+	QLineEdit* eName= new QLineEdit(LP->GetName().c_str());
 	lay->addWidget(eName,0,1);
 	
 	lay->addWidget(new QLabel(tr("Value: ")),1,0);
@@ -179,7 +179,7 @@ bool QLinearParameter::Edit()
 			QMessageBox::warning(this,tr("Edit Parameter"),tr("Parameter-Name is invalid!"));
 			return false;
 		}
-		LP->SetName(eName->text().toAscii());
+		LP->SetName(eName->text().toStdString());
 		LP->SetMin(Start->text().toDouble());
 		LP->SetMax(Stop->text().toDouble());
 		LP->SetStep(Step->text().toDouble());

@@ -421,7 +421,7 @@ void QCSXCAD::Delete()
 		size_t qtyPrim=prop->GetQtyPrimitives();
 		if (qtyPrim>0)
 		{
-			if (QMessageBox::question(this,tr("Delete Property"),tr("\"%1\" contains Primitive(s)!!\n Delete anyway?").arg(prop->GetName()),QMessageBox::Yes,QMessageBox::No)==QMessageBox::Yes)
+			if (QMessageBox::question(this,tr("Delete Property"),tr("\"%1\" contains Primitive(s)!!\n Delete anyway?").arg(prop->GetName().c_str()),QMessageBox::Yes,QMessageBox::No)==QMessageBox::Yes)
 			{
 				for (size_t i=0;i<qtyPrim;++i)
 				{
