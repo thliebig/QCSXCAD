@@ -81,6 +81,7 @@ protected slots:
 	void NewMultiBox();
 	void NewSphere();
 	void NewCylinder();
+	void NewPolygon();
 	void NewUserDefined();
 
 	void NewMaterial();

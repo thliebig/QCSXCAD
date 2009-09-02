@@ -26,6 +26,10 @@ QCSPrimEditor::QCSPrimEditor(ContinuousStructure *CS, CSPrimitives* prim, QWidge
 			CSPrimEdit = new QCSPrimCylinderLayout(CSPrim->ToCylinder());
 			setWindowTitle(tr("Cylinder Editor"));
 			break;
+		case CSPrimitives::POLYGON:
+			CSPrimEdit = new QCSPrimPolygonLayout(CSPrim->ToPolygon());
+			setWindowTitle(tr("Polygon Editor"));
+			break;
 		case CSPrimitives::USERDEFINED:
 			CSPrimEdit = new QCSPrimUserDefinedLayout(CSPrim->ToUserDefined());
 			setWindowTitle(tr("User Defined Primitive Editor"));
@@ -424,8 +428,154 @@ void QCSPrimMultiBoxLayout::EditBox(QListWidgetItem* item)
 {
 }
 
+//***********************************************************************************//
+QCSPrimPolygonLayout::QCSPrimPolygonLayout(CSPrimPolygon* prim, QWidget *parent) : QCSPrimitiveLayout(parent)
+{
+	clPoly=prim;
+	
+	addWidget(new QLabel(tr("Polygon Plane")),0,0);	
+	NormVec = new QComboBox();
+	NormVec->addItem(tr("xy-plane"));
+	NormVec->addItem(tr("yz-plane"));
+	NormVec->addItem(tr("zx-plane"));
+	QObject::connect(NormVec,SIGNAL(currentIndexChanged(int)),this,SLOT(NormVecChanged()));
+	addWidget(NormVec,0,1);
+	
+	addWidget(new QLabel(tr("Polygon Elevation")),1,0);	
+	Elevation = new QLineEdit();;
+	addWidget(Elevation,1,1);
 
+	QGroupBox* gb = new QGroupBox(tr("Polygon Vertices"));
+	QVBoxLayout* gbl = new QVBoxLayout();
+	gb->setLayout(gbl);
+	addWidget(gb,2,0,1,2);
+	
+	CoordTable = new QTableWidget(1,2);
+	gbl->addWidget(CoordTable);
+	
+	GetValues();
+}
 
+QCSPrimPolygonLayout::~QCSPrimPolygonLayout()
+{
+}
+
+void QCSPrimPolygonLayout::SetValues()
+{
+	int ind = NormVec->currentIndex();
+	clPoly->SetNormDir(0,0.0);
+	clPoly->SetNormDir(1,0.0);
+	clPoly->SetNormDir(2,0.0);
+	switch (ind)
+	{
+	case 0:
+		clPoly->SetNormDir(2,1.0);
+		break;
+	case 1:
+		clPoly->SetNormDir(0,1.0);
+		break;
+	case 2:
+		clPoly->SetNormDir(1,1.0);
+		break;
+	default:
+		clPoly->SetNormDir(2,1.0);
+		break;
+	}
+	ParameterScalar* ps;
+	bool bOk;
+	double dVal;
+	QString line;
+	
+	ps=clPoly->GetElevationPS();
+	line=Elevation->text();
+	dVal=line.toDouble(&bOk);
+	if (bOk) ps->SetValue(dVal);
+	else ps->SetValue(line.toStdString());
+	
+	clPoly->ClearCoords();
+	
+	for (int i=0; i<CoordTable->rowCount(); ++i)
+	{
+		QTableWidgetItem* item1 = CoordTable->item(i,0);
+		QTableWidgetItem* item2 = CoordTable->item(i,1);
+		if (item1==NULL || item2==NULL) return;
+
+		QString x1 = item1->text(); 
+		QString x2 = item2->text();
+		
+		if (x1.isEmpty() && x2.isEmpty()) return;
+		
+		dVal=x1.toDouble(&bOk);
+		if (bOk) clPoly->AddCoord(dVal);
+		else clPoly->AddCoord(line.toStdString());
+
+		dVal=x2.toDouble(&bOk);
+		if (bOk) clPoly->AddCoord(dVal);
+		else clPoly->AddCoord(line.toStdString());
+	}	
+}
+
+void QCSPrimPolygonLayout::GetValues()
+{
+	if (clPoly->GetNormDir(0))
+		NormVec->setCurrentIndex(1);
+	else if (clPoly->GetNormDir(1))
+		NormVec->setCurrentIndex(2);
+	else if (clPoly->GetNormDir(2))
+		NormVec->setCurrentIndex(0);
+	ParameterScalar* ps;
+	ps=clPoly->GetElevationPS();
+	if (ps->GetMode()) Elevation->setText(ps->GetString().c_str());
+	else Elevation->setText(QString("%1").arg(ps->GetValue()));
+
+	CoordTable->clear();
+	CoordTable->setRowCount(clPoly->GetQtyCoords()+2);
+	
+	for (size_t i=0; i<clPoly->GetQtyCoords(); ++i)
+	{
+		ps=clPoly->GetCoordPS(2*i);
+		if (ps)
+		{
+			QTableWidgetItem* item = new QTableWidgetItem();
+			if (item==NULL) exit(1);
+			if (ps->GetMode()) item->setText(ps->GetString().c_str());
+			else item->setText(QString("%1").arg(ps->GetValue()));
+			CoordTable->setItem(i,0,item);
+		}
+
+		ps=clPoly->GetCoordPS(2*i+1);
+		if (ps)
+		{
+			QTableWidgetItem* item = new QTableWidgetItem();
+			if (ps->GetMode()) item->setText(ps->GetString().c_str());
+			else item->setText(QString("%1").arg(ps->GetValue()));
+			CoordTable->setItem(i,1,item);
+		}
+	}
+}
+
+void QCSPrimPolygonLayout::NormVecChanged()
+{
+	QStringList headers;
+	switch (NormVec->currentIndex())
+	{
+	case 0:
+		headers << "x" << "y";
+		break;
+	case 1:
+		headers << "y" << "z";
+		break;
+	case 2:
+		headers << "z" << "x";
+		break;
+	default:
+		headers << "x" << "y";
+		break;
+	}
+	CoordTable->setHorizontalHeaderLabels(headers);
+}
+
+//***********************************************************************************//
 QCSPrimUserDefinedLayout::QCSPrimUserDefinedLayout(CSPrimUserDefined* prim, QWidget *parent) : QCSPrimitiveLayout(parent)
 {
 	clUserDef=prim;

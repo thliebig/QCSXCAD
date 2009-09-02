@@ -458,6 +458,11 @@ void QCSXCAD::NewCylinder()
 	NewPrimitive(new CSPrimCylinder(clParaSet,CSTree->GetCurrentProperty()));
 }
 
+void QCSXCAD::NewPolygon()
+{
+	NewPrimitive(new CSPrimPolygon(clParaSet,CSTree->GetCurrentProperty()));
+}
+
 void QCSXCAD::NewUserDefined()
 {
 	NewPrimitive(new CSPrimUserDefined(clParaSet,CSTree->GetCurrentProperty()));
@@ -668,6 +673,9 @@ void QCSXCAD::BuildToolBar()
 
 	newAct = newObjct->addAction(tr("Cylinder"),this,SLOT(NewCylinder()));
 	newAct->setToolTip(tr("add new Cylinder"));
+
+	newAct = newObjct->addAction(tr("Polygon"),this,SLOT(NewPolygon()));
+	newAct->setToolTip(tr("add new Polygon"));
 
 	newAct = newObjct->addAction(tr("User Defined"),this,SLOT(NewUserDefined()));
 	newAct->setToolTip(tr("add new User Definied Primitive"));

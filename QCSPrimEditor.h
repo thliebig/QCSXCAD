@@ -9,6 +9,9 @@ class QCSPrimBoxLayout;
 class QCSPrimSphereLayout;
 class QCSPrimCylinderLayout;
 class QCSPrimMultiBoxLayout;
+class QCSPrimPolygon;
+	class QCSPrimLinPoly;
+	class QCSPrimRotPoly;
 class QCSPrimUserDefinedLayout;
 
 class QCSPrimEditor : public QDialog
@@ -136,6 +139,30 @@ protected:
 	
 	QListWidget* qBoxList;
 	QVector<QString> vLines;
+};
+
+class QCSPrimPolygonLayout : public QCSPrimitiveLayout
+{
+	Q_OBJECT
+public:
+	QCSPrimPolygonLayout(CSPrimPolygon* prim, QWidget *parent=NULL);
+	virtual ~QCSPrimPolygonLayout();
+	
+public slots:
+	virtual void SetValues();
+	virtual void GetValues();
+	
+protected slots:
+	void NormVecChanged();
+	
+signals:
+	void modified();
+	
+protected:
+	CSPrimPolygon* clPoly;
+	QComboBox* NormVec;
+	QLineEdit* Elevation;
+	QTableWidget* CoordTable;
 };
 
 class QCSPrimUserDefinedLayout : public QCSPrimitiveLayout

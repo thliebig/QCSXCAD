@@ -43,28 +43,8 @@ void QCSTreeWidget::AddPrimItem(CSPrimitives* prim)
 	if (propID<0) return;
 	QTreeWidgetItem* parent = topLevelItem(propID);
 	if (parent==NULL) return;
-	QString str;
-	switch (prim->GetType())
-	{
-		case CSPrimitives::BOX:
-			str="Box";
-			break;
-		case CSPrimitives::MULTIBOX:
-			str="Multi Box";
-			break;
-		case CSPrimitives::SPHERE:
-			str="Sphere";
-			break;
-		case CSPrimitives::CYLINDER:
-			str="Cylinder";
-			break;
-		case CSPrimitives::USERDEFINED:
-			str="User Defined";
-			break;
-		default:
-			str="Unkown";
-			break;					
-	};
+	QString str = QString(prim->GetTypeName().c_str());
+
 	str+=QString(" - ID: %1").arg(prim->GetID());
 	QTreeWidgetItem* newPrimItem = new QTreeWidgetItem(parent,QStringList(str),1);
 	newPrimItem->setData(0,1,QVariant(prim->GetID()));
