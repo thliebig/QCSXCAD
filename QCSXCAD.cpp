@@ -1034,14 +1034,12 @@ void QGeometryPlot::mouseMoveEvent(QMouseEvent * event)
 {
 	if (statBar!=NULL)
 	{
-		double posX=event->x()*factor+offsetX;
-		double posY=(height()-event->y())*factor+offsetY;
-		if (direct==0) statBar->showMessage(QString("Y: %1  Z: %2").arg(posX).arg(posY));
-		if (direct==1) statBar->showMessage(QString("Z: %1  X: %2").arg(posX).arg(posY));
-		if (direct==2) statBar->showMessage(QString("X: %1  Y: %2").arg(posX).arg(posY));
+		GetMouseXY(event);
+		if (direct==0) statBar->showMessage(QString("Y: %1  Z: %2").arg(lastMouseXY[0]).arg(lastMouseXY[1]));
+		if (direct==1) statBar->showMessage(QString("Z: %1  X: %2").arg(lastMouseXY[0]).arg(lastMouseXY[1]));
+		if (direct==2) statBar->showMessage(QString("X: %1  Y: %2").arg(lastMouseXY[0]).arg(lastMouseXY[1]));
 	}
 
-//	QMessageBox::about(this,tr("test"),tr("test"));
 	if (event->buttons()!=Qt::RightButton) return;
 
 	double shiftX=-1*(Pos.x()-event->x())*factor;
@@ -1060,4 +1058,22 @@ void QGeometryPlot::mouseMoveEvent(QMouseEvent * event)
 	Pos=event->pos();
 	update();
 }
+
+
+double* QGeometryPlot::GetMouseXY(QMouseEvent* event, bool bRound)
+{
+	lastMouseXY[0]=event->x()*factor+offsetX;
+	lastMouseXY[1]=(height()-event->y())*factor+offsetY;
+	if (bRound==false) return lastMouseXY;
+	double logfac = pow(10,round(log10(factor)));
+	lastMouseXY[0] = round(lastMouseXY[0]/logfac)*logfac;	
+	lastMouseXY[1] = round(lastMouseXY[1]/logfac)*logfac;
+	return lastMouseXY;
+}
+
+void DrawArrow()
+{
+	cerr << dArrow[0] << " - " << dArrow[1] << " ; " << dArrow[2] << " - " << dArrow[3] << endl; 
+}
+
 

@@ -145,6 +145,9 @@ protected:
 	virtual void mousePressEvent(QMouseEvent * event);
 	virtual void mouseReleaseEvent(QMouseEvent * event);
 	virtual void mouseMoveEvent(QMouseEvent * event);
+	
+	double* GetMouseXY(QMouseEvent* event, bool bRound=true);
+	double lastMouseXY[2];
 
 	QCSXCAD* clCS;
 	int direct;
