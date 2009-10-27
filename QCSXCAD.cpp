@@ -756,6 +756,10 @@ void QCSXCAD::View3D()
 void QCSXCAD::keyPressEvent(QKeyEvent * event)
 {
 	if (event->key()==Qt::Key_Delete) Delete();
+	if (event->key()==Qt::Key_Escape)
+	{
+		CSTree->setCurrentItem(NULL);
+	}
 	QMainWindow::keyPressEvent(event);
 }
 
