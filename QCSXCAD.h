@@ -138,6 +138,8 @@ public slots:
 	void setZX();
 	void setDrawArea(double* area);
 	void setGridOpacity(int val);
+	
+	void Reset();
 
 protected:
 	virtual void paintEvent(QPaintEvent *event);
@@ -146,8 +148,11 @@ protected:
 	virtual void mouseReleaseEvent(QMouseEvent * event);
 	virtual void mouseMoveEvent(QMouseEvent * event);
 	
-	double* GetMouseXY(QMouseEvent* event, bool bRound=true);
+	double* GetMouseXY(const QPoint qp, bool bRound=true);
 	double lastMouseXY[2];
+	
+	bool bArrow;
+	double dArrow[4];
 
 	QCSXCAD* clCS;
 	int direct;

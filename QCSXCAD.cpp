@@ -759,6 +759,7 @@ void QCSXCAD::keyPressEvent(QKeyEvent * event)
 	if (event->key()==Qt::Key_Escape)
 	{
 		CSTree->setCurrentItem(NULL);
+		DrawWidget->Reset();
 	}
 	QMainWindow::keyPressEvent(event);
 }
@@ -775,6 +776,7 @@ QGeometryPlot::QGeometryPlot(QCSXCAD* CS) : QWidget()
 	setCursor(Qt::CrossCursor);
 	setMouseTracking(true);
 	statBar=NULL;
+	bArrow=false;
 }
 
 QGeometryPlot::~QGeometryPlot()
@@ -784,19 +786,19 @@ QGeometryPlot::~QGeometryPlot()
 void QGeometryPlot::setXY()
 {
 	direct=2;
-	update();
+	Reset();
 }
 
 void QGeometryPlot::setYZ()
 {
 	direct=0;
-	update();
+	Reset();
 }
 
 void QGeometryPlot::setZX()
 {
 	direct=1;
-	update();
+	Reset();
 }
 
 void QGeometryPlot::setDrawArea(double* area)
@@ -809,6 +811,12 @@ void QGeometryPlot::setDrawArea(double* area)
 void QGeometryPlot::setGridOpacity(int val)
 {
 	GridOpacity=val;
+	update();
+}
+
+void QGeometryPlot::Reset()
+{
+	bArrow = false;
 	update();
 }
 
@@ -977,6 +985,27 @@ void QGeometryPlot::paintEvent(QPaintEvent * /* event */)
 			};
 		}
 	}
+	
+	//calculate and draw an arrow here
+	if (bArrow)
+	{
+		QPen pen(QColor(255,0,0,255));
+		pen.setWidth(2);
+		painter.setPen(pen);
+		int x1 = (int)((dArrow[0]-offsetX)/factor);
+		int y1 = height()-(int)((dArrow[1]-offsetY)/factor);
+		int x2 = (int)((dArrow[2]-offsetX)/factor);
+		int y2 = height()-(int)((dArrow[3]-offsetY)/factor);
+		
+		painter.drawLine(x1,y1,x2,y2);
+		painter.drawText(x1,y1,QString("(%1,%2)").arg(dArrow[0]).arg(dArrow[1]));
+		painter.drawText(x2,y2,QString("(%1,%2)").arg(dArrow[2]).arg(dArrow[3]));
+		
+		double angle = atan2(y2-y1,x2-x1);
+		double PI = 3.141;
+		painter.drawLine(x2,y2,x2-10*cos(angle-PI/4),y2-10*sin(angle-PI/4));
+		painter.drawLine(x2,y2,x2-10*cos(angle+PI/4),y2-10*sin(angle+PI/4));
+	}
 
 	QRectF target(10, height()-110.0, 100.0, 100.0);
 	//QRectF source(0.0, 0.0, 70.0, 40.0);
@@ -987,7 +1016,7 @@ void QGeometryPlot::paintEvent(QPaintEvent * /* event */)
 	QRect source=image.rect();
 
 	painter.drawImage(target, image, source);
-
+	
 //	QPen pen;
 //	pen.setWidth(5);
 //	painter.setPen(pen);
@@ -1016,15 +1045,30 @@ void QGeometryPlot::wheelEvent(QWheelEvent * event)
 		DrawArea[2*i]=DrawArea[2*i]-width;
 		DrawArea[2*i+1]=DrawArea[2*i+1]+width;
 	}
+	if (event->buttons()==Qt::LeftButton)
+	{
+		GetMouseXY(event->pos());
+		dArrow[2]=lastMouseXY[0];
+		dArrow[3]=lastMouseXY[1];
+	}
 	update();
 }
 
 
 void QGeometryPlot::mousePressEvent(QMouseEvent * event)
 {
-	if (event->button()!=Qt::RightButton) return;
-	setCursor(Qt::ClosedHandCursor);
 	Pos=event->pos();
+	if (event->button()==Qt::RightButton)
+	{
+		setCursor(Qt::ClosedHandCursor);
+	}
+	if (event->button()==Qt::LeftButton)
+	{
+		bArrow=true;
+		GetMouseXY(event->pos());
+		dArrow[0]=lastMouseXY[0];
+		dArrow[1]=lastMouseXY[1];
+	}
 }
 
 
@@ -1032,18 +1076,34 @@ void QGeometryPlot::mousePressEvent(QMouseEvent * event)
 void QGeometryPlot::mouseReleaseEvent(QMouseEvent * event)
 {
 	setCursor(Qt::CrossCursor);
+	if (event->button()==Qt::LeftButton)
+	{
+		GetMouseXY(event->pos());
+		dArrow[2]=lastMouseXY[0];
+		dArrow[3]=lastMouseXY[1];
+		if (dArrow[0]==dArrow[2] && dArrow[1]==dArrow[3]) bArrow=false;
+		else bArrow=true;
+	}
 }
 
 void QGeometryPlot::mouseMoveEvent(QMouseEvent * event)
 {
 	if (statBar!=NULL)
 	{
-		GetMouseXY(event);
+		GetMouseXY(event->pos());
 		if (direct==0) statBar->showMessage(QString("Y: %1  Z: %2").arg(lastMouseXY[0]).arg(lastMouseXY[1]));
 		if (direct==1) statBar->showMessage(QString("Z: %1  X: %2").arg(lastMouseXY[0]).arg(lastMouseXY[1]));
 		if (direct==2) statBar->showMessage(QString("X: %1  Y: %2").arg(lastMouseXY[0]).arg(lastMouseXY[1]));
 	}
 
+	if ((event->buttons()==Qt::LeftButton) && (bArrow)) 
+	{
+		GetMouseXY(event->pos());
+		dArrow[2]=lastMouseXY[0];
+		dArrow[3]=lastMouseXY[1];
+		update(); 
+		return;
+	}
 	if (event->buttons()!=Qt::RightButton) return;
 
 	double shiftX=-1*(Pos.x()-event->x())*factor;
@@ -1064,10 +1124,10 @@ void QGeometryPlot::mouseMoveEvent(QMouseEvent * event)
 }
 
 
-double* QGeometryPlot::GetMouseXY(QMouseEvent* event, bool bRound)
+double* QGeometryPlot::GetMouseXY(const QPoint qp, bool bRound)
 {
-	lastMouseXY[0]=event->x()*factor+offsetX;
-	lastMouseXY[1]=(height()-event->y())*factor+offsetY;
+	lastMouseXY[0]=qp.x()*factor+offsetX;
+	lastMouseXY[1]=(height()-qp.y())*factor+offsetY;
 	if (bRound==false) return lastMouseXY;
 	double logfac = pow(10,round(log10(factor)));
 	lastMouseXY[0] = round(lastMouseXY[0]/logfac)*logfac;	
@@ -1075,9 +1135,6 @@ double* QGeometryPlot::GetMouseXY(QMouseEvent* event, bool bRound)
 	return lastMouseXY;
 }
 
-void DrawArrow()
-{
-	cerr << dArrow[0] << " - " << dArrow[1] << " ; " << dArrow[2] << " - " << dArrow[3] << endl; 
-}
+
 
 
