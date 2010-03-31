@@ -63,10 +63,11 @@ LIBS += $$VTK_BIN_DIR\libQVTK.dll \
 #    ..\Gym2XML\release\Gym2XML.dll
 }
 unix { 
-    VERSION = 0.1.2
-    INCLUDEPATH += ../CSXCAD
+    VERSION = 0.2.0
+	INCLUDEPATH += ../CSXCAD\
+		../tinyxml
     LIBS += -L../CSXCAD -lCSXCAD
-    INCLUDEPATH += /usr/include/vtk-5.0
+    INCLUDEPATH += /usr/include/vtk-5.2
     LIBS += -lvtkCommon \
         -lvtkDICOMParser \
         -lvtkFiltering \

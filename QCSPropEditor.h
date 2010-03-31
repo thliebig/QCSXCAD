@@ -168,7 +168,7 @@ class QCSPropChargeBoxGB : public QCSPropertyGroupBox
 {
 	Q_OBJECT
 public:
-	QCSPropChargeBoxGB(CSPropChargeBox *prop, QWidget *parent=NULL);
+	QCSPropChargeBoxGB(CSPropProbeBox *prop, QWidget *parent=NULL);
 	virtual ~QCSPropChargeBoxGB();
 
 public slots:
@@ -179,7 +179,7 @@ signals:
 	void modified();
 
 protected:
-	CSPropChargeBox* clProp;
+	CSPropProbeBox* clProp;
 
 	QSpinBox* Number;
 };

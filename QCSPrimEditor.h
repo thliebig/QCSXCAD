@@ -162,7 +162,8 @@ protected:
 	CSPrimPolygon* clPoly;
 	QComboBox* NormVec;
 	QLineEdit* Elevation;
-	QTableWidget* CoordTable;
+	QLineEdit* CoordLineX;
+	QLineEdit* CoordLineY;
 };
 
 class QCSPrimUserDefinedLayout : public QCSPrimitiveLayout

@@ -16,6 +16,8 @@ class QParameterSet;
 
 class QGeometryPlot;
 
+class TiXmlNode;
+
 class QCSXCAD_EXPORT QCSXCAD : public QMainWindow, public ContinuousStructure
 {
 	Q_OBJECT
@@ -102,6 +104,8 @@ protected:
 
 	void NewPrimitive(CSPrimitives* newPrim);
 	void NewProperty(CSProperties* newProp);
+
+	TiXmlNode* FindRootNode(TiXmlNode* node);
 
 	QCSTreeWidget *CSTree;
 	QCSGridEditor* GridEditor;

@@ -149,7 +149,7 @@ void QCSPrimEditor::UpdatePropertyCB()
 			case CSProperties::ELECTRODE:
 				str+=tr(" (Electrode)");
 				break;
-			case CSProperties::CHARGEBOX:
+			case CSProperties::PROBEBOX:
 				str+=tr(" (Charge-Box)");
 				break;
 			case CSProperties::RESBOX:
@@ -446,12 +446,14 @@ QCSPrimPolygonLayout::QCSPrimPolygonLayout(CSPrimPolygon* prim, QWidget *parent)
 	addWidget(Elevation,1,1);
 
 	QGroupBox* gb = new QGroupBox(tr("Polygon Vertices"));
-	QVBoxLayout* gbl = new QVBoxLayout();
+	QFormLayout* gbl = new QFormLayout();
 	gb->setLayout(gbl);
 	addWidget(gb,2,0,1,2);
 	
-	CoordTable = new QTableWidget(1,2);
-	gbl->addWidget(CoordTable);
+	CoordLineX = new QLineEdit();
+	gbl->addRow(tr("X_1"),CoordLineX);
+	CoordLineY = new QLineEdit();
+	gbl->addRow(tr("X_2"),CoordLineY);
 	
 	GetValues();
 }
@@ -494,14 +496,14 @@ void QCSPrimPolygonLayout::SetValues()
 	
 	clPoly->ClearCoords();
 	
-	for (int i=0; i<CoordTable->rowCount(); ++i)
+	QStringList strListX = CoordLineX->text().split(",",QString::SkipEmptyParts);
+	QStringList strListY = CoordLineY->text().split(",",QString::SkipEmptyParts);
+	
+	for (int i=0; (i<strListX.size()) && (i<strListY.size()) ; ++i)
 	{
-		QTableWidgetItem* item1 = CoordTable->item(i,0);
-		QTableWidgetItem* item2 = CoordTable->item(i,1);
-		if (item1==NULL || item2==NULL) return;
 
-		QString x1 = item1->text(); 
-		QString x2 = item2->text();
+		QString x1 = strListX.at(i); 
+		QString x2 = strListY.at(i); 
 		
 		if (x1.isEmpty() && x2.isEmpty()) return;
 		
@@ -528,51 +530,48 @@ void QCSPrimPolygonLayout::GetValues()
 	if (ps->GetMode()) Elevation->setText(ps->GetString().c_str());
 	else Elevation->setText(QString("%1").arg(ps->GetValue()));
 
-	CoordTable->clear();
-	CoordTable->setRowCount(clPoly->GetQtyCoords()+2);
+	QStringList strListX;
+	QStringList strListY;
 	
 	for (size_t i=0; i<clPoly->GetQtyCoords(); ++i)
 	{
 		ps=clPoly->GetCoordPS(2*i);
 		if (ps)
 		{
-			QTableWidgetItem* item = new QTableWidgetItem();
-			if (item==NULL) exit(1);
-			if (ps->GetMode()) item->setText(ps->GetString().c_str());
-			else item->setText(QString("%1").arg(ps->GetValue()));
-			CoordTable->setItem(i,0,item);
+			if (ps->GetMode()) strListX.append(ps->GetString().c_str());
+			else strListX.append(QString("%1").arg(ps->GetValue()));
 		}
 
 		ps=clPoly->GetCoordPS(2*i+1);
 		if (ps)
 		{
-			QTableWidgetItem* item = new QTableWidgetItem();
-			if (ps->GetMode()) item->setText(ps->GetString().c_str());
-			else item->setText(QString("%1").arg(ps->GetValue()));
-			CoordTable->setItem(i,1,item);
+			if (ps->GetMode()) strListY.append(ps->GetString().c_str());
+			else strListY.append(QString("%1").arg(ps->GetValue()));
 		}
 	}
+	CoordLineX->setText(strListX.join(", "));
+	CoordLineY->setText(strListY.join(", "));
 }
 
 void QCSPrimPolygonLayout::NormVecChanged()
 {
-	QStringList headers;
-	switch (NormVec->currentIndex())
-	{
-	case 0:
-		headers << "x" << "y";
-		break;
-	case 1:
-		headers << "y" << "z";
-		break;
-	case 2:
-		headers << "z" << "x";
-		break;
-	default:
-		headers << "x" << "y";
-		break;
-	}
-	CoordTable->setHorizontalHeaderLabels(headers);
+//	QStringList headers;
+//	switch (NormVec->currentIndex())
+//	{
+//	case 0:
+//		headers << "x" << "y";
+//		break;
+//	case 1:
+//		headers << "y" << "z";
+//		break;
+//	case 2:
+//		headers << "z" << "x";
+//		break;
+//	default:
+//		headers << "x" << "y";
+//		break;
+//	}
+//	CoordTable->setHorizontalHeaderLabels(headers);
 }
 
 //***********************************************************************************//

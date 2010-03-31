@@ -102,8 +102,8 @@ QCSPropertyGroupBox* QCSPropEditor::BuildPropGroupBox(CSProperties* clProp)
 		case CSProperties::ELECTRODE:
 			propGB = new QCSPropElectrodeGB(clProp->ToElectrode());
 			break;
-		case CSProperties::CHARGEBOX:
-			propGB = new QCSPropChargeBoxGB(clProp->ToChargeBox());
+		case CSProperties::PROBEBOX:
+			propGB = new QCSPropChargeBoxGB(clProp->ToProbeBox());
 			break;
 		case CSProperties::DUMPBOX:
 			propGB = new QCSPropDumpBoxGB(clProp->ToDumpBox(),m_SimMode);
@@ -166,8 +166,8 @@ void QCSPropEditor::ChangeType(int item)
 		case CSProperties::ELECTRODE:
 			clProp = new CSPropElectrode(saveProp);
 			break;
-		case CSProperties::CHARGEBOX:
-			clProp = new CSPropChargeBox(saveProp);
+		case CSProperties::PROBEBOX:
+			clProp = new CSPropProbeBox(saveProp);
 			break;
 		case CSProperties::DUMPBOX:
 			clProp = new CSPropDumpBox(saveProp);
@@ -210,7 +210,7 @@ QGroupBox* QCSPropEditor::BuildGeneral()
 	TypeCB->addItem(tr("Material"),QVariant(CSProperties::MATERIAL));
 	TypeCB->addItem(tr("Metal"),QVariant(CSProperties::METAL));
 	TypeCB->addItem(tr("Electrode"),QVariant(CSProperties::ELECTRODE));
-	TypeCB->addItem(tr("Probe Box"),QVariant(CSProperties::CHARGEBOX));
+	TypeCB->addItem(tr("Probe Box"),QVariant(CSProperties::PROBEBOX));
 	TypeCB->addItem(tr("Res Box"),QVariant(CSProperties::RESBOX));
 	TypeCB->addItem(tr("Dump Box"),QVariant(CSProperties::DUMPBOX));
 	grid->addWidget(TypeCB,1,1,1,2);
@@ -509,7 +509,7 @@ void QCSPropElectrodeGB::SetValues()
 	clProp->SetExcitType(Type->currentIndex()+1);
 	for (unsigned int i=0;i<3;++i)
 	{
-		clProp->SetWeightFct(FctLine[i]->text().toLatin1().data(),i);
+		clProp->SetWeightFunction(FctLine[i]->text().toLatin1().data(),i);
 		//clProp->SetWeightVars(VarLine[i]->text().toLatin1().data(),i);
 	}
 }
@@ -531,7 +531,7 @@ void QCSPropElectrodeGB::GetValues()
 
 	for (unsigned int i=0;i<3;++i)
 	{
-		FctLine[i]->setText(clProp->GetWeightFct(i).c_str());
+		FctLine[i]->setText(clProp->GetWeightFunction(i).c_str());
 		//VarLine[i]->setText(clProp->GetWeightVars(i));
 	}
 }
@@ -587,7 +587,7 @@ void QCSPropElectrodeGB::TypeChanged(int index)
 }
 
 /***************************QCSPropChargeBoxGB**************************************/
-QCSPropChargeBoxGB::QCSPropChargeBoxGB(CSPropChargeBox *prop, QWidget *parent) : QCSPropertyGroupBox(parent)
+QCSPropChargeBoxGB::QCSPropChargeBoxGB(CSPropProbeBox *prop, QWidget *parent) : QCSPropertyGroupBox(parent)
 {
 	clProp=prop;
 	TypeName=QString(tr("Probe Box"));

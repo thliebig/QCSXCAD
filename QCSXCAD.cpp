@@ -6,6 +6,7 @@
 #include "QCSGridEditor.h"
 #include "QParameterGui.h"
 #include "vtkConfigure.h"
+#include "tinyxml.h"
 #ifdef __GYM2XML__
 #include "Gym2XML.h"
 #endif
@@ -220,6 +221,22 @@ bool QCSXCAD::CheckGeometry()
 	return false;
 }
 
+TiXmlNode* QCSXCAD::FindRootNode(TiXmlNode* node)
+{
+	TiXmlElement* child=node->FirstChildElement();
+	TiXmlNode* found=NULL;
+	while (child!=NULL)
+	{
+		if (child->FirstChildElement("ContinuousStructure"))
+			return child;
+		found = FindRootNode(child);
+		if (found)
+			return found;
+		child = node->NextSiblingElement();
+	}
+	return NULL;
+}
+
 bool QCSXCAD::ReadNode(TiXmlNode* root)
 {
 	if (root==NULL) return false;
@@ -237,7 +254,17 @@ bool QCSXCAD::ReadNode(TiXmlNode* root)
 bool QCSXCAD::ReadFile(QString filename)
 {
 	if (QFile::exists(filename)==false) return false;
-	QString msg(ReadFromXML(filename.toLatin1().constData()));
+
+	TiXmlDocument doc(filename.toStdString().c_str());
+	if (!doc.LoadFile()) { QMessageBox::warning(this,tr("File- Error!!! File: "),tr("File-Loading failed!!!"),QMessageBox::Ok,QMessageBox::NoButton); }
+
+	TiXmlNode* root = FindRootNode(&doc);
+	if (root==NULL)
+	{
+		QMessageBox::warning(this,tr("Geometry read error"),tr("An geometry read error occured!!"),QMessageBox::Ok,QMessageBox::NoButton);
+	}
+//	QString msg(ReadFromXML(filename.toLatin1().constData()));
+	QString msg(ReadFromXML(root));
 	if (msg.isEmpty()==false) QMessageBox::warning(this,tr("Geometry read error"),tr("An geometry read error occured!!\n\n")+msg,QMessageBox::Ok,QMessageBox::NoButton);
 	CSTree->UpdateTree();
 	CSTree->expandAll();
@@ -506,7 +533,7 @@ void QCSXCAD::NewElectrode()
 
 void QCSXCAD::NewChargeBox()
 {
-	NewProperty(new CSPropChargeBox(clParaSet));
+	NewProperty(new CSPropProbeBox(clParaSet));
 }
 
 void QCSXCAD::NewResBox()
