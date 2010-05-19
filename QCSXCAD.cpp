@@ -261,7 +261,8 @@ bool QCSXCAD::ReadFile(QString filename)
 	TiXmlNode* root = FindRootNode(&doc);
 	if (root==NULL)
 	{
-		QMessageBox::warning(this,tr("Geometry read error"),tr("An geometry read error occured!!"),QMessageBox::Ok,QMessageBox::NoButton);
+		QMessageBox::warning(this,tr("Geometry read error"),tr("Can't find root CSX node!!"),QMessageBox::Ok,QMessageBox::NoButton);
+		return false;
 	}
 //	QString msg(ReadFromXML(filename.toLatin1().constData()));
 	QString msg(ReadFromXML(root));
