@@ -1010,6 +1010,40 @@ void QGeometryPlot::paintEvent(QPaintEvent * /* event */)
 					}
 					break;
 				}
+				case CSPrimitives::POLYGON:
+				{
+					CSPrimPolygon* poly=prim->ToPolygon();
+					double elev = poly->GetElevation();
+					int normDir = 0;
+					if (poly->GetNormDir(0) != 0) normDir = 0;
+					else if (poly->GetNormDir(1) != 0) normDir = 1;
+					else if (poly->GetNormDir(2) != 0) normDir = 2;
+					int nrPts = poly->GetQtyCoords();
+					QPointF points[nrPts+1];
+					for (int n=0;n<nrPts;++n)
+					{
+						if (normDir == direct)
+						{
+							points[n].setX((poly->GetCoord(2*n)-offsetX)/factor);
+							points[n].setY(height()-(poly->GetCoord(2*n+1)-offsetY)/factor);
+						}
+						else if ( normDir == ((direct+2)%3) )
+						{
+							points[n].setX((poly->GetCoord(2*n+1)-offsetX)/factor);
+							points[n].setY(height()-(elev-offsetY)/factor);
+						}
+						else if ( normDir == ((direct+1)%3) )
+						{
+							points[n].setX((elev-offsetX)/factor);
+							points[n].setY(height()-(poly->GetCoord(2*n)-offsetY)/factor);
+						}
+						else
+							break;
+					}
+					points[nrPts] = points[0];
+					painter.drawPolyline(points,nrPts+1);
+					break;
+				}
 			};
 		}
 	}
