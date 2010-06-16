@@ -361,6 +361,34 @@ void QVTKStructure::RenderGeometry()
 						for (int a=0;a<3;++a) direction[a]=cylinder->GetCoord(2*a+1)-start[a];
 						vtkPrims->AddCylinder(start,direction,cylinder->GetRadius(),rgb,(double)col.a/255.0,iResolution);
 						break;
+					}
+				case CSPrimitives::POLYGON:
+				case CSPrimitives::LINPOLY:
+					{
+						CSPrimPolygon* poly = NULL;
+						if (prim->GetType()==CSPrimitives::POLYGON)
+							poly = prim->ToPolygon();
+						else
+							poly = prim->ToLinPoly();
+						int normDir = 0;
+						double elev = poly->GetElevation();
+						double dExtrusionVector[3] = {0,0,0};
+						if (poly->GetNormDir(0) != 0) normDir = 0;
+						else if (poly->GetNormDir(1) != 0) normDir = 1;
+						else if (poly->GetNormDir(2) != 0) normDir = 2;
+						if (prim->GetType()==CSPrimitives::LINPOLY)
+							dExtrusionVector[normDir] = prim->ToLinPoly()->GetLength();
+						int nP = (normDir+1)%3;
+						int nPP = (normDir+2)%3;
+						int nrPts = poly->GetQtyCoords();
+						double dCoords[3*nrPts];
+						for (int n=0;n<nrPts;++n)
+						{
+							dCoords[normDir*nrPts + n] = elev;
+							dCoords[nP*nrPts + n] = poly->GetCoord(2*n);
+							dCoords[nPP*nrPts + n] = poly->GetCoord(2*n+1);
+						}
+						vtkPrims->AddClosedPoly(dCoords,nrPts,dExtrusionVector,rgb,(double)col.a/255.0);
 						break;
 					}
 				}
