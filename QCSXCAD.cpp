@@ -248,6 +248,8 @@ bool QCSXCAD::ReadNode(TiXmlNode* root)
 	setModified();
 	CheckGeometry();
 	GridEditor->Update();
+	BestView();
+	StructureVTK->ResetView();
 	return true;
 }
 
@@ -272,6 +274,8 @@ bool QCSXCAD::ReadFile(QString filename)
 	setModified();
 	CheckGeometry();
 	GridEditor->Update();
+	BestView();
+	StructureVTK->ResetView();
 	return true;
 }
 
