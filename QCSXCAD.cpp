@@ -740,6 +740,14 @@ void QCSXCAD::ExportGeometry_Povray()
 	QMessageBox::warning(this,tr("Povray export"),tr("Not Yet Implemented"),QMessageBox::Ok,QMessageBox::NoButton);
 }
 
+void QCSXCAD::ExportView2Image()
+{
+	if (ViewLevel==1)
+		StructureVTK->ExportView2Image();
+	else
+		QMessageBox::warning(this,tr("PNG export"),tr("Not Yet Implemented for 2D view, use 3D instead."),QMessageBox::Ok,QMessageBox::NoButton);
+}
+
 void QCSXCAD::GUIUpdate()
 {
 	CSTree->UpdateTree();
@@ -859,8 +867,6 @@ void QCSXCAD::View3D()
 	StructureVTK->RenderGrid();
 	StructureVTK->RenderGeometry();
 }
-
-
 
 void QCSXCAD::keyPressEvent(QKeyEvent * event)
 {

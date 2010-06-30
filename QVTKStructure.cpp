@@ -46,6 +46,8 @@
 #include "vtkInteractorStyle.h"
 #include "vtkCommand.h"
 #include "vtkCallbackCommand.h"
+#include "vtkWindowToImageFilter.h"
+#include "vtkPNGWriter.h"
 
 QVTKStructure::QVTKStructure()
 {
@@ -415,6 +417,24 @@ void QVTKStructure::RenderGeometry()
 	VTKWidget->GetRenderWindow()->GetInteractor()->Render();
 }
 
+void QVTKStructure::ExportView2Image()
+{
+	QString filename = QFileDialog::getSaveFileName(VTKWidget, tr("Choose file to save image"), QString(), tr("Images (*.png)"));
+
+	if (filename.isEmpty())
+		return;
+	filename += ".png";
+
+	vtkWindowToImageFilter* filter = vtkWindowToImageFilter::New();
+	filter->SetInput(VTKWidget->GetRenderWindow());
+
+	vtkPNGWriter* png_writer= vtkPNGWriter::New();
+	png_writer->SetInput(filter->GetOutput());
+	//png_writer->SetQuality(100);
+	png_writer->SetFileName(filename.toStdString().c_str());
+	png_writer->Write();
+}
+
 void QVTKStructure::KeyPress(vtkObject *caller, unsigned long eid, void *clientdata, void *calldata)
 {
 	//vtkInteractorStyle * istyle = (vtkInteractorStyle *) caller;
@@ -438,7 +458,6 @@ void QVTKStructure::KeyPress(vtkObject *caller, unsigned long eid, void *clientd
 				iren->Render();
 				break;
 			}
-
 	}
 }
 

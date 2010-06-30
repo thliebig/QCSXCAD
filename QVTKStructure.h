@@ -61,6 +61,8 @@ public slots:
 	void RenderGrid();
 	void RenderGeometry();
 
+	void ExportView2Image();
+
 protected:
 	typedef struct
 	{

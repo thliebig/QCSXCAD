@@ -76,6 +76,8 @@ public slots:
 	void ExportGeometry();
 	void ExportGeometry_Povray();
 
+	void ExportView2Image();
+
 	virtual void clear();
 	void New();
 
