@@ -1,3 +1,20 @@
+/*
+*	Copyright (C) 2008,2009,2010 Thorsten Liebig (Thorsten.Liebig@gmx.de)
+*
+*	This program is free software: you can redistribute it and/or modify
+*	it under the terms of the GNU Lesser General Public License as published
+*	by the Free Software Foundation, either version 3 of the License, or
+*	(at your option) any later version.
+*
+*	This program is distributed in the hope that it will be useful,
+*	but WITHOUT ANY WARRANTY; without even the implied warranty of
+*	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*	GNU Lesser General Public License for more details.
+*
+*	You should have received a copy of the GNU Lesser General Public License
+*	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #include "QCSXCAD.h"
 #include "QVTKStructure.h"
 #include "QCSPrimEditor.h"
@@ -117,7 +134,7 @@ QString QCSXCAD::GetInfoString()
 	QString text = QString("%1").arg(_QCSXCAD_LIB_NAME_);
 	text += QString("<br>Author: %1<br>EMail: %2").arg(_QCSXCAD_AUTHOR_).arg(_QCSXCAD_AUTHOR_MAIL_);
 	text += QString("<br>Version: %1\t Build: %2 %3").arg(_QCSXCAD_VERSION_).arg(__DATE__).arg(__TIME__);
-//	text += QString("<br>License: %1").arg(_QCSXCAD_LICENSE_);
+	text += QString("<br>License: %1").arg(_QCSXCAD_LICENSE_);
 	return text;
 }
 
