@@ -53,6 +53,9 @@ public:
 	/// Add a linear polygon to scene
 	/*! \param *dCoords Set Points as X1,X2,...,Xn,Y1,Y2,...,Yn,Z1,Z2,...Zn for polygon. \param uiQtyCoords Set Quantity of Points X,Y,Z \param LineWidth Set line width \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness)*/
 	void AddLinePoly(double *dCoords, unsigned int uiQtyCoords,unsigned int LineWidth, double *dRGB, double dOpacity);//complete
+	/// Add a linear polygon as tubes to scene
+	/*! \param *dCoords Set Points as X1,X2,...,Xn,Y1,Y2,...,Yn,Z1,Z2,...Zn for polygon. \param uiQtyCoords Set Quantity of Points X,Y,Z \param TubeRadius Set tube radius \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness)*/
+	void AddTubePoly(double *dCoords, unsigned int uiQtyCoords, double TubeRadius, double *dRGB, double dOpacity, int iResolution=8);//complete
 	/// Add a cylinder to scene
 	/*!  \param *dCenter Set Base Point in 3D space \param *dExtrusionVector Set height (absolute value) and direction \param fRadius Set Radius \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness) \param iResolution Set resolution of discretisation*/
 	void AddCylinder(double *dCenter, double *dExtrusionVector, float fRadius, double *dRGB, double dOpacity, int iResolution); //complete

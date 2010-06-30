@@ -383,8 +383,8 @@ void QVTKStructure::RenderGeometry()
 						vtkPrims->AddCylinder(start,direction,cylinder->GetRadius(),rgb,(double)col.a/255.0,iResolution);
 						break;
 					}
-				case CSPrimitives::POLYGON:
-				case CSPrimitives::LINPOLY:
+					case CSPrimitives::POLYGON:
+					case CSPrimitives::LINPOLY:
 					{
 						CSPrimPolygon* poly = NULL;
 						if (prim->GetType()==CSPrimitives::POLYGON)
@@ -410,6 +410,34 @@ void QVTKStructure::RenderGeometry()
 							dCoords[nPP*nrPts + n] = poly->GetCoord(2*n+1);
 						}
 						vtkPrims->AddClosedPoly(dCoords,nrPts,dExtrusionVector,rgb,(double)col.a/255.0);
+						break;
+					}
+					case CSPrimitives::CURVE:
+					case CSPrimitives::WIRE:
+					{
+						CSPrimCurve* curve = NULL;
+						if (prim->GetType()==CSPrimitives::CURVE)
+							curve = prim->ToCurve();
+						else
+							curve = prim->ToWire();
+
+						unsigned int nrP = (unsigned int)curve->GetNumberOfPoints();
+						double dCoords[3*nrP];
+						double xyz[3];
+						for (unsigned int n=0;n<nrP;++n)
+						{
+							curve->GetPoint(n,xyz);
+							dCoords[0*nrP+n] = xyz[0];
+							dCoords[1*nrP+n] = xyz[1];
+							dCoords[2*nrP+n] = xyz[2];
+						}
+						if (prim->GetType()==CSPrimitives::CURVE)
+							vtkPrims->AddLinePoly(dCoords,nrP,1,rgb,(double)col.a/255.0);
+						else
+						{
+							CSPrimWire* wire = prim->ToWire();
+							vtkPrims->AddTubePoly(dCoords,nrP,wire->GetWireRadius(),rgb,(double)col.a/255.0);
+						}
 						break;
 					}
 				}

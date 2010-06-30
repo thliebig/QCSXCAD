@@ -43,6 +43,7 @@
 #include "vtkTransformPolyDataFilter.h"
 #include "vtkCollectionIterator.h"
 #include "vtkConeSource.h"
+#include "vtkTubeFilter.h"
 
 
 VTKPrimitives::VTKPrimitives(vtkRenderer *Renderer)
@@ -211,8 +212,48 @@ void VTKPrimitives::AddLinePoly(double *dCoords, unsigned int uiQtyCoords, unsig
 	profile->Delete();
 	Mapper->Delete();
 	//Actor->Delete();
-
 }
+
+void VTKPrimitives::AddTubePoly(double *dCoords, unsigned int uiQtyCoords, double TubeRadius, double *dRGB, double dOpacity, int iResolution)
+{ //complete
+	unsigned int i=0;
+	vtkPoints *points = vtkPoints::New();
+	vtkCellArray *poly = vtkCellArray::New();
+	vtkPolyData *profile = vtkPolyData::New();
+	vtkPolyDataMapper *Mapper = vtkPolyDataMapper::New();
+	vtkActor *Actor = vtkActor::New();
+	for (i=0; i<uiQtyCoords;i++) points->InsertPoint(i,dCoords[i],dCoords[uiQtyCoords+i],dCoords[2*uiQtyCoords+i]);
+	for (i=1; i<uiQtyCoords;i++)
+	{
+		poly->InsertNextCell(2);
+		poly->InsertCellPoint(i-1);
+		poly->InsertCellPoint(i);
+	}
+
+	profile->SetPoints(points);
+	profile->SetLines(poly);
+
+	vtkTubeFilter* m_profileTubes = vtkTubeFilter::New();
+	m_profileTubes->SetNumberOfSides(iResolution);
+	m_profileTubes->SetInput(profile);
+	m_profileTubes->SetRadius(TubeRadius);
+
+	Mapper->SetInputConnection( m_profileTubes->GetOutputPort());
+
+	Actor->SetMapper(Mapper);
+	Actor->GetProperty()->SetColor(dRGB);
+	Actor->GetProperty()->SetOpacity(dOpacity);
+
+	ActorColl->AddItem(Actor);
+	ren->AddActor(Actor);
+
+	points->Delete();
+	poly->Delete();
+	profile->Delete();
+	Mapper->Delete();
+	//Actor->Delete();
+}
+
 void VTKPrimitives::AddCylinder(double *dCenter, double *dExtrusionVector, float fRadius, double *dRGB, double dOpacity, int iResolution)
 {//complete
 	double alpha=0,beta=0;
