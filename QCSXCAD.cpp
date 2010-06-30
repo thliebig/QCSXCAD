@@ -12,6 +12,13 @@
 #endif
 #include <iostream>
 
+#include <QVTKWidget.h>
+#include <vtkRendererCollection.h>
+#include <vtkRenderWindow.h>
+#include <vtkRenderer.h>
+#include <vtkCamera.h>
+#include <vtkPOVExporter.h>
+
 QCSXCAD::QCSXCAD(QWidget *parent) : QMainWindow(parent)
 {
 //	QFilename.clear();
@@ -623,8 +630,12 @@ void QCSXCAD::NewProperty(CSProperties* newProp)
 void QCSXCAD::New()
 {
 	if (bModified)
-	if (QMessageBox::question(this,tr("New Geometry"),tr("Create empty Geometry??"),QMessageBox::Yes,QMessageBox::No)==QMessageBox::No) return;
-	else clear();
+	{
+		if (QMessageBox::question(this,tr("New Geometry"),tr("Create empty Geometry??"),QMessageBox::Yes,QMessageBox::No)==QMessageBox::No)
+			return;
+		else
+			clear();
+	}
 }
 
 //void QCSXCAD::Load()
@@ -661,6 +672,55 @@ void QCSXCAD::ExportGeometry()
 	if (!qFilename.endsWith(".xml")) qFilename+=".xml";
 
 	if (Write2XML(qFilename.toLatin1().data())==false) QMessageBox::warning(this,tr("Geometry Export"),tr("Unknown error occured! Geometry Export failed"),1,0);
+}
+
+static string pov_vect( double *v )
+{
+	stringstream stream;
+	stream << "<" << v[0] << "," << v[1] << "," << v[2] << ">";
+	return stream.str();
+}
+
+void QCSXCAD::ExportGeometry_Povray()
+{
+//	// Instead of letting renderer to render the scene, we use
+//	// an exportor to save it to a file.
+//	vtkPOVExporter *povexp = vtkPOVExporter::New();
+//	povexp->SetRenderWindow( ((QVTKWidget*)(StructureVTK->GetVTKWidget()))->GetRenderWindow() );
+//	povexp->SetFileName("/tmp/TestPOVExporter.pov");
+//	cout << "Writing file TestPOVExporter.pov..." << endl;
+//
+//	povexp->Write();
+//	cout << "Done writing file TestPOVExporter.pov..." << endl;
+//
+//	povexp->Delete();
+
+
+
+	vtkRendererCollection* collection = ((QVTKWidget*)(StructureVTK->GetVTKWidget()))->GetRenderWindow()->GetRenderers();
+	vtkRenderer *r = collection->GetFirstRenderer();
+	if (!r)
+		return;
+	vtkCamera *c = r->GetActiveCamera();
+	if (!c)
+		return;
+
+	double *pos = c->GetPosition();
+	cout << "Camera position: " << pos[0] << ", " << pos[1] << ", " << pos[2] << endl;
+	double *focalpos = c->GetFocalPoint();
+	cout << "Camera focal point: " << focalpos[0] << ", " << focalpos[1] << ", " << focalpos[2] << endl;
+	double distance = c->GetDistance();
+	cout << "Camera distance (position to focal point): " << distance << endl;
+	double roll = c->GetRoll();
+	cout << "Camera roll angle (about direction of projection): " << roll << "°" << endl;
+	double angle = c->GetViewAngle();
+	cout << "Camera view angle: " << angle << "°" << endl;
+	double *up = c->GetViewUp();
+	cout << "Camera up vector: " << up[0] << ", " << up[1] << ", " << up[2] << endl;
+
+	cout << endl << endl << "camera { perspective location " << pov_vect(pos) << " look_at " << pov_vect(focalpos) << " sky " << pov_vect(up) << " right -1.33*x angle " << angle << "}" << endl;
+
+	QMessageBox::warning(this,tr("Povray export"),tr("Not Yet Implemented"),QMessageBox::Ok,QMessageBox::NoButton);
 }
 
 void QCSXCAD::GUIUpdate()

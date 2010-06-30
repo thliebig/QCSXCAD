@@ -57,6 +57,7 @@ public slots:
 
 	void ImportGeometry();
 	void ExportGeometry();
+	void ExportGeometry_Povray();
 
 	virtual void clear();
 	void New();

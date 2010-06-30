@@ -67,7 +67,7 @@ unix {
 	INCLUDEPATH += ../CSXCAD\
 		../tinyxml
     LIBS += -L../CSXCAD -lCSXCAD
-    INCLUDEPATH += /usr/include/vtk-5.2
+	INCLUDEPATH += /usr/include/vtk-5.2 /usr/include/vtk-5.6
     LIBS += -lvtkCommon \
         -lvtkDICOMParser \
         -lvtkFiltering \
