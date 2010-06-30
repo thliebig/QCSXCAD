@@ -4,7 +4,7 @@
 #define _QCSXCAD_LIB_NAME_ "QCSXCAD-Lib: Qt-Gui for Continuous Structure XML - CAD"
 #define _QCSXCAD_AUTHOR_ "Thorsten Liebig (2008-2010)"
 #define _QCSXCAD_AUTHOR_MAIL_ "Thorsten.Liebig@gmx.de"
-#define _QCSXCAD_VERSION_ "0.2.0 alpha"
+#define _QCSXCAD_VERSION_ GIT_VERSION
 #define _QCSXCAD_LICENSE_ ""
 
 #if defined(WIN32)

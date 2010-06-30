@@ -1,6 +1,10 @@
 TEMPLATE = lib
 CONFIG += release
 TARGET = QCSXCAD
+
+# add git revision
+QMAKE_CXXFLAGS += -DGIT_VERSION=\\\"`git describe --tags`\\\"
+
 MOC_DIR = moc
 OBJECTS_DIR = obj
 QT += core \
