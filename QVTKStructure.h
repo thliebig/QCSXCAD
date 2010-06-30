@@ -46,6 +46,7 @@ public:
 
 	void SetBackgroundColor(int r, int g, int b);
 
+	//! Set the update mode to false if this widget should not be rendered e.g. because it is hidden
 	void SetUpdateMode(bool mode) {AllowUpdate=mode;};
 
 	//Callback
@@ -61,6 +62,7 @@ public slots:
 	void RenderGrid();
 	void RenderGeometry();
 
+	//! Export the current view to an image file (currently only png)
 	void ExportView2Image();
 
 protected:
@@ -72,6 +74,7 @@ protected:
 
 	QVTKWidget *VTKWidget;
 
+	//set to false if this widget is hidden
 	bool AllowUpdate;
 
 	vtkRenderer *ren;
@@ -82,6 +85,7 @@ protected:
 	QVector<VTKLayerStruct> LayerPrimitives;
 
 	vtkActor* ActorGridPlane[3];
+	int GridOpacity; //remember the grid opacity
 
 	int iResolution;
 

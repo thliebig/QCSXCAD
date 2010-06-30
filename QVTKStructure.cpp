@@ -220,11 +220,13 @@ void QVTKStructure::RenderGrid()
 		plane->Delete();
 		Coords[i]->Delete();
 	}
+	SetGridOpacity(GridOpacity);
 	grid->Delete();
 }
 
 void QVTKStructure::SetGridOpacity(int val)
 {
+	GridOpacity = val;
 	if (AllowUpdate==false) return;
 	for (int i=0;i<3;++i)
 	{
