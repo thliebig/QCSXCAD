@@ -1131,6 +1131,35 @@ void QGeometryPlot::paintEvent(QPaintEvent * /* event */)
 					painter.drawPolyline(points,nrPts+1);
 					break;
 				}
+				case CSPrimitives::CURVE:
+				case CSPrimitives::WIRE:
+				{
+					CSPrimCurve* curve = NULL;
+					if (prim->GetType()==CSPrimitives::CURVE)
+						curve = prim->ToCurve();
+					else
+						curve = prim->ToWire();
+
+					unsigned int nrPts = (unsigned int)curve->GetNumberOfPoints();
+					QPointF points[nrPts];
+					double xyz[3];
+					int nP = (direct+1)%3;
+					int nPP = (direct+2)%3;
+					for (int n=0;n<nrPts;++n)
+					{
+						curve->GetPoint(n,xyz);
+						points[n].setX((xyz[nP]-offsetX)/factor);
+						points[n].setY(height()-(xyz[nPP]-offsetY)/factor);
+					}
+					if (prim->GetType()==CSPrimitives::CURVE)
+						painter.drawPolyline(points,nrPts);
+					else
+					{
+//						cerr << "QCSXCAD: Warning: 2D painting of wire currently with thin pen only..." << endl;
+						painter.drawPolyline(points,nrPts);
+					}
+					break;
+				}
 			};
 		}
 	}
