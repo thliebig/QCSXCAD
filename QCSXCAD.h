@@ -38,6 +38,7 @@ class TiXmlNode;
 class QCSXCAD_EXPORT QCSXCAD : public QMainWindow, public ContinuousStructure
 {
 	Q_OBJECT
+	friend class export_X3D;
 public:
 	QCSXCAD(QWidget *parent=NULL);
 	virtual ~QCSXCAD();
@@ -75,6 +76,7 @@ public slots:
 	void ImportGeometry();
 	void ExportGeometry();
 	void ExportGeometry_Povray();
+	void ExportGeometry_X3D();
 
 	void ExportView2Image();
 

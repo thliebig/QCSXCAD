@@ -36,6 +36,8 @@
 #include <vtkCamera.h>
 #include <vtkPOVExporter.h>
 
+#include "export_x3d.h"
+
 QCSXCAD::QCSXCAD(QWidget *parent) : QMainWindow(parent)
 {
 //	QFilename.clear();
@@ -738,6 +740,16 @@ void QCSXCAD::ExportGeometry_Povray()
 	cout << endl << endl << "camera { perspective location " << pov_vect(pos) << " look_at " << pov_vect(focalpos) << " sky " << pov_vect(up) << " right -1.33*x angle " << angle << "}" << endl;
 
 	QMessageBox::warning(this,tr("Povray export"),tr("Not Yet Implemented"),QMessageBox::Ok,QMessageBox::NoButton);
+}
+
+void QCSXCAD::ExportGeometry_X3D()
+{
+	QString filename = QFileDialog::getSaveFileName( this, tr("Save X3D-file"), QString(), tr("X3D files (*.x3d)") );
+	if (filename.isEmpty())
+		return;
+
+	export_X3D x3d( this );
+	x3d.save( filename );
 }
 
 void QCSXCAD::ExportView2Image()

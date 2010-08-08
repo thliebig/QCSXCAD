@@ -1,14 +1,15 @@
 TEMPLATE = lib
-CONFIG += release
 TARGET = QCSXCAD
 
 # add git revision
-QMAKE_CXXFLAGS += -DGIT_VERSION=\\\"`git describe --tags`\\\"
-
+QMAKE_CXXFLAGS += -DGIT_VERSION=\\\"`git \
+    describe \
+    --tags`\\\"
 MOC_DIR = moc
 OBJECTS_DIR = obj
 QT += core \
-    gui
+    gui \
+    xml
 HEADERS += QCSXCAD.h \
     QCSGridEditor.h \
     QCSPrimEditor.h \
@@ -17,7 +18,8 @@ HEADERS += QCSXCAD.h \
     QParameterGui.h \
     QVTKStructure.h \
     VTKPrimitives.h \
-    QCSXCAD_Global.h
+    QCSXCAD_Global.h \
+    export_x3d.h
 SOURCES += QCSXCAD.cpp \
     QCSGridEditor.cpp \
     QCSPrimEditor.cpp \
@@ -25,29 +27,32 @@ SOURCES += QCSXCAD.cpp \
     QCSTreeWidget.cpp \
     QParameterGui.cpp \
     QVTKStructure.cpp \
-    VTKPrimitives.cpp
-win32 {
-DEFINES += BUILD_QCSXCAD_LIB
-#DEFINES += __GYM2XML__
-include(localPathes.pri)
-INCLUDEPATH += . \
-    $$VTK_BIN_DIR\.. \
-    $$VTK_DIR\
-    $$VTK_DIR\Common \
-    $$VTK_DIR\Common\Testing\Cxx \
-    $$VTK_DIR\Filtering \
-    $$VTK_DIR\GUISupport\Qt \
-    $$VTK_DIR\GenericFiltering \
-    $$VTK_DIR\Graphics \
-    $$VTK_DIR\Hybrid \
-    $$VTK_DIR\IO \
-    $$VTK_DIR\Imaging \
-    $$VTK_DIR\Rendering \
-    $$VTK_DIR\Utilities \
-    $$VTK_DIR\Widgets \
-    ..\CSXCAD 
-#    ..\Gym2XML
-LIBS += $$VTK_BIN_DIR\libQVTK.dll \
+    VTKPrimitives.cpp \
+    export_x3d.cpp
+win32 { 
+    DEFINES += BUILD_QCSXCAD_LIB
+    
+    # DEFINES += __GYM2XML__
+    include(localPathes.pri)
+    INCLUDEPATH += . \
+        $$VTK_BIN_DIR\.. \
+        $$VTK_DIR \
+        $$VTK_DIR\Common \
+        $$VTK_DIR\Common\Testing\Cxx \
+        $$VTK_DIR\Filtering \
+        $$VTK_DIR\GUISupport\Qt \
+        $$VTK_DIR\GenericFiltering \
+        $$VTK_DIR\Graphics \
+        $$VTK_DIR\Hybrid \
+        $$VTK_DIR\IO \
+        $$VTK_DIR\Imaging \
+        $$VTK_DIR\Rendering \
+        $$VTK_DIR\Utilities \
+        $$VTK_DIR\Widgets \
+        ..\CSXCAD
+    
+    # ..\Gym2XML
+    LIBS += $$VTK_BIN_DIR\libQVTK.dll \
         $$VTK_BIN_DIR\libvtkHybrid.dll \
         $$VTK_BIN_DIR\libvtkIO.dll \
         $$VTK_BIN_DIR\libvtkImaging.dll \
@@ -63,15 +68,18 @@ LIBS += $$VTK_BIN_DIR\libQVTK.dll \
         $$VTK_BIN_DIR\libvtksys.dll \
         $$VTK_BIN_DIR\libvtkzlib.dll \
         $$VTK_BIN_DIR\libvtkfreetype.dll \
-    ..\CSXCAD\release\CSXCAD.dll 
-#    ..\Gym2XML\release\Gym2XML.dll
+        ..\CSXCAD\release\CSXCAD.dll
 }
+
+# ..\Gym2XML\release\Gym2XML.dll
 unix { 
     VERSION = 0.2.0
-	INCLUDEPATH += ../CSXCAD\
-		../tinyxml
-    LIBS += -L../CSXCAD -lCSXCAD
-	INCLUDEPATH += /usr/include/vtk-5.2 /usr/include/vtk-5.6
+    INCLUDEPATH += ../CSXCAD \
+        ../tinyxml
+    LIBS += -L../CSXCAD \
+        -lCSXCAD
+    INCLUDEPATH += /usr/include/vtk-5.2 \
+        /usr/include/vtk-5.6
     LIBS += -lvtkCommon \
         -lvtkDICOMParser \
         -lvtkFiltering \
@@ -93,3 +101,5 @@ unix {
 FORMS += 
 RESOURCES += resources.qrc
 DEFINES += BUILD_QCSXCAD_LIB
+QMAKE_CXXFLAGS_DEBUG = -O0 \
+    -g
