@@ -81,6 +81,9 @@ public slots:
 	virtual void clear();
 	void New();
 
+	void HideAll();
+	void ShowAll();
+
 	void BestView();
 	void setXY();
 	void setYZ();
@@ -126,6 +129,8 @@ protected:
 	void NewProperty(CSProperties* newProp);
 
 	TiXmlNode* FindRootNode(TiXmlNode* node);
+
+	void SetVisibility2All(bool value);
 
 	QCSTreeWidget *CSTree;
 	QCSGridEditor* GridEditor;

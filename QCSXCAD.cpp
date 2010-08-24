@@ -442,6 +442,33 @@ void QCSXCAD::Copy()
 //	}
 }
 
+void QCSXCAD::SetVisibility2All(bool value)
+{
+	for (size_t n=0; n<vProperties.size();++n)
+	{
+		CSProperties* prop = vProperties.at(n);
+		prop->SetVisibility(value);
+		CSTree->RefreshItem(GetIndex(prop));
+		if (ViewLevel==0) DrawWidget->update();
+		if (ViewLevel==1)
+		{
+			if (value) StructureVTK->SetPropOpacity(prop->GetUniqueID(),prop->GetFillColor().a);
+			else StructureVTK->SetPropOpacity(prop->GetUniqueID(),0);
+		}
+	}
+}
+
+void QCSXCAD::HideAll()
+{
+	SetVisibility2All(false);
+}
+
+void QCSXCAD::ShowAll()
+{
+	SetVisibility2All(true);
+}
+
+
 void QCSXCAD::ShowHide()
 {
 	CSProperties* prop = CSTree->GetCurrentProperty();
@@ -775,6 +802,9 @@ void QCSXCAD::BuildToolBar()
 
 	ItemTB->addAction(tr("CollapseAll"),CSTree,SLOT(collapseAll()));
 	ItemTB->addAction(tr("ExpandAll"),CSTree,SLOT(expandAll()));
+
+	ItemTB->addAction(QIcon(":/images/bulb.png"),tr("ShowAll"),this,SLOT(ShowAll()));
+	ItemTB->addAction(QIcon(":/images/bulb_off.png"),tr("HideAll"),this,SLOT(HideAll()));
 
 	QToolBar *newObjct = addToolBar(tr("add new Primitive"));
 
