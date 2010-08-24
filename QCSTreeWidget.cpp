@@ -198,6 +198,7 @@ void QCSTreeWidget::expandAll()
 
 void QCSTreeWidget::Edit(QTreeWidgetItem * item, int column)
 {
+	UNUSED(column);
 	if (item==NULL) return;
 	if (item->type()!=PRIMTYPE) return;
 	emit Edit();

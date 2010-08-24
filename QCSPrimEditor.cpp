@@ -430,6 +430,7 @@ void QCSPrimMultiBoxLayout::GetValues()
 
 void QCSPrimMultiBoxLayout::NewBox(QListWidgetItem* item)
 {
+	UNUSED(item);
 //	unsigned int nr=qBoxList->count()
 //	clMultiBox->ClearOverlap();
 //	qBoxList->addItem(tr("Box #%1").arg(nr));
@@ -439,10 +440,12 @@ void QCSPrimMultiBoxLayout::NewBox(QListWidgetItem* item)
 
 void QCSPrimMultiBoxLayout::DeleteBox(QListWidgetItem* item)
 {
+	UNUSED(item);
 }
 
 void QCSPrimMultiBoxLayout::EditBox(QListWidgetItem* item)
 {
+	UNUSED(item);
 }
 
 //***********************************************************************************//
