@@ -39,6 +39,7 @@ class QCSXCAD_EXPORT QCSXCAD : public QMainWindow, public ContinuousStructure
 {
 	Q_OBJECT
 	friend class export_X3D;
+	friend class export_pov;
 public:
 	QCSXCAD(QWidget *parent=NULL);
 	virtual ~QCSXCAD();

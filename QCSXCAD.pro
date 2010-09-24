@@ -19,7 +19,8 @@ HEADERS += QCSXCAD.h \
     QVTKStructure.h \
     VTKPrimitives.h \
     QCSXCAD_Global.h \
-    export_x3d.h
+    export_x3d.h \
+    export_pov.h
 SOURCES += QCSXCAD.cpp \
     QCSGridEditor.cpp \
     QCSPrimEditor.cpp \
@@ -28,7 +29,8 @@ SOURCES += QCSXCAD.cpp \
     QParameterGui.cpp \
     QVTKStructure.cpp \
     VTKPrimitives.cpp \
-    export_x3d.cpp
+    export_x3d.cpp \
+    export_pov.cpp
 win32 { 
     DEFINES += BUILD_QCSXCAD_LIB
     
@@ -103,3 +105,44 @@ RESOURCES += resources.qrc
 DEFINES += BUILD_QCSXCAD_LIB
 QMAKE_CXXFLAGS_DEBUG = -O0 \
     -g
+
+# to use ABI2 target:
+# qmake CONFIG+="ABI2 bits64" -o Makefile.ABI2-64 QCSXCAD.pro
+# make -fMakefile.ABI2-64
+ABI2 { 
+    CONFIG -= debug \
+        debug_and_release
+    CONFIG += release
+    QMAKE_CFLAGS_RELEASE = -O2 \
+        -fabi-version=2
+    QMAKE_CXXFLAGS_RELEASE = -O2 \
+        -fabi-version=2
+    QMAKE_CC = apgcc
+    QMAKE_CXX = apg++
+    QMAKE_LINK = apg++
+    QMAKE_LINK_SHLIB = apg++
+    QMAKE_LFLAGS_RPATH = 
+    QMAKE_LFLAGS = \'-Wl,-rpath,\$$ORIGIN/lib\'
+}
+bits64 { 
+    QMAKE_CXXFLAGS_RELEASE += -m64 \
+        -march=athlon64
+    QMAKE_LFLAGS_RELEASE += -m64 \
+        -march=athlon64
+    OBJECTS_DIR = ABI2-64
+    LIBS = ../CSXCAD/ABI2-64/libCSXCAD.so
+}
+bits32 { 
+    QMAKE_CXXFLAGS_RELEASE += -m32 \
+        -march=pentium3
+    QMAKE_LFLAGS_RELEASE += -m32 \
+        -march=pentium3
+    OBJECTS_DIR = ABI2-32
+    LIBS = ../CSXCAD/ABI2-32/libCSXCAD.so
+}
+ABI2 { 
+    DESTDIR = $$OBJECTS_DIR
+    MOC_DIR = $$OBJECTS_DIR
+    UI_DIR = $$OBJECTS_DIR
+    RCC_DIR = $$OBJECTS_DIR
+}
