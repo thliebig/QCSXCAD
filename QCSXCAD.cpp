@@ -251,7 +251,11 @@ bool QCSXCAD::CheckGeometry()
 
 TiXmlNode* QCSXCAD::FindRootNode(TiXmlNode* node)
 {
-	TiXmlElement* child=node->FirstChildElement();
+	if (node==NULL) return NULL;
+	TiXmlElement* child = node->FirstChildElement("ContinuousStructure");
+	if (child)
+		return node;
+	child=node->FirstChildElement();
 	TiXmlNode* found=NULL;
 	while (child!=NULL)
 	{
