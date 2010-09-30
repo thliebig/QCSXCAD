@@ -46,11 +46,16 @@ void export_pov::save( QString filename )
 	stream.setCodec( "UTF-8" );
 
 	stream << "// povray-file exported by QCSXCAD" << endl;
+	stream << "// render with:" << endl;
+	stream << "// povray -W640 -H480 +A " << QFileInfo(filename).fileName() << endl;
+	stream << endl;
+	stream << "#declare TRANSPARENT = off; // if on, also use the \"+ua\" command line flag" << endl;
+	stream << endl;
 	stream << "#include \"colors.inc\"" << endl;
 	stream << "#include \"metals.inc\"" << endl;
 	stream << "#include \"textures.inc\"" << endl;
 	stream << "#include \"transforms.inc\"" << endl;
-	stream << "background { color rgb<1.000000,1.000000,1.000000> }" << endl;
+	stream << "background { color rgb<1.000000,1.000000,1.000000> #if(TRANSPARENT) transmit 1.0 #end }" << endl;
 
 	// export material
 	vector<CSProperties*> properties = m_CSX->GetPropertyByType( CSProperties::MATERIAL );
