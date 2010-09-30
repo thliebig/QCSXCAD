@@ -68,6 +68,8 @@ public:
 	static QString GetInfoString();
 	static QIcon GetLibIcon();
 
+	const QHash<QString,QString> &GetFDTD_BC() const { return m_FDTD_BC; }
+
 signals:
 	void modified(bool val);
 
@@ -153,6 +155,8 @@ protected:
 	int m_SimMode;
 
 	virtual void keyPressEvent(QKeyEvent * event);
+
+	QHash<QString,QString> m_FDTD_BC; //!< boundary conditions from FDTD element in xml file
 };
 
 class QGeometryPlot : public QWidget

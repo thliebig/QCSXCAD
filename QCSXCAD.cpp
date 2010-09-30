@@ -301,6 +301,23 @@ bool QCSXCAD::ReadFile(QString filename)
 //	QString msg(ReadFromXML(filename.toLatin1().constData()));
 	QString msg(ReadFromXML(root));
 	if (msg.isEmpty()==false) QMessageBox::warning(this,tr("Geometry read error"),tr("An geometry read error occured!!\n\n")+msg,QMessageBox::Ok,QMessageBox::NoButton);
+
+	// read FDTD options
+	m_FDTD_BC.clear();
+	TiXmlElement* element = doc.FirstChildElement("openEMS");
+	if (element)
+		element = element->FirstChildElement("FDTD");
+	if (element)
+	{
+		TiXmlElement* BC = element->FirstChildElement("BoundaryCond");
+		TiXmlAttribute *attr = BC->FirstAttribute();
+		while (attr)
+		{
+			m_FDTD_BC[attr->Name()] = attr->Value();
+			attr = attr->Next();
+		}
+	}
+
 	CSTree->UpdateTree();
 	CSTree->expandAll();
 	setModified();
@@ -744,7 +761,7 @@ void QCSXCAD::ExportGeometry_Povray()
 	QStringList args;
 	args << filename;
 	args << "-W640";
-	args << "-H640";
+	args << "-H480";
 	args << "+A";
 	//only valid for povray >3.7.0     args << "+WT4";
 	QProcess::startDetached( "povray", args, QFileInfo(filename).absolutePath() );
@@ -1245,6 +1262,61 @@ void QGeometryPlot::paintEvent(QPaintEvent * /* event */)
 //		points[4]=QPointF(60.0, height()-20.0);
 //		painter.drawPolyline(points, 5);
 //	}
+
+	// *****
+	// * indicate the boundary conditions
+
+	// calculate offset in
+	QRect v = painter.viewport();
+	QRect w = painter.window();
+	int offset1 = 10 * (double)w.width() / (double)v.width();
+	int offset2 = 10 * (double)w.height() / (double)v.height();
+
+	CSRectGrid* grid = clCS->GetGrid();
+	int iY1 = height()-(int)((grid->GetLine(y,0)-offsetY)/factor);
+	int iY2 = height()-(int)((grid->GetLine(y,grid->GetQtyLines(y)-1)-offsetY)/factor);
+	int iX1 = (int)((grid->GetLine(x,0)-offsetX)/factor);
+	int iX2 = (int)((grid->GetLine(x,grid->GetQtyLines(x)-1)-offsetX)/factor);
+	int iY = (iY1 + iY2) / 2.0;
+	int iX = (iX1 + iX2) / 2.0;
+
+	QString xmin, xmax, ymin, ymax;
+	QHash<QString,QString> BC = clCS->GetFDTD_BC();
+	if (direct == 0) {
+		// y-z plane
+		xmin = BC.value("ymin");
+		xmax = BC.value("ymax");
+		ymin = BC.value("zmin");
+		ymax = BC.value("zmax");
+	}
+	else if (direct == 1) {
+		// x-z plane
+		xmin = BC.value("zmin");
+		xmax = BC.value("zmax");
+		ymin = BC.value("xmin");
+		ymax = BC.value("xmax");
+	}
+	else if (direct == 2) {
+		// x-y plane
+		xmin = BC.value("xmin");
+		xmax = BC.value("xmax");
+		ymin = BC.value("ymin");
+		ymax = BC.value("ymax");
+	}
+
+	painter.setPen(Qt::black);
+	painter.save();
+	painter.translate( iX1-offset1, iY );
+	painter.rotate(-90);
+	painter.drawText( 0, 0, 0, 0, Qt::AlignCenter|Qt::TextDontClip, xmin );
+	painter.restore();
+	painter.save();
+	painter.translate( iX2+offset1, iY );
+	painter.rotate(-90);
+	painter.drawText( 0, 0, 0, 0, Qt::AlignCenter|Qt::TextDontClip, xmax );
+	painter.restore();
+	painter.drawText( iX, iY1+offset2, 0, 0, Qt::AlignCenter|Qt::TextDontClip, ymin );
+	painter.drawText( iX, iY2-offset2, 0, 0, Qt::AlignCenter|Qt::TextDontClip, ymax );
 }
 
 void QGeometryPlot::wheelEvent(QWheelEvent * event)
