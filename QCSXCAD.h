@@ -68,7 +68,7 @@ public:
 	static QString GetInfoString();
 	static QIcon GetLibIcon();
 
-	const QHash<QString,QString> &GetFDTD_BC() const { return m_FDTD_BC; }
+	const QHash<QString,QString> &Get_BC() const { return m_BC; }
 
 signals:
 	void modified(bool val);
@@ -129,6 +129,9 @@ protected slots:
 	void View3D();
 
 protected:
+	//read supported files, return the root to a CSX
+	TiXmlNode* ReadOpenEMS(TiXmlNode* openEMS);
+
 
 	void NewPrimitive(CSPrimitives* newPrim);
 	void NewProperty(CSProperties* newProp);
@@ -156,7 +159,7 @@ protected:
 
 	virtual void keyPressEvent(QKeyEvent * event);
 
-	QHash<QString,QString> m_FDTD_BC; //!< boundary conditions from FDTD element in xml file
+	QHash<QString,QString> m_BC; //!< boundary conditions
 };
 
 class QGeometryPlot : public QWidget

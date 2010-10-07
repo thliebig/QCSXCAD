@@ -292,7 +292,17 @@ bool QCSXCAD::ReadFile(QString filename)
 	TiXmlDocument doc(filename.toStdString().c_str());
 	if (!doc.LoadFile()) { QMessageBox::warning(this,tr("File- Error!!! File: "),tr("File-Loading failed!!!"),QMessageBox::Ok,QMessageBox::NoButton); }
 
-	TiXmlNode* root = FindRootNode(&doc);
+	TiXmlNode* root = 0;
+	TiXmlElement* openEMS = doc.FirstChildElement("openEMS");
+	if (openEMS)
+	{
+		root = ReadOpenEMS(openEMS);
+	}
+	else
+	{
+		//try to find a root node somewhere else...
+		root = FindRootNode(&doc);
+	}
 	if (root==NULL)
 	{
 		QMessageBox::warning(this,tr("Geometry read error"),tr("Can't find root CSX node!!"),QMessageBox::Ok,QMessageBox::NoButton);
@@ -300,23 +310,8 @@ bool QCSXCAD::ReadFile(QString filename)
 	}
 //	QString msg(ReadFromXML(filename.toLatin1().constData()));
 	QString msg(ReadFromXML(root));
-	if (msg.isEmpty()==false) QMessageBox::warning(this,tr("Geometry read error"),tr("An geometry read error occured!!\n\n")+msg,QMessageBox::Ok,QMessageBox::NoButton);
-
-	// read FDTD options
-	m_FDTD_BC.clear();
-	TiXmlElement* element = doc.FirstChildElement("openEMS");
-	if (element)
-		element = element->FirstChildElement("FDTD");
-	if (element)
-	{
-		TiXmlElement* BC = element->FirstChildElement("BoundaryCond");
-		TiXmlAttribute *attr = BC->FirstAttribute();
-		while (attr)
-		{
-			m_FDTD_BC[attr->Name()] = attr->Value();
-			attr = attr->Next();
-		}
-	}
+	if (msg.isEmpty()==false)
+		QMessageBox::warning(this,tr("Geometry read error"),tr("An geometry read error occured!!\n\n")+msg,QMessageBox::Ok,QMessageBox::NoButton);
 
 	CSTree->UpdateTree();
 	CSTree->expandAll();
@@ -326,6 +321,24 @@ bool QCSXCAD::ReadFile(QString filename)
 	BestView();
 	StructureVTK->ResetView();
 	return true;
+}
+
+TiXmlNode* QCSXCAD::ReadOpenEMS(TiXmlNode* openEMS)
+{
+	// read FDTD options
+	m_BC.clear();
+	TiXmlElement* element = openEMS->FirstChildElement("FDTD");
+	if (element)
+	{
+		TiXmlElement* BC = element->FirstChildElement("BoundaryCond");
+		TiXmlAttribute *attr = BC->FirstAttribute();
+		while (attr)
+		{
+			m_BC[attr->Name()] = attr->Value();
+			attr = attr->Next();
+		}
+	}
+	return openEMS;
 }
 
 int QCSXCAD::GetCurrentPrimitive()
@@ -1281,7 +1294,7 @@ void QGeometryPlot::paintEvent(QPaintEvent * /* event */)
 	int iX = (iX1 + iX2) / 2.0;
 
 	QString xmin, xmax, ymin, ymax;
-	QHash<QString,QString> BC = clCS->GetFDTD_BC();
+	QHash<QString,QString> BC = clCS->Get_BC();
 	if (direct == 0) {
 		// y-z plane
 		xmin = BC.value("ymin");
