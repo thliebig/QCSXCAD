@@ -22,6 +22,7 @@
 #include "vtkAxesActor.h"
 #include "vtkActor.h"
 #include "ContinuousStructure.h"
+#include "ParameterCoord.h"
 #include "VTKPrimitives.h"
 #include "QVTKStructure.h"
 #include "vtkCubeSource.h"
@@ -322,29 +323,18 @@ void QVTKStructure::RenderGeometry()
 			{
 				CSPrimitives* prim = prop->GetPrimitive(n);
 				if (prim==NULL) return;
+				CoordinateSystem primCS = prim->GetCoordinateSystem();
+				if (primCS==UNDEFINED_CS)
+					primCS=clCS->GetCoordInputType();
 				switch (prim->GetType())
 				{
 					case CSPrimitives::BOX:
 					{
 						CSPrimBox* box = prim->ToBox();
-						double coords[6];
-						double val0,val1;
-						for (unsigned int a=0;a<3;++a)
-						{
-							val0=box->GetCoord(2*a);
-							val1=box->GetCoord(2*a+1);
-							if (val0<=val1)
-							{
-								coords[2*a]=val0;
-								coords[2*a+1]=val1;
-							}
-							else
-							{
-								coords[2*a]=val1;
-								coords[2*a+1]=val0;
-							}
-						}
-						vtkPrims->AddCube(coords,rgb,(double)col.a/255.0);
+						if (primCS==CARTESIAN)
+							vtkPrims->AddCube(box->GetStartCoord()->GetCartesianCoords(),box->GetStopCoord()->GetCartesianCoords(),rgb,(double)col.a/255.0);
+						else if (primCS==CYLINDRICAL)
+							vtkPrims->AddCylindricalCube(box->GetStartCoord()->GetCylindricalCoords(),box->GetStopCoord()->GetCylindricalCoords(),rgb,(double)col.a/255.0);
 						break;
 					}
 					case CSPrimitives::MULTIBOX:
@@ -368,19 +358,13 @@ void QVTKStructure::RenderGeometry()
 					case CSPrimitives::SPHERE:
 					{
 						CSPrimSphere* sphere = prim->ToSphere();
-						double coords[3];
-						for (int a=0;a<3;++a) coords[a]=sphere->GetCoord(a);
-						vtkPrims->AddSphere(coords,sphere->GetRadius(),rgb,(double)col.a/255.0,iResolution);
+						vtkPrims->AddSphere(sphere->GetCenter()->GetCartesianCoords(),sphere->GetRadius(),rgb,(double)col.a/255.0,iResolution);
 						break;
 					}
 					case CSPrimitives::CYLINDER:
 					{
 						CSPrimCylinder* cylinder = prim->ToCylinder();
-						double start[3];
-						double direction[3];
-						for (int a=0;a<3;++a) start[a]=cylinder->GetCoord(2*a);
-						for (int a=0;a<3;++a) direction[a]=cylinder->GetCoord(2*a+1)-start[a];
-						vtkPrims->AddCylinder(start,direction,cylinder->GetRadius(),rgb,(double)col.a/255.0,iResolution);
+						vtkPrims->AddCylinder2(cylinder->GetAxisStartCoord()->GetCartesianCoords(),cylinder->GetAxisStopCoord()->GetCartesianCoords(),cylinder->GetRadius(),rgb,(double)col.a/255.0,iResolution);
 						break;
 					}
 					case CSPrimitives::POLYGON:

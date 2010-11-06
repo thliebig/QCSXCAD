@@ -29,6 +29,7 @@
 
 class vtkRenderer;
 class vtkActorCollection;
+class vtkAppendPolyData;
 
 #define PI 3.141592654
 
@@ -42,8 +43,16 @@ public:
 	/// Deconstructor
 	~VTKPrimitives();
 	/// Add a Cube to scene
-	/*! \param *dCoords Set points as room diagonal (Xmin,Ymin,Zmin,Xmax,Ymax,Zmax) \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness)  */
+	/*! \param *dCoords Set points as room diagonal (Xmin,Xmax,Ymin,Ymax,Zmin,,Zmax) \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness)  */
 	void AddCube(double *dCoords, double *dRGB, double dOpacity);	//complete
+	void AddCube(const double *dStart, const double *dStop, double *dRGB, double dOpacity);	//complete
+	/// Add a Cube in cylindrical coordinates to scene
+	/*! \param *dCoords Set points as room diagonal (Rmin,Rmax,Amin,Amax,Zmin,,Zmax) \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness)  */
+	void AddCylindricalCube(double *dCoords, double *dRGB, double dOpacity);
+	void AddCylindricalCube(const double *dStart, const double *dStop, double *dRGB, double dOpacity);
+	/// Add a Plane to scene
+	/*! \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness)  */
+	void AddPlane(double *dOrigin, double* dP1, double* dP2, double *dRGB, double dOpacity);	//complete
 	/// Add a discrete object (many cubes) to scene
 	/*! \param *dCoords Set Points as X1,X2,...,Xn,Y1,Y2,...,Yn,Z1,Z2,...Zn. \param uiQtyCoords Set quantity of Points X,Y,Z. \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness) */
 	void AddDisc(double *dCoords, unsigned int uiQtyCoords, double *dRGB, double dOpacity);
@@ -57,11 +66,13 @@ public:
 	/*! \param *dCoords Set Points as X1,X2,...,Xn,Y1,Y2,...,Yn,Z1,Z2,...Zn for polygon. \param uiQtyCoords Set Quantity of Points X,Y,Z \param TubeRadius Set tube radius \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness)*/
 	void AddTubePoly(double *dCoords, unsigned int uiQtyCoords, double TubeRadius, double *dRGB, double dOpacity, int iResolution=8);//complete
 	/// Add a cylinder to scene
-	/*!  \param *dCenter Set Base Point in 3D space \param *dExtrusionVector Set height (absolute value) and direction \param fRadius Set Radius \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness) \param iResolution Set resolution of discretisation*/
-	void AddCylinder(double *dCenter, double *dExtrusionVector, float fRadius, double *dRGB, double dOpacity, int iResolution); //complete
+	/*!  \param *dCenterAxis Set Base Point in 3D space \param *dExtrusionVector Set height (absolute value) and direction \param fRadius Set Radius \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness) \param iResolution Set resolution of discretisation*/
+	void AddCylinder(const double *dCenterAxis, const double *dExtrusionVector, float fRadius, double *dRGB, double dOpacity, int iResolution); //complete
+	/*!  \param *dAxisStart Cylinder axis start point \param *dAxisStop Cylinder axis end point \param fRadius Set Radius \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness) \param iResolution Set resolution of discretisation*/
+	void AddCylinder2(const double *dAxisStart, const double* dAxisStop, float fRadius, double *dRGB, double dOpacity, int iResolution); //complete
 	/// Add a Sphere to scene
 	/*! \param *dCenter Set Center Point in 3D space \param fRadius Set Radius \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness) \param iResolution Set resolution of discretisation*/
-	void AddSphere(double *dCenter, float fRadius, double *dRGB, double dOpacity, int iResolution);	//complete
+	void AddSphere(const double *dCenter, float fRadius, double *dRGB, double dOpacity, int iResolution);	//complete
 	/// Add an arrow to scene
 	/*! \param *dStart Set start point \param *dEnd Set end point \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness) \param iResolution Set resolution of discretisation*/
 	void AddArrow(double *dStart, double *dEnd, double *dRGB, double dOpacity, int iResolution=6);
@@ -98,6 +109,14 @@ protected:
 	/// Calculate distance between one point and another 
 	/*! \param *dpoint1 Set first point \param *dpoint2 Set second point \return Methode returns distance */
 	double DistancePointPoint(double *dpoint1, double *dpoint2);
+
+	//! A Collection of all incoming poly-data
+	vtkAppendPolyData* m_PolyDataCollection;
+
+	double m_ArcDelta;
+
+	//! This internal methode will transform cylindrical coords into cartesian coords used by vtk.
+	double* TransformCylindricalCoords(double* in, double* out, unsigned int nrPoints=1);
 };
 
 #endif

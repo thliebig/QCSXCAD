@@ -26,7 +26,9 @@
 #include "vtkProperty.h"
 #include "vtkCamera.h"
 #include "vtkCubeSource.h"
+#include "vtkPlaneSource.h"
 #include "vtkCylinderSource.h"
+#include "vtkLineSource.h"
 #include "vtkSphereSource.h"
 #include "vtkPoints.h"
 #include "vtkCellArray.h"
@@ -44,6 +46,9 @@
 #include "vtkCollectionIterator.h"
 #include "vtkConeSource.h"
 #include "vtkTubeFilter.h"
+#include "vtkAppendPolyData.h"
+#include "vtkXMLPolyDataWriter.h"
+#include "vtkSTLWriter.h"
 
 
 VTKPrimitives::VTKPrimitives(vtkRenderer *Renderer)
@@ -51,32 +56,60 @@ VTKPrimitives::VTKPrimitives(vtkRenderer *Renderer)
 	ren = Renderer;
 
 	ActorColl = vtkActorCollection::New();
+
+	m_PolyDataCollection = vtkAppendPolyData::New();
+	m_ArcDelta = 3.0/180.0*PI; // default of 5° resolution for representing angles
 }
 
 VTKPrimitives::~VTKPrimitives()
 {
 	ActorColl->InitTraversal();
 	vtkActor* act=NULL;
-	while (act=ActorColl->GetNextActor())
+	while ((act=ActorColl->GetNextActor()))
 	{
 		ren->RemoveActor(act);
 		act->Delete();
 	}
 	ActorColl->Delete();
 	ActorColl=NULL;
+
+	if (m_PolyDataCollection)
+		m_PolyDataCollection->Delete();
+	m_PolyDataCollection=NULL;
 }
 
 VTKPrimitives::VTKPrimitives()
 {
 }
 
+void VTKPrimitives::AddCube(const double *start, const double *stop, double *dRGB, double dOpacity)
+{
+	double coords[6] = {start[0],stop[0],start[1],stop[1],start[2],stop[2]};
+	double help;
+	//swap start stop if start>stop
+	for (int n=0;n<3;++n)
+	{
+		if (coords[2*n]>coords[2*n+1])
+		{
+			help=coords[2*n+1];
+			coords[2*n+1]=coords[2*n];
+			coords[2*n]=help;
+		}
+	}
+	AddCube(coords,dRGB,dOpacity);
+}
 
 void VTKPrimitives::AddCube(double *dCoords, double *dRGB, double dOpacity)
-{ //complete
+{
+	//create a simple cartesian cube...
+	double CC[6];
+	TransformCylindricalCoords(dCoords,CC,2);
+
 	vtkCubeSource *Source = vtkCubeSource::New();
+	Source->SetBounds(CC);
+	m_PolyDataCollection->AddInput(Source->GetOutput());
 	vtkPolyDataMapper *SourceMapper = vtkPolyDataMapper::New();
 	vtkActor *SourceActor = vtkActor::New();
-	Source->SetBounds(dCoords);
 	SourceMapper->SetInput(Source->GetOutput());
 	SourceActor->SetMapper(SourceMapper);
 	SourceActor->GetProperty()->SetColor(dRGB);
@@ -84,13 +117,146 @@ void VTKPrimitives::AddCube(double *dCoords, double *dRGB, double dOpacity)
 	ren->AddActor(SourceActor);
 	ActorColl->AddItem(SourceActor);
 	Source->Delete();
-	SourceMapper->Delete();
+//	SourceMapper->Delete();
 	//SourceActor->Delete();
 }
 
+void VTKPrimitives::AddCylindricalCube(const double *start, const double *stop, double *dRGB, double dOpacity)
+{
+	double coords[6] = {start[0],stop[0],start[1],stop[1],start[2],stop[2]};
+	double help;
+	//swap start stop if start>stop
+	for (int n=0;n<3;++n)
+	{
+		if (coords[2*n]>coords[2*n+1])
+		{
+			help=coords[2*n+1];
+			coords[2*n+1]=coords[2*n];
+			coords[2*n]=help;
+		}
+	}
+	AddCylindricalCube(coords,dRGB,dOpacity);
+}
+
+
+void VTKPrimitives::AddCylindricalCube(double *dCoords, double *dRGB, double dOpacity)
+{
+	vtkPolyDataAlgorithm* PDSource = NULL;
+	vtkPolyDataAlgorithm* PDFilter = NULL;
+
+	if ( (dCoords[2]!=dCoords[3]) )
+	{
+		if ((dCoords[0]!=dCoords[1]) && ((dCoords[4]!=dCoords[5])))  //3D object
+		{
+			double dO[3] = {dCoords[0],dCoords[2],dCoords[4]};
+			double dP1[3] = {dCoords[0],dCoords[2],dCoords[5]};
+			double dP2[3] = {dCoords[1],dCoords[2],dCoords[4]};
+			double out[3];
+			vtkPlaneSource *Source = vtkPlaneSource::New();
+			Source->SetOrigin(TransformCylindricalCoords(dO,out));
+			Source->SetPoint1(TransformCylindricalCoords(dP1,out));
+			Source->SetPoint2(TransformCylindricalCoords(dP2,out));
+			PDSource = Source;
+		}
+		else if (dCoords[4]!=dCoords[5])	// alpha-z plane
+		{
+			double dP1[3] = {dCoords[0],dCoords[2],dCoords[4]};
+			double dP2[3] = {dCoords[0],dCoords[2],dCoords[5]};
+			double out[3];
+
+			vtkLineSource *Source = vtkLineSource::New();
+			Source->SetPoint1(TransformCylindricalCoords(dP1,out));
+			Source->SetPoint2(TransformCylindricalCoords(dP2,out));
+			PDSource = Source;
+		}
+		else if (dCoords[0]!=dCoords[1])	// alpha-r plane
+		{
+			double dP1[3] = {dCoords[0],dCoords[2],dCoords[4]};
+			double dP2[3] = {dCoords[1],dCoords[2],dCoords[4]};
+			double out[3];
+
+			vtkLineSource *Source = vtkLineSource::New();
+			Source->SetPoint1(TransformCylindricalCoords(dP1,out));
+			Source->SetPoint2(TransformCylindricalCoords(dP2,out));
+			PDSource = Source;
+		}
+
+		if (PDSource==NULL)
+			return;
+
+		vtkRotationalExtrusionFilter *extrude = vtkRotationalExtrusionFilter::New();
+		extrude->SetInput(PDSource->GetOutput());
+		int nrSteps = ceil(fabs(dCoords[3]-dCoords[2])/m_ArcDelta);
+		extrude->SetResolution(nrSteps);
+		extrude->SetAngle( (dCoords[3]-dCoords[2])*180/PI );
+		PDFilter = extrude;
+	}
+	else //rz-plane or line
+	{
+		if (dCoords[0]==dCoords[1]) //line in z-direction
+		{
+			return;
+		}
+		if (dCoords[4]==dCoords[5]) //line in r-direction
+		{
+			return;
+		}
+
+		//rz-plane
+		double dO[3] = {dCoords[0],dCoords[2],dCoords[4]};
+		double dP1[3] = {dCoords[0],dCoords[2],dCoords[5]};
+		double dP2[3] = {dCoords[1],dCoords[2],dCoords[4]};
+		double out[3];
+		vtkPlaneSource *Source = vtkPlaneSource::New();
+		Source->SetOrigin(TransformCylindricalCoords(dO,out));
+		Source->SetPoint1(TransformCylindricalCoords(dP1,out));
+		Source->SetPoint2(TransformCylindricalCoords(dP2,out));
+		PDFilter = Source;
+	}
+
+	if (PDFilter==NULL)
+		return;
+
+	m_PolyDataCollection->AddInput(PDFilter->GetOutput());
+	vtkPolyDataMapper *SourceMapper = vtkPolyDataMapper::New();
+	vtkActor *SourceActor = vtkActor::New();
+	SourceMapper->SetInput(PDFilter->GetOutput());
+	SourceActor->SetMapper(SourceMapper);
+	SourceActor->GetProperty()->SetColor(dRGB);
+	SourceActor->GetProperty()->SetOpacity(dOpacity);
+	ren->AddActor(SourceActor);
+	ActorColl->AddItem(SourceActor);
+
+	if (PDSource)
+		PDSource->Delete();
+	PDFilter->Delete();
+}
+
+void VTKPrimitives::AddPlane(double *dOrigin, double* dP1, double* dP2, double *dRGB, double dOpacity)
+{
+	double out[3];
+	vtkPlaneSource *Source = vtkPlaneSource::New();
+	Source->SetOrigin(TransformCylindricalCoords(dOrigin,out));
+	Source->SetPoint1(TransformCylindricalCoords(dP1,out));
+	Source->SetPoint2(TransformCylindricalCoords(dP2,out));
+
+	vtkPolyDataMapper *SourceMapper = vtkPolyDataMapper::New();
+	vtkActor *SourceActor = vtkActor::New();
+	SourceMapper->SetInput(Source->GetOutput());
+	SourceActor->SetMapper(SourceMapper);
+	SourceActor->GetProperty()->SetColor(dRGB);
+	SourceActor->GetProperty()->SetOpacity(dOpacity);
+	ren->AddActor(SourceActor);
+	ActorColl->AddItem(SourceActor);
+	m_PolyDataCollection->AddInput(Source->GetOutput());
+	Source->Delete();
+	SourceMapper->Delete();
+}
+
+
 void VTKPrimitives::AddDisc(double *dCoords, unsigned int uiQtyCoords, double *dRGB, double dOpacity)
 {
-	unsigned int i=0,j=0,h=0;//,k=0;
+	unsigned int i=0,j=0;//,h=0;//,k=0;
 //	vtkIdType pts[6][4]={{0,1,2,3}, {4,5,6,7}, {0,1,5,4},
 //                        {1,2,6,5}, {2,3,7,6}, {3,0,4,7}};
 	vtkPoints *points = vtkPoints::New();
@@ -121,6 +287,7 @@ void VTKPrimitives::AddDisc(double *dCoords, unsigned int uiQtyCoords, double *d
 	profile->SetPoints(points);
 	profile->SetPolys(poly);
 	//profile->GetPointData()->SetScalars(scalars);
+	m_PolyDataCollection->AddInput(profile);
 	Mapper->SetInput(profile);
 	//Mapper->SetScalarRange(0,8);
 	Actor->SetMapper(Mapper);
@@ -163,6 +330,7 @@ void VTKPrimitives::AddClosedPoly(double *dCoords, unsigned int uiQtyCoords, dou
 
 //	fprintf(stderr,"\n Vector: %f %f %f", dExtrusionVector[0],dExtrusionVector[1],dExtrusionVector[2]);
 
+	m_PolyDataCollection->AddInput(extrude->GetOutput());
 	Mapper->SetInput(extrude->GetOutput());
 	Actor->SetMapper(Mapper);
 	Actor->GetProperty()->SetColor(dRGB);
@@ -198,6 +366,8 @@ void VTKPrimitives::AddLinePoly(double *dCoords, unsigned int uiQtyCoords, unsig
 
 	profile->SetPoints(points);
 	profile->SetLines(poly);
+
+	m_PolyDataCollection->AddInput(profile);
 	Mapper->SetInput(profile);
 	Actor->SetMapper(Mapper);
 	Actor->GetProperty()->SetColor(dRGB);
@@ -240,6 +410,8 @@ void VTKPrimitives::AddTubePoly(double *dCoords, unsigned int uiQtyCoords, doubl
 
 	Mapper->SetInputConnection( m_profileTubes->GetOutputPort());
 
+	m_PolyDataCollection->AddInput(m_profileTubes->GetOutput());
+
 	Actor->SetMapper(Mapper);
 	Actor->GetProperty()->SetColor(dRGB);
 	Actor->GetProperty()->SetOpacity(dOpacity);
@@ -254,8 +426,14 @@ void VTKPrimitives::AddTubePoly(double *dCoords, unsigned int uiQtyCoords, doubl
 	//Actor->Delete();
 }
 
-void VTKPrimitives::AddCylinder(double *dCenter, double *dExtrusionVector, float fRadius, double *dRGB, double dOpacity, int iResolution)
-{//complete
+void VTKPrimitives::AddCylinder2(const double *dAxisStart, const double* dAxisStop, float fRadius, double *dRGB, double dOpacity, int iResolution)
+{
+	double direction[3] = {dAxisStop[0]-dAxisStart[0],dAxisStop[1]-dAxisStart[1],dAxisStop[2]-dAxisStart[2]};
+	AddCylinder(dAxisStart,direction,fRadius,dRGB,dOpacity,iResolution);
+}
+
+void VTKPrimitives::AddCylinder(const double *dCenter, const double *dExtrusionVector, float fRadius, double *dRGB, double dOpacity, int iResolution)
+{
 	double alpha=0,beta=0;
 	double length=sqrt( dExtrusionVector[0]*dExtrusionVector[0]+dExtrusionVector[1]*dExtrusionVector[1]+dExtrusionVector[2]*dExtrusionVector[2] ) ;
 	//if (length==0) { fprintf(stderr," Error Cylinder Extrusion Vector ist Zero.. Abort..."); exit(1); } 
@@ -280,6 +458,7 @@ void VTKPrimitives::AddCylinder(double *dCenter, double *dExtrusionVector, float
 	transformFilter->SetInput(Source->GetOutput());
 	transformFilter->SetTransform(transform);
 
+	m_PolyDataCollection->AddInput(transformFilter->GetOutput());
 	SourceMapper->SetInput(transformFilter->GetOutput());
 	SourceActor->SetMapper(SourceMapper);
 	SourceActor->GetProperty()->SetColor(dRGB);
@@ -295,15 +474,17 @@ void VTKPrimitives::AddCylinder(double *dCenter, double *dExtrusionVector, float
 	//SourceActor->Delete();
 }
 
-void VTKPrimitives::AddSphere(double *dCenter, float fRadius, double *dRGB, double dOpacity, int iResolution)
+void VTKPrimitives::AddSphere(const double *dCenter, float fRadius, double *dRGB, double dOpacity, int iResolution)
 {//complete
 	vtkSphereSource *Source = vtkSphereSource::New();
 	vtkPolyDataMapper *SourceMapper = vtkPolyDataMapper::New();
 	vtkActor *SourceActor = vtkActor::New();
-	Source->SetCenter(dCenter);
+	double center[3]={dCenter[0],dCenter[1],dCenter[2]};
+	Source->SetCenter(center);
 	Source->SetRadius(fRadius);
 	Source->SetPhiResolution(iResolution);
 	Source->SetThetaResolution(iResolution);
+	m_PolyDataCollection->AddInput(Source->GetOutput());
 	SourceMapper->SetInput(Source->GetOutput());
 	SourceActor->SetMapper(SourceMapper);
 	SourceActor->GetProperty()->SetColor(dRGB);
@@ -344,6 +525,7 @@ void VTKPrimitives::AddArrow(double *dStart, double *dEnd, double *dRGB, double 
 	transformFilter->SetInput(Source->GetOutput());
 	transformFilter->SetTransform(transform);
 
+	m_PolyDataCollection->AddInput(transformFilter->GetOutput());
 	SourceMapper->SetInput(transformFilter->GetOutput());
 	SourceActor->SetMapper(SourceMapper);
 	SourceActor->GetProperty()->SetColor(dRGB);
@@ -366,6 +548,7 @@ void VTKPrimitives::AddLabel(char *cText, double *dCoords, double *dRGB, double 
 	vtkPolyDataMapper *Mapper = vtkPolyDataMapper::New();
 	vtkFollower *Actor = vtkFollower::New();
 	text->SetText(cText);
+	m_PolyDataCollection->AddInput(text->GetOutput());
 	Mapper->SetInput(text->GetOutput());
 	Actor->SetMapper(Mapper);
 	Actor->SetScale(dscale);
@@ -430,7 +613,7 @@ void VTKPrimitives::AddRotationalPoly(double *dCoords, unsigned int uiQtyCoords,
 	profile->SetLines(poly);
 	extrude->SetInput(profile);
 	extrude->SetResolution(iResolution);
-	extrude->SetAngle(360.0);
+	extrude->SetAngle(90.0);
 
 
 	double alpha=VectorAngel(vector[0],sqrt(vector[1]*vector[1]+vector[2]*vector[2]),0,0,1,0);
@@ -450,6 +633,7 @@ void VTKPrimitives::AddRotationalPoly(double *dCoords, unsigned int uiQtyCoords,
 	transformFilter->SetInput(extrude->GetOutput());
 	transformFilter->SetTransform(transform);
 
+	m_PolyDataCollection->AddInput(transformFilter->GetOutput());
 	Mapper->SetInput(transformFilter->GetOutput());
 	Actor->SetMapper(Mapper);
 	Actor->GetProperty()->SetColor(dRGB);
@@ -522,6 +706,7 @@ void VTKPrimitives::AddRotationalSolid(double *dPoint, double fRadius, double *f
 	transformFilter->SetInput(extrude->GetOutput());
 	transformFilter->SetTransform(transform);
 
+	m_PolyDataCollection->AddInput(transformFilter->GetOutput());
 	Mapper->SetInput(transformFilter->GetOutput());
 	Actor->SetMapper(Mapper);
 	Actor->GetProperty()->SetColor(dRGB);
@@ -559,6 +744,7 @@ void VTKPrimitives::AddSurface(double *dCoords, unsigned int uiQtyCoords, double
 	}
 	profile->SetPoints(points);
 	profile->SetPolys(poly);
+	m_PolyDataCollection->AddInput(profile);
 	Mapper->SetInput(profile);
 	Actor->SetMapper(Mapper);
 	Actor->GetProperty()->SetColor(dRGB);
@@ -583,6 +769,7 @@ void VTKPrimitives::AddSTLObject(char *Filename, double *dCenter, double *dRGB, 
 	vtkSTLReader *part = vtkSTLReader::New();
 	part->SetFileName(Filename);
 	vtkPolyDataMapper *partMapper = vtkPolyDataMapper::New();
+	m_PolyDataCollection->AddInput(part->GetOutput());
 	partMapper->SetInput(part->GetOutput());
 	partMapper->ScalarVisibilityOff();
 	vtkActor *partActor = vtkActor::New();
@@ -601,7 +788,7 @@ void VTKPrimitives::SetOpacity2All(double opacity)
 {
 	ActorColl->InitTraversal();
 	vtkActor* act=NULL;
-	while (act=ActorColl->GetNextActor())
+	while ((act=ActorColl->GetNextActor()))
 	{
 		act->GetProperty()->SetOpacity(opacity);
 	}
@@ -634,4 +821,20 @@ double VTKPrimitives::DistancePointLine(double *dpoint,double *dstart,double *dv
 double VTKPrimitives::DistancePointPoint(double *dpoint1, double *dpoint2)
 {
 	return sqrt( (dpoint1[0]-dpoint2[0])*(dpoint1[0]-dpoint2[0]) + (dpoint1[1]-dpoint2[1])*(dpoint1[1]-dpoint2[1]) + (dpoint1[2]-dpoint2[2])*(dpoint1[2]-dpoint2[2]) );
+}
+
+double* VTKPrimitives::TransformCylindricalCoords(double* in, double* out, unsigned int nrPoints)
+{
+	unsigned int i,j,k;
+	for (unsigned int n=0;n<nrPoints;++n)
+	{
+		i = n;
+		j = nrPoints + n;
+		k = 2*nrPoints + n;
+
+		out[i] = in[i] * cos(in[j]);
+		out[j] = in[i] * sin(in[j]);
+		out[k] = in[k];
+	}
+	return out;
 }

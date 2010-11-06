@@ -1211,7 +1211,7 @@ void QGeometryPlot::paintEvent(QPaintEvent * /* event */)
 					double xyz[3];
 					int nP = (direct+1)%3;
 					int nPP = (direct+2)%3;
-					for (int n=0;n<nrPts;++n)
+					for (unsigned int n=0;n<nrPts;++n)
 					{
 						curve->GetPoint(n,xyz);
 						points[n].setX((xyz[nP]-offsetX)/factor);
