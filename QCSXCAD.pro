@@ -81,8 +81,9 @@ unix {
     LIBS += -L../CSXCAD \
         -lCSXCAD
     INCLUDEPATH += /usr/include/vtk-5.2 \
-        /usr/include/vtk-5.6
-    LIBS += -lvtkCommon \
+		/usr/include/vtk-5.4 \
+		/usr/include/vtk-5.6
+	LIBS += -lvtkCommon \
         -lvtkDICOMParser \
         -lvtkFiltering \
         -lvtkGenericFiltering \
