@@ -233,17 +233,15 @@ QCSPrimBoxLayout::~QCSPrimBoxLayout()
 
 void QCSPrimBoxLayout::SetValues()
 {
-	ParameterScalar* ps;
 	bool bOk;
 	double dVal;
 	QString line;
 	for (size_t i=0; i< 6; ++i)
 	{
-		ps=clBox->GetCoordPS(i);
 		line=Lines[i]->text();
 		dVal=line.toDouble(&bOk);
-		if (bOk) ps->SetValue(dVal);
-		else ps->SetValue(line.toStdString());
+		if (bOk) clBox->SetCoord(i,dVal);
+		else clBox->SetCoord(i,line.toStdString());
 	}	
 }
 
@@ -282,20 +280,18 @@ QCSPrimSphereLayout::~QCSPrimSphereLayout()
 
 void QCSPrimSphereLayout::SetValues()
 {
-	ParameterScalar* ps;
 	bool bOk;
 	double dVal;
 	QString line;
 	for (size_t i=0; i< 3; ++i)
 	{
-		ps=clSphere->GetCoordPS(i);
 		line=Lines[i]->text();
 		dVal=line.toDouble(&bOk);
-		if (bOk) ps->SetValue(dVal);
-		else ps->SetValue(line.toLatin1().data());
+		if (bOk) clSphere->SetCoord(i,dVal);
+		else clSphere->SetCoord(i,line.toLatin1().data());
 	}	
 
-	ps=clSphere->GetRadiusPS();
+	ParameterScalar* ps=clSphere->GetRadiusPS();
 	line=Lines[3]->text();
 	dVal=line.toDouble(&bOk);
 	if (bOk) ps->SetValue(dVal);
@@ -351,20 +347,18 @@ QCSPrimCylinderLayout::~QCSPrimCylinderLayout()
 
 void QCSPrimCylinderLayout::SetValues()
 {
-	ParameterScalar* ps;
 	bool bOk;
 	double dVal;
 	QString line;
 	for (size_t i=0; i< 6; ++i)
 	{
-		ps=clCylinder->GetCoordPS(i);
 		line=Lines[i]->text();
 		dVal=line.toDouble(&bOk);
-		if (bOk) ps->SetValue(dVal);
-		else ps->SetValue(line.toLatin1().data());
+		if (bOk) clCylinder->SetCoord(i,dVal);
+		else clCylinder->SetCoord(i,line.toLatin1().data());
 	}	
 
-	ps=clCylinder->GetRadiusPS();
+	ParameterScalar* ps=clCylinder->GetRadiusPS();
 	line=Lines[6]->text();
 	dVal=line.toDouble(&bOk);
 	if (bOk) ps->SetValue(dVal);
