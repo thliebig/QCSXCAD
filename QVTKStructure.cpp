@@ -449,6 +449,30 @@ void QVTKStructure::ExportView2Image()
 	png_writer->Write();
 }
 
+void QVTKStructure::ExportProperty2PolyDataVTK(unsigned int uiID, QString filename, double scale)
+{
+	for (int i=0;i<LayerPrimitives.size();++i)
+	{
+		if (LayerPrimitives.at(i).uID==uiID)
+		{
+			if (LayerPrimitives.at(i).VTKProp!=NULL)
+				LayerPrimitives.at(i).VTKProp->WritePolyData2File(filename.toStdString().c_str(), scale);
+		}
+	}
+}
+
+void QVTKStructure::ExportProperty2STL(unsigned int uiID, QString filename, double scale)
+{
+	for (int i=0;i<LayerPrimitives.size();++i)
+	{
+		if (LayerPrimitives.at(i).uID==uiID)
+		{
+			if (LayerPrimitives.at(i).VTKProp!=NULL)
+				LayerPrimitives.at(i).VTKProp->WritePolyData2STL(filename.toStdString().c_str(), scale);
+		}
+	}
+}
+
 void QVTKStructure::KeyPress(vtkObject *caller, unsigned long eid, void *clientdata, void *calldata)
 {
 	//vtkInteractorStyle * istyle = (vtkInteractorStyle *) caller;

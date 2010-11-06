@@ -794,6 +794,72 @@ void VTKPrimitives::SetOpacity2All(double opacity)
 	}
 }
 
+void VTKPrimitives::WritePolyData2File(const char* filename, double scale)
+{
+	cout << "VTKPrimitives::WritePolyData2File: Dump to vtk file: " << filename << " -- Using scale: " << scale << endl;
+	vtkXMLPolyDataWriter* writer  = vtkXMLPolyDataWriter::New();
+	writer->SetFileName(filename);
+
+	if (scale==1.0)
+	{
+		writer->SetInput(m_PolyDataCollection->GetOutput());
+		writer->Write();
+	}
+	else
+	{
+		vtkTransform *transform = vtkTransform::New();
+		vtkTransformPolyDataFilter *transformFilter = vtkTransformPolyDataFilter::New();
+
+		transformFilter->SetInput(m_PolyDataCollection->GetOutput());
+		transform->Scale(scale,scale,scale);
+		transformFilter->SetTransform(transform);
+
+		writer->SetInput(transformFilter->GetOutput());
+		writer->Write();
+
+		transform->Delete();
+		transformFilter->Delete();
+	}
+
+	writer->Delete();
+}
+
+void VTKPrimitives::WritePolyData2STL(const char* filename, double scale)
+{
+	cout << "VTKPrimitives::WritePolyData2STL: Dump to stl file: " << filename << " -- Using scale: " << scale << endl;
+
+	vtkTriangleFilter* filter = vtkTriangleFilter::New();
+
+	filter->SetInput(m_PolyDataCollection->GetOutput());
+
+	vtkSTLWriter* writer  = vtkSTLWriter::New();
+	writer->SetFileName(filename);
+
+	if (scale==1.0)
+	{
+		writer->SetInput(filter->GetOutput());
+		writer->Write();
+	}
+	else
+	{
+		vtkTransform *transform = vtkTransform::New();
+		vtkTransformPolyDataFilter *transformFilter = vtkTransformPolyDataFilter::New();
+
+		transformFilter->SetInput(filter->GetOutput());
+		transform->Scale(scale,scale,scale);
+		transformFilter->SetTransform(transform);
+
+		writer->SetInput(transformFilter->GetOutput());
+		writer->Write();
+
+		transform->Delete();
+		transformFilter->Delete();
+	}
+
+	writer->Delete();
+}
+
+
 double VTKPrimitives::VectorAngel(double dV1_1, double dV1_2, double dV1_3, double dV2_1, double dV2_2, double dV2_3)
 {
 	double angel=0,dV1L,dV2L;

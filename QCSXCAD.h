@@ -80,6 +80,8 @@ public slots:
 	void ExportGeometry();
 	void ExportGeometry_Povray();
 	void ExportGeometry_X3D();
+	void ExportGeometry_PolyDataVTK();
+	void ExportGeometry_STL();
 
 	void ExportView2Image();
 

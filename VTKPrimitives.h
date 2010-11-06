@@ -94,6 +94,12 @@ public:
 	
 	void SetOpacity2All(double opacity);
 
+	//! Write the collected poly-data into a vtk xml file (should be a *.vtp)
+	void WritePolyData2File(const char* filename, double scale=1.0);
+
+	//! Write the collected poly-data into a stl file (should be a *.stl)
+	void WritePolyData2STL(const char* filename, double scale=1.0);
+
 protected:
 	/// unusable constructor, only for inheritance 
 	VTKPrimitives();

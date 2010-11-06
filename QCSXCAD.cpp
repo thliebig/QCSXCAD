@@ -803,6 +803,50 @@ void QCSXCAD::ExportGeometry_X3D()
 	x3d.save( filename );
 }
 
+void QCSXCAD::ExportGeometry_PolyDataVTK()
+{
+	QString dirname = QFileDialog::getExistingDirectory(this, tr("Choose directory to save data"));
+	int QtyProp = GetQtyProperties();
+	for (int i=0;i<QtyProp;++i)
+	{
+		CSProperties* prop = GetProperty(i);
+		if (prop==NULL) continue;
+
+		 unsigned int uID = prop->GetUniqueID();
+
+		 if (prop->GetVisibility()==true)
+		 {
+			QString filename(dirname);
+			filename.append("/");
+			filename.append(prop->GetName().c_str());
+			filename.append(".vtp");
+			StructureVTK->ExportProperty2PolyDataVTK(uID,filename,clGrid.GetDeltaUnit());
+		 }
+	 }
+}
+
+void QCSXCAD::ExportGeometry_STL()
+{
+	QString dirname = QFileDialog::getExistingDirectory(this, tr("Choose directory to save data"));
+	int QtyProp = GetQtyProperties();
+	for (int i=0;i<QtyProp;++i)
+	{
+		CSProperties* prop = GetProperty(i);
+		if (prop==NULL) continue;
+
+		 unsigned int uID = prop->GetUniqueID();
+
+		 if (prop->GetVisibility()==true)
+		 {
+			QString filename(dirname);
+			filename.append("/");
+			filename.append(prop->GetName().c_str());
+			filename.append(".stl");
+			StructureVTK->ExportProperty2STL(uID,filename,clGrid.GetDeltaUnit());
+		 }
+	 }
+}
+
 void QCSXCAD::ExportView2Image()
 {
 	if (ViewLevel==1)

@@ -65,6 +65,9 @@ public slots:
 	//! Export the current view to an image file (currently only png)
 	void ExportView2Image();
 
+	void ExportProperty2PolyDataVTK(unsigned int uiID, QString filename, double scale = 1.0);
+	void ExportProperty2STL(unsigned int uiID, QString filename, double scale = 1.0);
+
 protected:
 	typedef struct
 	{
