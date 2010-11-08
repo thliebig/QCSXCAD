@@ -102,11 +102,8 @@ void VTKPrimitives::AddCube(const double *start, const double *stop, double *dRG
 void VTKPrimitives::AddCube(double *dCoords, double *dRGB, double dOpacity)
 {
 	//create a simple cartesian cube...
-	double CC[6];
-	TransformCylindricalCoords(dCoords,CC,2);
-
 	vtkCubeSource *Source = vtkCubeSource::New();
-	Source->SetBounds(CC);
+	Source->SetBounds(dCoords);
 	m_PolyDataCollection->AddInput(Source->GetOutput());
 	vtkPolyDataMapper *SourceMapper = vtkPolyDataMapper::New();
 	vtkActor *SourceActor = vtkActor::New();
