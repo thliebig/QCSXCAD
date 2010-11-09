@@ -19,6 +19,7 @@
 #define _QCSXCAD_H_
 
 #include <QtGui>
+#include "QGeometryPlot.h"
 #include "QCSXCAD_Global.h"
 #include "ContinuousStructure.h"
 using namespace std;
@@ -30,8 +31,6 @@ class QCSTreeWidget;
 class QCSGridEditor;
 class QParameterGui;
 class QParameterSet;
-
-class QGeometryPlot;
 
 class TiXmlNode;
 
@@ -162,51 +161,6 @@ protected:
 	virtual void keyPressEvent(QKeyEvent * event);
 
 	QHash<QString,QString> m_BC; //!< boundary conditions
-};
-
-class QGeometryPlot : public QWidget
-{
-	Q_OBJECT
-public:
-	QGeometryPlot(QCSXCAD* CS);
-	~QGeometryPlot();
-
-	void SetStatusBar(QStatusBar* bar) {statBar=bar;};
-
-public slots:
-	void setXY();
-	void setYZ();
-	void setZX();
-	void setDrawArea(double* area);
-	void setGridOpacity(int val);
-	
-	void Reset();
-
-protected:
-	virtual void paintEvent(QPaintEvent *event);
-	virtual void wheelEvent(QWheelEvent * event);
-	virtual void mousePressEvent(QMouseEvent * event);
-	virtual void mouseReleaseEvent(QMouseEvent * event);
-	virtual void mouseMoveEvent(QMouseEvent * event);
-	
-	double* GetMouseXY(const QPoint qp, bool bRound=true);
-	double lastMouseXY[2];
-	
-	bool bArrow;
-	double dArrow[4];
-
-	QCSXCAD* clCS;
-	int direct;
-	int spacer;
-	int GridOpacity;
-	double DrawArea[6];
-
-	double factor;
-	double offsetX,offsetY;
-
-	QStatusBar* statBar;
-
-	QPoint Pos;
 };
 
 #endif //_QCSXCAD_H_

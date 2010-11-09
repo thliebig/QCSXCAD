@@ -20,7 +20,8 @@ HEADERS += QCSXCAD.h \
     VTKPrimitives.h \
     QCSXCAD_Global.h \
     export_x3d.h \
-    export_pov.h
+    export_pov.h \
+    QGeometryPlot.h
 SOURCES += QCSXCAD.cpp \
     QCSGridEditor.cpp \
     QCSPrimEditor.cpp \
@@ -30,7 +31,8 @@ SOURCES += QCSXCAD.cpp \
     QVTKStructure.cpp \
     VTKPrimitives.cpp \
     export_x3d.cpp \
-    export_pov.cpp
+    export_pov.cpp \
+    QGeometryPlot.cpp
 win32 { 
     DEFINES += BUILD_QCSXCAD_LIB
     
