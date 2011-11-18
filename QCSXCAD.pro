@@ -93,7 +93,6 @@ unix {
         -lvtkHybrid \
         -lvtkIO \
         -lvtkImaging \
-        -lvtkNetCDF \
         -lvtkParallel \
         -lvtkRendering \
         -lvtkVolumeRendering \
