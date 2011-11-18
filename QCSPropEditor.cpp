@@ -376,18 +376,6 @@ QCSPropMaterialGB::QCSPropMaterialGB(CSPropMaterial *prop, QWidget *parent) : QC
 
 	QGridLayout* layout = new QGridLayout();
 
-	EpsLine = new QLineEdit();
-	layout->addWidget(new QLabel(tr("Epsilon: ")),0,0);
-	layout->addWidget(EpsLine,0,1);
-
-	MueLine = new QLineEdit();
-	layout->addWidget(new QLabel(tr("Mue: ")),1,0);
-	layout->addWidget(MueLine,1,1);
-
-	KappaLine = new QLineEdit();
-	layout->addWidget(new QLabel(tr("Kappa: ")),2,0);
-	layout->addWidget(KappaLine,2,1);
-
 	GetValues();
 
 	setLayout(layout);
@@ -399,42 +387,10 @@ QCSPropMaterialGB::~QCSPropMaterialGB()
 
 void QCSPropMaterialGB::SetValues()
 {
-	bool bOk;
-	double dVal;
-	QString line;
-
-	line=EpsLine->text();
-	dVal=line.toDouble(&bOk);
-	if (bOk) clProp->SetEpsilon(dVal);
-	else clProp->SetEpsilon(line.toLatin1().data());
-
-	line=MueLine->text();
-	dVal=line.toDouble(&bOk);
-	if (bOk) clProp->SetMue(dVal);
-	else clProp->SetMue(line.toLatin1().data());
-
-	line=KappaLine->text();
-	dVal=line.toDouble(&bOk);
-	if (bOk) clProp->SetKappa(dVal);
-	else clProp->SetKappa(line.toLatin1().data());
-
 }
 
 void QCSPropMaterialGB::GetValues()
 {
-	string line;
-	line=clProp->GetEpsilonTerm();
-	if (!line.empty()) EpsLine->setText(line.c_str());
-	else EpsLine->setText(QString("%1").arg(clProp->GetEpsilon()));
-
-	line=clProp->GetMueTerm();
-	if (!line.empty()) MueLine->setText(line.c_str());
-	else MueLine->setText(QString("%1").arg(clProp->GetMue()));
-
-	line=clProp->GetKappaTerm();
-	if (!line.empty()) KappaLine->setText(line.c_str());
-	else KappaLine->setText(QString("%1").arg(clProp->GetKappa()));
-
 }
 
 /***************************QCSPropElectrodeGB**************************************/
@@ -679,89 +635,6 @@ QCSPropDumpBoxGB::QCSPropDumpBoxGB(CSPropDumpBox *prop, int SimMode, QWidget *pa
 
 	QVBoxLayout* layout = new QVBoxLayout();
 
-	GlobSet = new QCheckBox(tr("Use Global Dump Settings"));
-	layout->addWidget(GlobSet);
-
-	QGroupBox* ScalarGB = new QGroupBox(tr("Scalar Field Dump Options"));
-	QVBoxLayout* scalLay = new QVBoxLayout();
-	DumpPhi = new QCheckBox(tr("Phi Dump"));
-	scalLay->addWidget(DumpPhi);
-	DumpDivE = new QCheckBox(tr("div(E) Dump"));
-	scalLay->addWidget(DumpDivE);
-	DumpDivD = new QCheckBox(tr("div(D) Dump"));
-	scalLay->addWidget(DumpDivD);
-	DumpDivP = new QCheckBox(tr("div(P) Dump"));
-	scalLay->addWidget(DumpDivP);
-	DumpFieldW = new QCheckBox(tr("Field Energy Dump (1/2*E*D*dV)"));
-	scalLay->addWidget(DumpFieldW);
-	DumpChargeW = new QCheckBox(tr("Charge Energy Dump (1/2*Phi*div(D)*dV)"));
-	scalLay->addWidget(DumpChargeW);
-	ScalarGB->setLayout(scalLay);
-	layout->addWidget(ScalarGB);
-
-	QGroupBox* VectorGB = new QGroupBox(tr("Vector Field Dump Options"));
-	QVBoxLayout* vecLay = new QVBoxLayout();
-	DumpEField = new QCheckBox(tr("E-Field Dump"));
-	vecLay->addWidget(DumpEField);
-	DumpDField = new QCheckBox(tr("D-Field Dump"));
-	vecLay->addWidget(DumpDField);
-	DumpPField = new QCheckBox(tr("P-Field Dump"));
-	vecLay->addWidget(DumpPField);
-	VectorGB->setLayout(vecLay);
-	layout->addWidget(VectorGB);
-
-	//cout << "SimMode: " << SimMode << endl;
-	switch (SimMode)
-	{
-	case 1:
-		DumpDivE->setText(tr("div(H) Dump"));
-		DumpDivD->setText(tr("div(B) Dump"));
-		DumpDivP->setText(tr("div(M) Dump"));
-		DumpFieldW->setText(tr("Field Energy (1/2*H*B*dV)"));
-		DumpChargeW->hide();
-		DumpEField->setText(tr("H-Field"));
-		DumpDField->setText(tr("B-Field"));
-		DumpPField->setText(tr("M-Field"));
-		break;
-	case 2:
-		DumpDivE->setText(tr("div(E) Dump"));
-		DumpDivD->setText(tr("div(J) Dump"));
-		DumpDivP->hide();
-		DumpFieldW->setText(tr("dissipation loss (1/2*E*J*dV)"));
-		DumpChargeW->hide();
-		DumpEField->setText(tr("E-Field"));
-		DumpDField->setText(tr("J-Field"));
-		DumpPField->hide();
-		break;
-	case 3:
-		DumpDivE->hide();
-		DumpDivD->hide();
-		DumpDivP->hide();
-		DumpFieldW->setText(tr("Field Energy (1/2*H*B*dV)"));
-		DumpChargeW->hide();
-		DumpEField->setText(tr("H-Field"));
-		DumpDField->setText(tr("B-Field"));
-		DumpPField->setText(tr("M-Field"));
-		break;
-	}
-
-	QGroupBox* SubGridGB = new QGroupBox(tr("Sub-Grid Dump Options"));
-	SubGridGB->setToolTip(tr("only possible with active Sub-Grids and Sub-Grid-Postprocessing"));
-	QVBoxLayout* SGLay = new QVBoxLayout();
-	DumpSubGrid = new QCheckBox(tr("Use Sub Grid's for Dump - max Level:"));
-	SGLay->addWidget(DumpSubGrid);
-	SGLevel = new QSpinBox();
-	SGLevel->setMinimum(-1);
-	SGLay->addWidget(SGLevel);
-	SimpleGrid = new QCheckBox(tr("User only simple Dump Grid! (Rectilinear Grid)"));
-	SGLay->addWidget(SimpleGrid);
-	SimpleGrid->hide(); //not yet used
-	SubGridGB->setLayout(SGLay);
-	layout->addWidget(SubGridGB);
-
-	QObject::connect(GlobSet,SIGNAL(toggled(bool)),ScalarGB,SLOT(setDisabled(bool)));
-	QObject::connect(GlobSet,SIGNAL(toggled(bool)),VectorGB,SLOT(setDisabled(bool)));
-
 	GetValues();
 
 	setLayout(layout);
@@ -773,35 +646,9 @@ QCSPropDumpBoxGB::~QCSPropDumpBoxGB()
 
 void QCSPropDumpBoxGB::SetValues()
 {
-	clProp->SetGlobalSetting(GlobSet->isChecked());
-	clProp->SetPhiDump(DumpPhi->isChecked());
-	clProp->SetDivEDump(DumpDivE->isChecked());
-	clProp->SetDivDDump(DumpDivD->isChecked());
-	clProp->SetDivPDump(DumpDivP->isChecked());
-	clProp->SetFieldWDump(DumpFieldW->isChecked());
-	clProp->SetChargeWDump(DumpChargeW->isChecked());
-	clProp->SetEFieldDump(DumpEField->isChecked());
-	clProp->SetDFieldDump(DumpDField->isChecked());
-	clProp->SetPFieldDump(DumpPField->isChecked());
-	clProp->SetSGDump(DumpSubGrid->isChecked());
-	clProp->SetSimpleDump(SimpleGrid->isChecked());
-	clProp->SetSGLevel(SGLevel->value());
 }
 
 void QCSPropDumpBoxGB::GetValues()
 {
-	GlobSet->setChecked(clProp->GetGlobalSetting());
-	DumpPhi->setChecked(clProp->GetPhiDump());
-	DumpDivE->setChecked(clProp->GetDivEDump());
-	DumpDivD->setChecked(clProp->GetDivDDump());
-	DumpDivP->setChecked(clProp->GetDivPDump());
-	DumpFieldW->setChecked(clProp->GetFieldWDump());
-	DumpChargeW->setChecked(clProp->GetChargeWDump());
-	DumpEField->setChecked(clProp->GetEFieldDump());
-	DumpDField->setChecked(clProp->GetDFieldDump());
-	DumpPField->setChecked(clProp->GetPFieldDump());
-	DumpSubGrid->setChecked(clProp->GetSGDump());
-	SimpleGrid->setChecked(clProp->GetSimpleDump());
-	SGLevel->setValue(clProp->GetSGLevel());
 }
 

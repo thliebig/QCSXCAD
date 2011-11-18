@@ -147,10 +147,6 @@ signals:
 
 protected:
 	CSPropMaterial* clProp;
-
-	QLineEdit* EpsLine;
-	QLineEdit* MueLine;
-	QLineEdit* KappaLine;
 };
 
 class QCSPropElectrodeGB : public QCSPropertyGroupBox
@@ -237,25 +233,6 @@ signals:
 
 protected:
 	CSPropDumpBox* clProp;
-
-	QCheckBox* GlobSet;
-
-	QCheckBox* DumpPhi;
-	QCheckBox* DumpDivE;
-	QCheckBox* DumpDivD;
-	QCheckBox* DumpDivP;
-	QCheckBox* DumpFieldW;
-	QCheckBox* DumpChargeW;
-
-	QCheckBox* DumpEField;
-	QCheckBox* DumpDField;
-	QCheckBox* DumpPField;
-
-	QCheckBox* DumpSubGrid;
-	QSpinBox* SGLevel;
-	QCheckBox* SimpleGrid;
-
-	QLineEdit* DumpPath;
 };
 
 
