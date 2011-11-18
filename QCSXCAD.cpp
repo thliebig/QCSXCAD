@@ -97,6 +97,7 @@ QCSXCAD::QCSXCAD(QWidget *parent) : QMainWindow(parent)
 	dock->setAllowedAreas(Qt::LeftDockWidgetArea);
 	dock->setWidget(CSTree);
 	dock->setFeatures(QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
+	dock->setObjectName("Properties_and_Structures_Dock");
 
 	addDockWidget(Qt::LeftDockWidgetArea,dock);
 
@@ -110,6 +111,7 @@ QCSXCAD::QCSXCAD(QWidget *parent) : QMainWindow(parent)
 	dock->setAllowedAreas(Qt::LeftDockWidgetArea);
 	dock->setWidget(GridEditor);
 	dock->setFeatures(QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
+	dock->setObjectName("Rectilinear_Grid_Dock");
 	addDockWidget(Qt::LeftDockWidgetArea,dock);
 
 	QParaSet= new QParameterSet();
@@ -121,6 +123,7 @@ QCSXCAD::QCSXCAD(QWidget *parent) : QMainWindow(parent)
 	dock->setAllowedAreas(Qt::LeftDockWidgetArea);
 	dock->setWidget(QParaSet);
 	dock->setFeatures(QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
+	dock->setObjectName("Parameter_Dock");
 	addDockWidget(Qt::LeftDockWidgetArea,dock);
 
 	BuildToolBar();
@@ -872,6 +875,7 @@ void QCSXCAD::clear()
 void QCSXCAD::BuildToolBar()
 {
 	QToolBar *mainTB = addToolBar(tr("General"));
+	mainTB->setObjectName("General_ToolBar");
 
 	mainTB->addAction(QIcon(":/images/filenew.png"),tr("New"),this,SLOT(New()));
 	mainTB->addAction(QIcon(":/images/down.png"),tr("Import"),this,SLOT(ImportGeometry()));
@@ -879,6 +883,7 @@ void QCSXCAD::BuildToolBar()
 
 
 	QToolBar *ItemTB = addToolBar(tr("Item View"));
+	ItemTB->setObjectName("Item_View_ToolBar");
 
 	ItemTB->addAction(tr("CollapseAll"),CSTree,SLOT(collapseAll()));
 	ItemTB->addAction(tr("ExpandAll"),CSTree,SLOT(expandAll()));
@@ -887,6 +892,7 @@ void QCSXCAD::BuildToolBar()
 	ItemTB->addAction(QIcon(":/images/bulb_off.png"),tr("HideAll"),this,SLOT(HideAll()));
 
 	QToolBar *newObjct = addToolBar(tr("add new Primitive"));
+	newObjct->setObjectName("New_Primitive_ToolBar");
 
 	QAction* newAct = NULL;
 	newAct = newObjct->addAction(tr("Box"),this,SLOT(NewBox()));
@@ -908,6 +914,7 @@ void QCSXCAD::BuildToolBar()
 	newAct->setToolTip(tr("add new User Definied Primitive"));
 
 	newObjct = addToolBar(tr("add new Property"));
+	newObjct->setObjectName("New_Property_ToolBar");
 
 	newAct = newObjct->addAction(tr("Material"),this,SLOT(NewMaterial()));
 	newAct->setToolTip(tr("add new Material-Property"));
@@ -928,6 +935,7 @@ void QCSXCAD::BuildToolBar()
 	newAct->setToolTip(tr("add new Dump-Box-Property"));
 
 	newObjct = addToolBar(tr("Zoom"));
+	newObjct->setObjectName("Zoom_ToolBar");
 
 	newAct = newObjct->addAction(QIcon(":/images/viewmagfit.png"),tr("Zoom fit"),this,SLOT(BestView()));
 

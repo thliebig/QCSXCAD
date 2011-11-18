@@ -88,6 +88,7 @@ QCSGridEditor::~QCSGridEditor()
 QToolBar* QCSGridEditor::BuildToolbar()
 {
 	QToolBar *TB = new QToolBar(tr("Discretisation"));
+	TB->setObjectName("Discretisation_ToolBar");
 	TB->addAction(tr("homo\nDisc"),this,SLOT(BuildHomogenDisc()));
 	TB->addAction(tr("inhomo\nDisc"),this,SLOT(BuildInHomogenDisc()));
 	TB->addAction(tr("increase \nDisc"),this,SLOT(IncreaseResolution()));
