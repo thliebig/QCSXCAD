@@ -511,50 +511,16 @@ void QCSPropElectrodeGB::GetValues()
 
 void QCSPropElectrodeGB::TypeChanged(int index)
 {
+	//enable/disable certain lines, depending on the excitation typez
 	switch (index)
 	{
 	default:
-		Excitation[1]->setEnabled(false);
-		Excitation[2]->setEnabled(false);
-		FctLine[0]->setEnabled(false);
-		//VarLine[0]->setEnabled(true);
-		FctLine[1]->setEnabled(false);
-		//VarLine[1]->setEnabled(false);
-		FctLine[2]->setEnabled(false);
-		//VarLine[2]->setEnabled(false);
-		break;
-	case 2:
-	case 3:
-		Excitation[1]->setEnabled(false);
-		Excitation[2]->setEnabled(false);
-		FctLine[0]->setEnabled(true);
-		//VarLine[0]->setEnabled(true);
-		FctLine[1]->setEnabled(false);
-		//VarLine[1]->setEnabled(false);
-		FctLine[2]->setEnabled(false);
-		//VarLine[2]->setEnabled(false);
-		break;
-	case 4:
-	case 6:
-		Excitation[1]->setEnabled(true);
-		Excitation[2]->setEnabled(true);
-		FctLine[0]->setEnabled(false);
-		//VarLine[0]->setEnabled(false);
-		FctLine[1]->setEnabled(false);
-		//VarLine[1]->setEnabled(false);
-		FctLine[2]->setEnabled(false);
-		//VarLine[2]->setEnabled(false);
-		break;
-	case 5:
-	case 7:
+		Excitation[0]->setEnabled(true);
 		Excitation[1]->setEnabled(true);
 		Excitation[2]->setEnabled(true);
 		FctLine[0]->setEnabled(true);
-		//VarLine[0]->setEnabled(true);
 		FctLine[1]->setEnabled(true);
-		//VarLine[1]->setEnabled(true);
 		FctLine[2]->setEnabled(true);
-		//VarLine[2]->setEnabled(true);
 		break;
 	}
 }
