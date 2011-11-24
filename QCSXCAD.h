@@ -43,6 +43,11 @@ public:
 	QCSXCAD(QWidget *parent=NULL);
 	virtual ~QCSXCAD();
 
+	enum ViewMode
+	{
+		VIEW_2D, VIEW_3D
+	};
+
 //	void SetFile(QString filename);
 //	void SetPath(QString path) {relPath=path;};
 //	QString GetFilename();
@@ -155,7 +160,7 @@ protected:
 	void BuildToolBar();
 
 	bool bModified;
-	int ViewLevel;
+	ViewMode ViewLevel;
 	int m_SimMode;
 
 	virtual void keyPressEvent(QKeyEvent * event);

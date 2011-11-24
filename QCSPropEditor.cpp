@@ -408,14 +408,10 @@ QCSPropElectrodeGB::QCSPropElectrodeGB(CSPropElectrode *prop, QWidget *parent) :
 	layout->addWidget(Number,0,1);
 
 	Type = new QComboBox();
-	Type->addItem(tr("Const. Potential (e.g. Voltage)"));
-	Type->addItem(tr("Const. Charge (Current)"));
-	Type->addItem(tr("Var. Potential (e.g. Voltage)"));
-	Type->addItem(tr("Var. Charge (Current)"));
-	Type->addItem(tr("Const. Polarisation"));
-	Type->addItem(tr("Var. Polarisation"));
-	Type->addItem(tr("Const. Vector (e.g. Current-Dens.)"));
-	Type->addItem(tr("Var. Vector (e.g. Current-Dens.)"));
+	Type->addItem(tr("Electric field (soft)"));
+	Type->addItem(tr("Electric field (hard)"));
+	Type->addItem(tr("Magnetic field (soft)"));
+	Type->addItem(tr("Magnetic field (hard)"));
 	layout->addWidget(new QLabel(tr("Type: ")),0,2);
 	layout->addWidget(Type,0,3,1,3);
 	QObject::connect(Type,SIGNAL(currentIndexChanged(int)),this,SLOT(TypeChanged(int)));
@@ -437,25 +433,14 @@ QCSPropElectrodeGB::QCSPropElectrodeGB(CSPropElectrode *prop, QWidget *parent) :
 	FctLine[0] = new QLineEdit();
 	layout->addWidget(FctLine[0],2,1,1,5);
 
-//	layout->addWidget(new QLabel(tr("Analytic Vars (X): ")),2,3);
-//	VarLine[0] = new QLineEdit();
-//	layout->addWidget(VarLine[0],2,4,1,2);
-
 	layout->addWidget(new QLabel(tr("Analytic Fct (Y): ")),3,0);
 	FctLine[1] = new QLineEdit();
 	layout->addWidget(FctLine[1],3,1,1,5);
-
-//	layout->addWidget(new QLabel(tr("Analytic Vars (Y): ")),3,3);
-//	VarLine[1] = new QLineEdit();
-//	layout->addWidget(VarLine[1],3,4,1,2);
 
 	layout->addWidget(new QLabel(tr("Analytic Fct (Z): ")),4,0);
 	FctLine[2] = new QLineEdit();
 	layout->addWidget(FctLine[2],4,1,1,5);
 
-//	layout->addWidget(new QLabel(tr("Analytic Vars (Z): ")),4,3);
-//	VarLine[2] = new QLineEdit();
-//	layout->addWidget(VarLine[2],2,4,1,2);
 	GetValues();
 
 	setLayout(layout);
@@ -481,10 +466,7 @@ void QCSPropElectrodeGB::SetValues()
 	clProp->SetNumber((unsigned int)Number->value());
 	clProp->SetExcitType(Type->currentIndex()+1);
 	for (unsigned int i=0;i<3;++i)
-	{
 		clProp->SetWeightFunction(FctLine[i]->text().toLatin1().data(),i);
-		//clProp->SetWeightVars(VarLine[i]->text().toLatin1().data(),i);
-	}
 }
 
 void QCSPropElectrodeGB::GetValues()
@@ -499,14 +481,11 @@ void QCSPropElectrodeGB::GetValues()
 	}
 
 	Number->setValue(clProp->GetNumber());
-	Type->setCurrentIndex(clProp->GetExcitType()-1);
-	TypeChanged(clProp->GetExcitType()-1);
+	Type->setCurrentIndex(clProp->GetExcitType());
+	TypeChanged(clProp->GetExcitType());
 
 	for (unsigned int i=0;i<3;++i)
-	{
 		FctLine[i]->setText(clProp->GetWeightFunction(i).c_str());
-		//VarLine[i]->setText(clProp->GetWeightVars(i));
-	}
 }
 
 void QCSPropElectrodeGB::TypeChanged(int index)

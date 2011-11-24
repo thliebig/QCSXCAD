@@ -58,7 +58,7 @@ QCSXCAD::QCSXCAD(QWidget *parent) : QMainWindow(parent)
 //	Layout->setColumnStretch(3,1);
 //	Layout->setRowStretch(4,1);
 
-	ViewLevel=0; //0=2D; 1=3D view
+	ViewLevel=VIEW_2D;
 
 	StructureVTK = new QVTKStructure();
 	StructureVTK->SetGeometry(this);
@@ -490,8 +490,8 @@ void QCSXCAD::SetVisibility2All(bool value)
 		CSProperties* prop = vProperties.at(n);
 		prop->SetVisibility(value);
 		CSTree->RefreshItem(GetIndex(prop));
-		if (ViewLevel==0) DrawWidget->update();
-		if (ViewLevel==1)
+		if (ViewLevel==VIEW_2D) DrawWidget->update();
+		if (ViewLevel==VIEW_3D)
 		{
 			if (value) StructureVTK->SetPropOpacity(prop->GetUniqueID(),prop->GetFillColor().a);
 			else StructureVTK->SetPropOpacity(prop->GetUniqueID(),0);
@@ -517,8 +517,8 @@ void QCSXCAD::ShowHide()
 	{
 		prop->SetVisibility(!prop->GetVisibility());
 		CSTree->RefreshItem(GetIndex(prop));
-		if (ViewLevel==0) DrawWidget->update();
-		if (ViewLevel==1)
+		if (ViewLevel==VIEW_2D) DrawWidget->update();
+		if (ViewLevel==VIEW_3D)
 		{
 			if (prop->GetVisibility()) StructureVTK->SetPropOpacity(prop->GetUniqueID(),prop->GetFillColor().a);
 			else StructureVTK->SetPropOpacity(prop->GetUniqueID(),0);
@@ -658,7 +658,7 @@ void QCSXCAD::DetectEdges(int nu)
 
 void QCSXCAD::BestView()
 {
-	if (ViewLevel==0)
+	if (ViewLevel==VIEW_2D)
 	{
 		double area[6];
 		double* SimArea=clGrid.GetSimArea();
@@ -679,19 +679,19 @@ void QCSXCAD::BestView()
 
 void QCSXCAD::setXY()
 {
-	if (ViewLevel==1) StructureVTK->setXY();
+	if (ViewLevel==VIEW_3D) StructureVTK->setXY();
 	else DrawWidget->setXY();
 }
 
 void QCSXCAD::setYZ()
 {
-	if (ViewLevel==1) StructureVTK->setYZ();
+	if (ViewLevel==VIEW_3D) StructureVTK->setYZ();
 	else DrawWidget->setYZ();
 }
 
 void QCSXCAD::setZX()
 {
-	if (ViewLevel==1) StructureVTK->setZX();
+	if (ViewLevel==VIEW_3D) StructureVTK->setZX();
 	else DrawWidget->setZX();
 }
 
@@ -852,7 +852,7 @@ void QCSXCAD::ExportGeometry_STL()
 
 void QCSXCAD::ExportView2Image()
 {
-	if (ViewLevel==1)
+	if (ViewLevel==VIEW_3D)
 		StructureVTK->ExportView2Image();
 	else
 		QMessageBox::warning(this,tr("PNG export"),tr("Not Yet Implemented for 2D view, use 3D instead."),QMessageBox::Ok,QMessageBox::NoButton);
@@ -971,14 +971,14 @@ void QCSXCAD::BuildToolBar()
 
 void QCSXCAD::View2D()
 {
-	ViewLevel=0;
+	ViewLevel=VIEW_2D;
 	StackWidget->setCurrentIndex(ViewLevel);
 	StructureVTK->SetUpdateMode(false);
 }
 
 void QCSXCAD::View3D()
 {
-	ViewLevel=1;
+	ViewLevel=VIEW_3D;
 
 	StackWidget->setCurrentIndex(ViewLevel);
 	StructureVTK->SetUpdateMode(true);
