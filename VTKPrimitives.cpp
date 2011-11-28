@@ -82,7 +82,7 @@ VTKPrimitives::VTKPrimitives()
 {
 }
 
-void VTKPrimitives::AddCube(const double *start, const double *stop, double *dRGB, double dOpacity)
+void VTKPrimitives::AddCube(const double *start, const double *stop, double *dRGB, double dOpacity, double* tf_matrix)
 {
 	double coords[6] = {start[0],stop[0],start[1],stop[1],start[2],stop[2]};
 	double help;
@@ -96,29 +96,38 @@ void VTKPrimitives::AddCube(const double *start, const double *stop, double *dRG
 			coords[2*n]=help;
 		}
 	}
-	AddCube(coords,dRGB,dOpacity);
+	AddCube(coords,dRGB,dOpacity,tf_matrix);
 }
 
-void VTKPrimitives::AddCube(double *dCoords, double *dRGB, double dOpacity)
+void VTKPrimitives::AddCube(double *dCoords, double *dRGB, double dOpacity, double* tf_matrix)
 {
 	//create a simple cartesian cube...
 	vtkCubeSource *Source = vtkCubeSource::New();
 	Source->SetBounds(dCoords);
-	m_PolyDataCollection->AddInput(Source->GetOutput());
+
+	vtkTransformPolyDataFilter* filter = vtkTransformPolyDataFilter::New();
+	vtkTransform* vtrans = vtkTransform::New();
+	filter->SetInput(Source->GetOutput());
+	if (tf_matrix)
+		vtrans->SetMatrix(tf_matrix);
+	filter->SetTransform(vtrans);
+
+	m_PolyDataCollection->AddInput(filter->GetOutput());
 	vtkPolyDataMapper *SourceMapper = vtkPolyDataMapper::New();
 	vtkActor *SourceActor = vtkActor::New();
-	SourceMapper->SetInput(Source->GetOutput());
+	SourceMapper->SetInput(filter->GetOutput());
 	SourceActor->SetMapper(SourceMapper);
 	SourceActor->GetProperty()->SetColor(dRGB);
 	SourceActor->GetProperty()->SetOpacity(dOpacity);
 	ren->AddActor(SourceActor);
 	ActorColl->AddItem(SourceActor);
 	Source->Delete();
-//	SourceMapper->Delete();
-	//SourceActor->Delete();
+	filter->Delete();
+	vtrans->Delete();
+	SourceMapper->Delete();
 }
 
-void VTKPrimitives::AddCylindricalCube(const double *start, const double *stop, double *dRGB, double dOpacity)
+void VTKPrimitives::AddCylindricalCube(const double *start, const double *stop, double *dRGB, double dOpacity, double* tf_matrix)
 {
 	double coords[6] = {start[0],stop[0],start[1],stop[1],start[2],stop[2]};
 	double help;
@@ -132,11 +141,11 @@ void VTKPrimitives::AddCylindricalCube(const double *start, const double *stop, 
 			coords[2*n]=help;
 		}
 	}
-	AddCylindricalCube(coords,dRGB,dOpacity);
+	AddCylindricalCube(coords,dRGB,dOpacity,tf_matrix);
 }
 
 
-void VTKPrimitives::AddCylindricalCube(double *dCoords, double *dRGB, double dOpacity)
+void VTKPrimitives::AddCylindricalCube(double *dCoords, double *dRGB, double dOpacity, double* tf_matrix)
 {
 	vtkPolyDataAlgorithm* PDSource = NULL;
 	vtkPolyDataAlgorithm* PDFilter = NULL;
@@ -214,10 +223,17 @@ void VTKPrimitives::AddCylindricalCube(double *dCoords, double *dRGB, double dOp
 	if (PDFilter==NULL)
 		return;
 
-	m_PolyDataCollection->AddInput(PDFilter->GetOutput());
+	vtkTransformPolyDataFilter* filter = vtkTransformPolyDataFilter::New();
+	vtkTransform* vtrans = vtkTransform::New();
+	filter->SetInput(PDFilter->GetOutput());
+	if (tf_matrix)
+		vtrans->SetMatrix(tf_matrix);
+	filter->SetTransform(vtrans);
+
+	m_PolyDataCollection->AddInput(filter->GetOutput());
 	vtkPolyDataMapper *SourceMapper = vtkPolyDataMapper::New();
 	vtkActor *SourceActor = vtkActor::New();
-	SourceMapper->SetInput(PDFilter->GetOutput());
+	SourceMapper->SetInput(filter->GetOutput());
 	SourceActor->SetMapper(SourceMapper);
 	SourceActor->GetProperty()->SetColor(dRGB);
 	SourceActor->GetProperty()->SetOpacity(dOpacity);
@@ -227,9 +243,11 @@ void VTKPrimitives::AddCylindricalCube(double *dCoords, double *dRGB, double dOp
 	if (PDSource)
 		PDSource->Delete();
 	PDFilter->Delete();
+	filter->Delete();
+	vtrans->Delete();
 }
 
-void VTKPrimitives::AddPlane(double *dOrigin, double* dP1, double* dP2, double *dRGB, double dOpacity)
+void VTKPrimitives::AddPlane(double *dOrigin, double* dP1, double* dP2, double *dRGB, double dOpacity, double* tf_matrix)
 {
 	double out[3];
 	vtkPlaneSource *Source = vtkPlaneSource::New();
@@ -237,21 +255,30 @@ void VTKPrimitives::AddPlane(double *dOrigin, double* dP1, double* dP2, double *
 	Source->SetPoint1(TransformCylindricalCoords(dP1,out));
 	Source->SetPoint2(TransformCylindricalCoords(dP2,out));
 
+	vtkTransformPolyDataFilter* filter = vtkTransformPolyDataFilter::New();
+	vtkTransform* vtrans = vtkTransform::New();
+	filter->SetInput(Source->GetOutput());
+	if (tf_matrix)
+		vtrans->SetMatrix(tf_matrix);
+	filter->SetTransform(vtrans);
+
 	vtkPolyDataMapper *SourceMapper = vtkPolyDataMapper::New();
 	vtkActor *SourceActor = vtkActor::New();
-	SourceMapper->SetInput(Source->GetOutput());
+	SourceMapper->SetInput(filter->GetOutput());
 	SourceActor->SetMapper(SourceMapper);
 	SourceActor->GetProperty()->SetColor(dRGB);
 	SourceActor->GetProperty()->SetOpacity(dOpacity);
 	ren->AddActor(SourceActor);
 	ActorColl->AddItem(SourceActor);
-	m_PolyDataCollection->AddInput(Source->GetOutput());
+	m_PolyDataCollection->AddInput(filter->GetOutput());
 	Source->Delete();
 	SourceMapper->Delete();
+	filter->Delete();
+	vtrans->Delete();
 }
 
 
-void VTKPrimitives::AddDisc(double *dCoords, unsigned int uiQtyCoords, double *dRGB, double dOpacity)
+void VTKPrimitives::AddDisc(double *dCoords, unsigned int uiQtyCoords, double *dRGB, double dOpacity, double* tf_matrix)
 {
 	unsigned int i=0,j=0;//,h=0;//,k=0;
 //	vtkIdType pts[6][4]={{0,1,2,3}, {4,5,6,7}, {0,1,5,4},
@@ -283,9 +310,17 @@ void VTKPrimitives::AddDisc(double *dCoords, unsigned int uiQtyCoords, double *d
 	}
 	profile->SetPoints(points);
 	profile->SetPolys(poly);
+
+	vtkTransformPolyDataFilter* filter = vtkTransformPolyDataFilter::New();
+	vtkTransform* vtrans = vtkTransform::New();
+	filter->SetInput(profile);
+	if (tf_matrix)
+		vtrans->SetMatrix(tf_matrix);
+	filter->SetTransform(vtrans);
+
 	//profile->GetPointData()->SetScalars(scalars);
-	m_PolyDataCollection->AddInput(profile);
-	Mapper->SetInput(profile);
+	m_PolyDataCollection->AddInput(filter->GetOutput());
+	Mapper->SetInput(filter->GetOutput());
 	//Mapper->SetScalarRange(0,8);
 	Actor->SetMapper(Mapper);
 	Actor->GetProperty()->SetColor(dRGB);
@@ -299,10 +334,12 @@ void VTKPrimitives::AddDisc(double *dCoords, unsigned int uiQtyCoords, double *d
 	Mapper->Delete();
 	//Actor->Delete();
 	//scalars->Delete();
+	filter->Delete();
+	vtrans->Delete();
 }
 
 
-void VTKPrimitives::AddClosedPoly(double *dCoords, unsigned int uiQtyCoords, double *dExtrusionVector, double *dRGB, double dOpacity)
+void VTKPrimitives::AddClosedPoly(double *dCoords, unsigned int uiQtyCoords, double *dExtrusionVector, double *dRGB, double dOpacity, double* tf_matrix)
 {  //complete
 	unsigned int i=0;
 	vtkPoints *points = vtkPoints::New();
@@ -327,8 +364,15 @@ void VTKPrimitives::AddClosedPoly(double *dCoords, unsigned int uiQtyCoords, dou
 
 //	fprintf(stderr,"\n Vector: %f %f %f", dExtrusionVector[0],dExtrusionVector[1],dExtrusionVector[2]);
 
-	m_PolyDataCollection->AddInput(extrude->GetOutput());
-	Mapper->SetInput(extrude->GetOutput());
+	vtkTransformPolyDataFilter* filter = vtkTransformPolyDataFilter::New();
+	vtkTransform* vtrans = vtkTransform::New();
+	filter->SetInput(extrude->GetOutput());
+	if (tf_matrix)
+		vtrans->SetMatrix(tf_matrix);
+	filter->SetTransform(vtrans);
+
+	m_PolyDataCollection->AddInput(filter->GetOutput());
+	Mapper->SetInput(filter->GetOutput());
 	Actor->SetMapper(Mapper);
 	Actor->GetProperty()->SetColor(dRGB);
 	Actor->GetProperty()->SetOpacity(dOpacity);
@@ -342,10 +386,11 @@ void VTKPrimitives::AddClosedPoly(double *dCoords, unsigned int uiQtyCoords, dou
 	extrude->Delete();
 
 	Mapper->Delete();
-	//Actor->Delete();
+	filter->Delete();
+	vtrans->Delete();
 }
 
-void VTKPrimitives::AddLinePoly(double *dCoords, unsigned int uiQtyCoords, unsigned int LineWidth, double *dRGB, double dOpacity)
+void VTKPrimitives::AddLinePoly(double *dCoords, unsigned int uiQtyCoords, unsigned int LineWidth, double *dRGB, double dOpacity, double* tf_matrix)
 { //complete
 	unsigned int i=0;
 	vtkPoints *points = vtkPoints::New();
@@ -364,8 +409,15 @@ void VTKPrimitives::AddLinePoly(double *dCoords, unsigned int uiQtyCoords, unsig
 	profile->SetPoints(points);
 	profile->SetLines(poly);
 
-	m_PolyDataCollection->AddInput(profile);
-	Mapper->SetInput(profile);
+	vtkTransformPolyDataFilter* filter = vtkTransformPolyDataFilter::New();
+	vtkTransform* vtrans = vtkTransform::New();
+	filter->SetInput(profile);
+	if (tf_matrix)
+		vtrans->SetMatrix(tf_matrix);
+	filter->SetTransform(vtrans);
+
+	m_PolyDataCollection->AddInput(filter->GetOutput());
+	Mapper->SetInput(filter->GetOutput());
 	Actor->SetMapper(Mapper);
 	Actor->GetProperty()->SetColor(dRGB);
 	Actor->GetProperty()->SetOpacity(dOpacity);
@@ -378,10 +430,11 @@ void VTKPrimitives::AddLinePoly(double *dCoords, unsigned int uiQtyCoords, unsig
 	poly->Delete();
 	profile->Delete();
 	Mapper->Delete();
-	//Actor->Delete();
+	filter->Delete();
+	vtrans->Delete();
 }
 
-void VTKPrimitives::AddTubePoly(double *dCoords, unsigned int uiQtyCoords, double TubeRadius, double *dRGB, double dOpacity, int iResolution)
+void VTKPrimitives::AddTubePoly(double *dCoords, unsigned int uiQtyCoords, double TubeRadius, double *dRGB, double dOpacity, int iResolution, double* tf_matrix)
 { //complete
 	unsigned int i=0;
 	vtkPoints *points = vtkPoints::New();
@@ -405,9 +458,16 @@ void VTKPrimitives::AddTubePoly(double *dCoords, unsigned int uiQtyCoords, doubl
 	m_profileTubes->SetInput(profile);
 	m_profileTubes->SetRadius(TubeRadius);
 
-	Mapper->SetInputConnection( m_profileTubes->GetOutputPort());
 
-	m_PolyDataCollection->AddInput(m_profileTubes->GetOutput());
+	vtkTransformPolyDataFilter* filter = vtkTransformPolyDataFilter::New();
+	vtkTransform* vtrans = vtkTransform::New();
+	filter->SetInput(m_profileTubes->GetOutput());
+	if (tf_matrix)
+		vtrans->SetMatrix(tf_matrix);
+	filter->SetTransform(vtrans);
+
+	Mapper->SetInput( filter->GetOutput());
+	m_PolyDataCollection->AddInput(filter->GetOutput());
 
 	Actor->SetMapper(Mapper);
 	Actor->GetProperty()->SetColor(dRGB);
@@ -420,16 +480,17 @@ void VTKPrimitives::AddTubePoly(double *dCoords, unsigned int uiQtyCoords, doubl
 	poly->Delete();
 	profile->Delete();
 	Mapper->Delete();
-	//Actor->Delete();
+	filter->Delete();
+	vtrans->Delete();
 }
 
-void VTKPrimitives::AddCylinder2(const double *dAxisStart, const double* dAxisStop, float fRadius, double *dRGB, double dOpacity, int iResolution)
+void VTKPrimitives::AddCylinder2(const double *dAxisStart, const double* dAxisStop, float fRadius, double *dRGB, double dOpacity, int iResolution, double* tf_matrix)
 {
 	double direction[3] = {dAxisStop[0]-dAxisStart[0],dAxisStop[1]-dAxisStart[1],dAxisStop[2]-dAxisStart[2]};
-	AddCylinder(dAxisStart,direction,fRadius,dRGB,dOpacity,iResolution);
+	AddCylinder(dAxisStart,direction,fRadius,dRGB,dOpacity,iResolution,tf_matrix);
 }
 
-void VTKPrimitives::AddCylinder(const double *dCenter, const double *dExtrusionVector, float fRadius, double *dRGB, double dOpacity, int iResolution)
+void VTKPrimitives::AddCylinder(const double *dCenter, const double *dExtrusionVector, float fRadius, double *dRGB, double dOpacity, int iResolution, double* tf_matrix)
 {
 	double alpha=0,beta=0;
 	double length=sqrt( dExtrusionVector[0]*dExtrusionVector[0]+dExtrusionVector[1]*dExtrusionVector[1]+dExtrusionVector[2]*dExtrusionVector[2] ) ;
@@ -452,6 +513,10 @@ void VTKPrimitives::AddCylinder(const double *dCenter, const double *dExtrusionV
 	transform->RotateWXYZ(beta,1,0,0);
 	transform->RotateWXYZ(alpha,0,0,1);
 
+	transform->PostMultiply();
+	if (tf_matrix)
+		transform->Concatenate(tf_matrix);
+
 	transformFilter->SetInput(Source->GetOutput());
 	transformFilter->SetTransform(transform);
 
@@ -468,10 +533,9 @@ void VTKPrimitives::AddCylinder(const double *dCenter, const double *dExtrusionV
 	transform->Delete();
 	transformFilter->Delete();
 	SourceMapper->Delete();
-	//SourceActor->Delete();
 }
 
-void VTKPrimitives::AddSphere(const double *dCenter, float fRadius, double *dRGB, double dOpacity, int iResolution)
+void VTKPrimitives::AddSphere(const double *dCenter, float fRadius, double *dRGB, double dOpacity, int iResolution, double* tf_matrix)
 {//complete
 	vtkSphereSource *Source = vtkSphereSource::New();
 	vtkPolyDataMapper *SourceMapper = vtkPolyDataMapper::New();
@@ -481,8 +545,16 @@ void VTKPrimitives::AddSphere(const double *dCenter, float fRadius, double *dRGB
 	Source->SetRadius(fRadius);
 	Source->SetPhiResolution(iResolution);
 	Source->SetThetaResolution(iResolution);
-	m_PolyDataCollection->AddInput(Source->GetOutput());
-	SourceMapper->SetInput(Source->GetOutput());
+
+	vtkTransformPolyDataFilter* filter = vtkTransformPolyDataFilter::New();
+	vtkTransform* vtrans = vtkTransform::New();
+	filter->SetInput(Source->GetOutput());
+	if (tf_matrix)
+		vtrans->SetMatrix(tf_matrix);
+	filter->SetTransform(vtrans);
+
+	m_PolyDataCollection->AddInput(filter->GetOutput());
+	SourceMapper->SetInput(filter->GetOutput());
 	SourceActor->SetMapper(SourceMapper);
 	SourceActor->GetProperty()->SetColor(dRGB);
 	SourceActor->GetProperty()->SetOpacity(dOpacity);
@@ -490,10 +562,11 @@ void VTKPrimitives::AddSphere(const double *dCenter, float fRadius, double *dRGB
 	ActorColl->AddItem(SourceActor);
 	Source->Delete();
 	SourceMapper->Delete();
-	//SourceActor->Delete();
+	filter->Delete();
+	vtrans->Delete();
 }
 
-void VTKPrimitives::AddArrow(double *dStart, double *dEnd, double *dRGB, double dOpacity, int iResolution)
+void VTKPrimitives::AddArrow(double *dStart, double *dEnd, double *dRGB, double dOpacity, int iResolution, double* tf_matrix)
 {
 	double alpha=0,beta=0;
 	double dvector[3]={dEnd[0]-dStart[0],dEnd[1]-dStart[1],dEnd[2]-dStart[2]};
@@ -518,6 +591,10 @@ void VTKPrimitives::AddArrow(double *dStart, double *dEnd, double *dRGB, double 
 	transform->RotateWXYZ(beta,1,0,0);
 	transform->RotateWXYZ(alpha,0,0,1);
 	transform->RotateWXYZ(90,0,0,1);
+
+	transform->PostMultiply();
+	if (tf_matrix)
+		transform->Concatenate(tf_matrix);
 	
 	transformFilter->SetInput(Source->GetOutput());
 	transformFilter->SetTransform(transform);
@@ -536,17 +613,24 @@ void VTKPrimitives::AddArrow(double *dStart, double *dEnd, double *dRGB, double 
 	transform->Delete();
 	transformFilter->Delete();
 	SourceMapper->Delete();
-	//SourceActor->Delete();
 }
 
-void VTKPrimitives::AddLabel(char *cText, double *dCoords, double *dRGB, double dOpacity, double dscale)
+void VTKPrimitives::AddLabel(char *cText, double *dCoords, double *dRGB, double dOpacity, double dscale, double* tf_matrix)
 {
 	vtkVectorText *text = vtkVectorText::New();
 	vtkPolyDataMapper *Mapper = vtkPolyDataMapper::New();
 	vtkFollower *Actor = vtkFollower::New();
 	text->SetText(cText);
-	m_PolyDataCollection->AddInput(text->GetOutput());
-	Mapper->SetInput(text->GetOutput());
+
+	vtkTransformPolyDataFilter* filter = vtkTransformPolyDataFilter::New();
+	vtkTransform* vtrans = vtkTransform::New();
+	filter->SetInput(text->GetOutput());
+	if (tf_matrix)
+		vtrans->SetMatrix(tf_matrix);
+	filter->SetTransform(vtrans);
+
+	m_PolyDataCollection->AddInput(filter->GetOutput());
+	Mapper->SetInput(filter->GetOutput());
 	Actor->SetMapper(Mapper);
 	Actor->SetScale(dscale);
 	Actor->SetCamera(ren->GetActiveCamera());
@@ -557,12 +641,13 @@ void VTKPrimitives::AddLabel(char *cText, double *dCoords, double *dRGB, double 
 	ren->AddActor(Actor);
 	ActorColl->AddItem(Actor);
 
-	//Actor->Delete();
 	Mapper->Delete();
 	text->Delete();
+	filter->Delete();
+	vtrans->Delete();
 }
 
-void VTKPrimitives::AddRotationalPoly(double *dCoords, unsigned int uiQtyCoords, double *fRotAxis, double *dRGB, double dOpacity, int iResolution)
+void VTKPrimitives::AddRotationalPoly(double *dCoords, unsigned int uiQtyCoords, double *fRotAxis, double *dRGB, double dOpacity, int iResolution, double* tf_matrix)
 {//complete, noch nicht ausgiebig getestet!!!
 	unsigned int i=0;
 	double start[3]={0,0,0},vector[3]={0,0,0},origin[3]={0,0,0},Footpoint[3]={0,0,0},Basepoint[3]={0,0,0},point[3]={0,0,0};
@@ -627,6 +712,10 @@ void VTKPrimitives::AddRotationalPoly(double *dCoords, unsigned int uiQtyCoords,
 	transform->RotateWXYZ(alpha,0,0,1);
 	transform->RotateWXYZ(-90,1,0,0);
 
+	transform->PostMultiply();
+	if (tf_matrix)
+		transform->Concatenate(tf_matrix);
+
 	transformFilter->SetInput(extrude->GetOutput());
 	transformFilter->SetTransform(transform);
 
@@ -648,10 +737,9 @@ void VTKPrimitives::AddRotationalPoly(double *dCoords, unsigned int uiQtyCoords,
 	transform->Delete();
 	transformFilter->Delete();
 	Mapper->Delete();
-	//Actor->Delete();
 }
 
-void VTKPrimitives::AddRotationalSolid(double *dPoint, double fRadius, double *fRotAxis, double *dRGB, double dOpacity, int iResolution)
+void VTKPrimitives::AddRotationalSolid(double *dPoint, double fRadius, double *fRotAxis, double *dRGB, double dOpacity, int iResolution, double* tf_matrix)
 {
 	vtkPoints *points = vtkPoints::New();
 	vtkCellArray *poly = vtkCellArray::New();
@@ -700,6 +788,10 @@ void VTKPrimitives::AddRotationalSolid(double *dPoint, double fRadius, double *f
 	transform->RotateWXYZ(alpha,0,0,1);
 	transform->RotateWXYZ(-90,1,0,0);
 
+	transform->PostMultiply();
+	if (tf_matrix)
+		transform->Concatenate(tf_matrix);
+
 	transformFilter->SetInput(extrude->GetOutput());
 	transformFilter->SetTransform(transform);
 
@@ -719,11 +811,10 @@ void VTKPrimitives::AddRotationalSolid(double *dPoint, double fRadius, double *f
 	transform->Delete();
 	transformFilter->Delete();
 	Mapper->Delete();
-	//Actor->Delete();
 }
 
 
-void VTKPrimitives::AddSurface(double *dCoords, unsigned int uiQtyCoords, double *dRGB, double dOpacity)
+void VTKPrimitives::AddSurface(double *dCoords, unsigned int uiQtyCoords, double *dRGB, double dOpacity, double* tf_matrix)
 {//complete
 	unsigned int i=0;
 	vtkPoints *points = vtkPoints::New();
@@ -741,8 +832,16 @@ void VTKPrimitives::AddSurface(double *dCoords, unsigned int uiQtyCoords, double
 	}
 	profile->SetPoints(points);
 	profile->SetPolys(poly);
-	m_PolyDataCollection->AddInput(profile);
-	Mapper->SetInput(profile);
+
+	vtkTransformPolyDataFilter* filter = vtkTransformPolyDataFilter::New();
+	vtkTransform* vtrans = vtkTransform::New();
+	filter->SetInput(profile);
+	if (tf_matrix)
+		vtrans->SetMatrix(tf_matrix);
+	filter->SetTransform(vtrans);
+
+	m_PolyDataCollection->AddInput(filter->GetOutput());
+	Mapper->SetInput(filter->GetOutput());
 	Actor->SetMapper(Mapper);
 	Actor->GetProperty()->SetColor(dRGB);
 	Actor->GetProperty()->SetOpacity(dOpacity);
@@ -755,19 +854,27 @@ void VTKPrimitives::AddSurface(double *dCoords, unsigned int uiQtyCoords, double
 	poly->Delete();
 	profile->Delete();
 	Mapper->Delete();
-	//Actor->Delete();
-
+	filter->Delete();
+	vtrans->Delete();
 }
 
 
 
-void VTKPrimitives::AddSTLObject(char *Filename, double *dCenter, double *dRGB, double dOpacity)
+void VTKPrimitives::AddSTLObject(char *Filename, double *dCenter, double *dRGB, double dOpacity, double* tf_matrix)
 { //complete??
 	vtkSTLReader *part = vtkSTLReader::New();
 	part->SetFileName(Filename);
 	vtkPolyDataMapper *partMapper = vtkPolyDataMapper::New();
-	m_PolyDataCollection->AddInput(part->GetOutput());
-	partMapper->SetInput(part->GetOutput());
+
+	vtkTransformPolyDataFilter* filter = vtkTransformPolyDataFilter::New();
+	vtkTransform* vtrans = vtkTransform::New();
+	filter->SetInput(part->GetOutput());
+	if (tf_matrix)
+		vtrans->SetMatrix(tf_matrix);
+	filter->SetTransform(vtrans);
+
+	m_PolyDataCollection->AddInput(filter->GetOutput());
+	partMapper->SetInput(filter->GetOutput());
 	partMapper->ScalarVisibilityOff();
 	vtkActor *partActor = vtkActor::New();
 	partActor->SetMapper(partMapper);
@@ -778,7 +885,8 @@ void VTKPrimitives::AddSTLObject(char *Filename, double *dCenter, double *dRGB, 
 	ActorColl->AddItem(partActor);
 	part->Delete();
 	partMapper->Delete();
-	//partActor->Delete();
+	filter->Delete();
+	vtrans->Delete();
 }
 
 void VTKPrimitives::SetOpacity2All(double opacity)

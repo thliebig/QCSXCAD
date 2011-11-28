@@ -44,53 +44,53 @@ public:
 	~VTKPrimitives();
 	/// Add a Cube to scene
 	/*! \param *dCoords Set points as room diagonal (Xmin,Xmax,Ymin,Ymax,Zmin,,Zmax) \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness)  */
-	void AddCube(double *dCoords, double *dRGB, double dOpacity);	//complete
-	void AddCube(const double *dStart, const double *dStop, double *dRGB, double dOpacity);	//complete
+	void AddCube(double *dCoords, double *dRGB, double dOpacity, double* tf_matrix=0);	//complete
+	void AddCube(const double *dStart, const double *dStop, double *dRGB, double dOpacity, double* tf_matrix=0);	//complete
 	/// Add a Cube in cylindrical coordinates to scene
 	/*! \param *dCoords Set points as room diagonal (Rmin,Rmax,Amin,Amax,Zmin,,Zmax) \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness)  */
-	void AddCylindricalCube(double *dCoords, double *dRGB, double dOpacity);
-	void AddCylindricalCube(const double *dStart, const double *dStop, double *dRGB, double dOpacity);
+	void AddCylindricalCube(double *dCoords, double *dRGB, double dOpacity, double* tf_matrix=0);
+	void AddCylindricalCube(const double *dStart, const double *dStop, double *dRGB, double dOpacity, double* tf_matrix=0);
 	/// Add a Plane to scene
 	/*! \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness)  */
-	void AddPlane(double *dOrigin, double* dP1, double* dP2, double *dRGB, double dOpacity);	//complete
+	void AddPlane(double *dOrigin, double* dP1, double* dP2, double *dRGB, double dOpacity, double* tf_matrix=0);	//complete
 	/// Add a discrete object (many cubes) to scene
 	/*! \param *dCoords Set Points as X1,X2,...,Xn,Y1,Y2,...,Yn,Z1,Z2,...Zn. \param uiQtyCoords Set quantity of Points X,Y,Z. \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness) */
-	void AddDisc(double *dCoords, unsigned int uiQtyCoords, double *dRGB, double dOpacity);
+	void AddDisc(double *dCoords, unsigned int uiQtyCoords, double *dRGB, double dOpacity, double* tf_matrix=0);
 	/// Add a closed polygon to scene
 	/*! \param *dCoords Set Points as X1,X2,...,Xn,Y1,Y2,...,Yn,Z1,Z2,...Zn for polygon. \param uiQtyCoords Set Quantity of Points X,Y,Z \param dExtrusionVector Give extrusion vector (X,Y,Z) \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness)*/
-	void AddClosedPoly(double *dCoords, unsigned int uiQtyCoords, double *dExtrusionVector, double *dRGB, double dOpacity);//complete
+	void AddClosedPoly(double *dCoords, unsigned int uiQtyCoords, double *dExtrusionVector, double *dRGB, double dOpacity, double* tf_matrix=0);//complete
 	/// Add a linear polygon to scene
 	/*! \param *dCoords Set Points as X1,X2,...,Xn,Y1,Y2,...,Yn,Z1,Z2,...Zn for polygon. \param uiQtyCoords Set Quantity of Points X,Y,Z \param LineWidth Set line width \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness)*/
-	void AddLinePoly(double *dCoords, unsigned int uiQtyCoords,unsigned int LineWidth, double *dRGB, double dOpacity);//complete
+	void AddLinePoly(double *dCoords, unsigned int uiQtyCoords,unsigned int LineWidth, double *dRGB, double dOpacity, double* tf_matrix=0);//complete
 	/// Add a linear polygon as tubes to scene
 	/*! \param *dCoords Set Points as X1,X2,...,Xn,Y1,Y2,...,Yn,Z1,Z2,...Zn for polygon. \param uiQtyCoords Set Quantity of Points X,Y,Z \param TubeRadius Set tube radius \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness)*/
-	void AddTubePoly(double *dCoords, unsigned int uiQtyCoords, double TubeRadius, double *dRGB, double dOpacity, int iResolution=8);//complete
+	void AddTubePoly(double *dCoords, unsigned int uiQtyCoords, double TubeRadius, double *dRGB, double dOpacity, int iResolution=8, double* tf_matrix=0);//complete
 	/// Add a cylinder to scene
 	/*!  \param *dCenterAxis Set Base Point in 3D space \param *dExtrusionVector Set height (absolute value) and direction \param fRadius Set Radius \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness) \param iResolution Set resolution of discretisation*/
-	void AddCylinder(const double *dCenterAxis, const double *dExtrusionVector, float fRadius, double *dRGB, double dOpacity, int iResolution); //complete
+	void AddCylinder(const double *dCenterAxis, const double *dExtrusionVector, float fRadius, double *dRGB, double dOpacity, int iResolution, double* tf_matrix=0); //complete
 	/*!  \param *dAxisStart Cylinder axis start point \param *dAxisStop Cylinder axis end point \param fRadius Set Radius \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness) \param iResolution Set resolution of discretisation*/
-	void AddCylinder2(const double *dAxisStart, const double* dAxisStop, float fRadius, double *dRGB, double dOpacity, int iResolution); //complete
+	void AddCylinder2(const double *dAxisStart, const double* dAxisStop, float fRadius, double *dRGB, double dOpacity, int iResolution, double* tf_matrix=0); //complete
 	/// Add a Sphere to scene
 	/*! \param *dCenter Set Center Point in 3D space \param fRadius Set Radius \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness) \param iResolution Set resolution of discretisation*/
-	void AddSphere(const double *dCenter, float fRadius, double *dRGB, double dOpacity, int iResolution);	//complete
+	void AddSphere(const double *dCenter, float fRadius, double *dRGB, double dOpacity, int iResolution, double* tf_matrix=0);	//complete
 	/// Add an arrow to scene
 	/*! \param *dStart Set start point \param *dEnd Set end point \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness) \param iResolution Set resolution of discretisation*/
-	void AddArrow(double *dStart, double *dEnd, double *dRGB, double dOpacity, int iResolution=6);
+	void AddArrow(double *dStart, double *dEnd, double *dRGB, double dOpacity, int iResolution=6, double* tf_matrix=0);
 	/// Add a text-label to scene
 	/*! \param *cText Set text for the label \param *dCoords Set point of label origin \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness) \param dscale Scale the size of the label*/
-	void AddLabel(char *cText, double *dCoords, double *dRGB, double dOpacity, double dscale=1.0);
+	void AddLabel(char *cText, double *dCoords, double *dRGB, double dOpacity, double dscale=1.0, double* tf_matrix=0);
 	/// Add a rotated polygon to scene
 	/*! \param *dCoords Set Points as X1,X2,...,Xn,Y1,Y2,...,Yn,Z1,Z2,...Zn for polygon. \param uiQtyCoords Set Quantity of Points X,Y,Z \param *fRotAxis Set rotation axis (X1,X2,Y1,Y2,Z1,Z2) \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness) \param iResolution Set resolution of discretisation*/
-	void AddRotationalPoly(double *dCoords, unsigned int uiQtyCoords, double *fRotAxis, double *dRGB, double dOpacity, int iResolution);//complete
+	void AddRotationalPoly(double *dCoords, unsigned int uiQtyCoords, double *fRotAxis, double *dRGB, double dOpacity, int iResolution, double* tf_matrix=0);//complete
 	/// Add a rotated circle (torus) to scene
 	/*! \param dPoint Set point in 3D space \param fRadius Set radius of the torus \param *fRotAxis Set rotation axis (X1,X2,Y1,Y2,Z1,Z2) \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness) \param iResolution Set resolution of discretisation*/
-	void AddRotationalSolid(double *dPoint, double fRadius, double *fRotAxis, double *dRGB, double dOpacity, int iResolution); //complete
+	void AddRotationalSolid(double *dPoint, double fRadius, double *fRotAxis, double *dRGB, double dOpacity, int iResolution, double* tf_matrix=0); //complete
 	/// Add a surface (triangles) to scene
 	/*! \param *dCoords Set Points as X1,X2,...,Xn,Y1,Y2,...,Yn,Z1,Z2,...Zn for triangles of surface. \param uiQtyCoords Set Quantity of Points X,Y,Z \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness)*/
-	void AddSurface(double *dCoords, unsigned int uiQtyCoords, double *dRGB, double dOpacity);//complete
+	void AddSurface(double *dCoords, unsigned int uiQtyCoords, double *dRGB, double dOpacity, double* tf_matrix=0);//complete
 	/// Add a STL-object to scene
 	/*! \param *Filename Set filename of STL object \param *dCenter Set point of origin for STL object \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness)*/
-	void AddSTLObject(char *Filename, double *dCenter, double *dRGB, double dOpacity);//complete
+	void AddSTLObject(char *Filename, double *dCenter, double *dRGB, double dOpacity, double* tf_matrix=0);//complete
 	
 	void SetOpacity2All(double opacity);
 

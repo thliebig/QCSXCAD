@@ -50,6 +50,8 @@
 #include "vtkWindowToImageFilter.h"
 #include "vtkPNGWriter.h"
 
+#include "CSTransform.h"
+
 QVTKStructure::QVTKStructure()
 {
 	clCS=NULL;
@@ -324,6 +326,10 @@ void QVTKStructure::RenderGeometry()
 				CSPrimitives* prim = prop->GetPrimitive(n);
 				if (prim==NULL) return;
 				CoordinateSystem primCS = prim->GetCoordinateSystem();
+				CSTransform* transform = prim->GetTransform();
+				double* transform_matrix = NULL;
+				if (transform)
+					transform_matrix = transform->GetMatrix();
 				if (primCS==UNDEFINED_CS)
 					primCS=clCS->GetCoordInputType();
 				switch (prim->GetType())
@@ -332,9 +338,9 @@ void QVTKStructure::RenderGeometry()
 					{
 						CSPrimBox* box = prim->ToBox();
 						if (primCS==CARTESIAN)
-							vtkPrims->AddCube(box->GetStartCoord()->GetCartesianCoords(),box->GetStopCoord()->GetCartesianCoords(),rgb,(double)col.a/255.0);
+							vtkPrims->AddCube(box->GetStartCoord()->GetCartesianCoords(),box->GetStopCoord()->GetCartesianCoords(),rgb,(double)col.a/255.0,transform_matrix);
 						else if (primCS==CYLINDRICAL)
-							vtkPrims->AddCylindricalCube(box->GetStartCoord()->GetCylindricalCoords(),box->GetStopCoord()->GetCylindricalCoords(),rgb,(double)col.a/255.0);
+							vtkPrims->AddCylindricalCube(box->GetStartCoord()->GetCylindricalCoords(),box->GetStopCoord()->GetCylindricalCoords(),rgb,(double)col.a/255.0,transform_matrix);
 						break;
 					}
 					case CSPrimitives::MULTIBOX:
@@ -351,20 +357,20 @@ void QVTKStructure::RenderGeometry()
 							coords[2*qtyPts+a]=multibox->GetCoord(3*a+4);
 							coords[2*qtyPts+a+1]=multibox->GetCoord(3*a+5);
 						}
-						vtkPrims->AddDisc(coords,qtyPts,rgb,(double)col.a/255.0);
+						vtkPrims->AddDisc(coords,qtyPts,rgb,(double)col.a/255.0,transform_matrix);
 						delete[] coords;
 						break;
 					}
 					case CSPrimitives::SPHERE:
 					{
 						CSPrimSphere* sphere = prim->ToSphere();
-						vtkPrims->AddSphere(sphere->GetCenter()->GetCartesianCoords(),sphere->GetRadius(),rgb,(double)col.a/255.0,iResolution);
+						vtkPrims->AddSphere(sphere->GetCenter()->GetCartesianCoords(),sphere->GetRadius(),rgb,(double)col.a/255.0,iResolution,transform_matrix);
 						break;
 					}
 					case CSPrimitives::CYLINDER:
 					{
 						CSPrimCylinder* cylinder = prim->ToCylinder();
-						vtkPrims->AddCylinder2(cylinder->GetAxisStartCoord()->GetCartesianCoords(),cylinder->GetAxisStopCoord()->GetCartesianCoords(),cylinder->GetRadius(),rgb,(double)col.a/255.0,iResolution);
+						vtkPrims->AddCylinder2(cylinder->GetAxisStartCoord()->GetCartesianCoords(),cylinder->GetAxisStopCoord()->GetCartesianCoords(),cylinder->GetRadius(),rgb,(double)col.a/255.0,iResolution,transform_matrix);
 						break;
 					}
 					case CSPrimitives::POLYGON:
@@ -393,7 +399,7 @@ void QVTKStructure::RenderGeometry()
 							dCoords[nP*nrPts + n] = poly->GetCoord(2*n);
 							dCoords[nPP*nrPts + n] = poly->GetCoord(2*n+1);
 						}
-						vtkPrims->AddClosedPoly(dCoords,nrPts,dExtrusionVector,rgb,(double)col.a/255.0);
+						vtkPrims->AddClosedPoly(dCoords,nrPts,dExtrusionVector,rgb,(double)col.a/255.0,transform_matrix);
 						break;
 					}
 					case CSPrimitives::CURVE:
@@ -408,19 +414,20 @@ void QVTKStructure::RenderGeometry()
 						unsigned int nrP = (unsigned int)curve->GetNumberOfPoints();
 						double dCoords[3*nrP];
 						double xyz[3];
+						bool isCurve = (prim->GetType()==CSPrimitives::CURVE);
 						for (unsigned int n=0;n<nrP;++n)
 						{
-							curve->GetPoint(n,xyz);
+							curve->GetPoint(n,xyz,isCurve);
 							dCoords[0*nrP+n] = xyz[0];
 							dCoords[1*nrP+n] = xyz[1];
 							dCoords[2*nrP+n] = xyz[2];
 						}
-						if (prim->GetType()==CSPrimitives::CURVE)
+						if (isCurve)
 							vtkPrims->AddLinePoly(dCoords,nrP,1,rgb,(double)col.a/255.0);
 						else
 						{
 							CSPrimWire* wire = prim->ToWire();
-							vtkPrims->AddTubePoly(dCoords,nrP,wire->GetWireRadius(),rgb,(double)col.a/255.0);
+							vtkPrims->AddTubePoly(dCoords,nrP,wire->GetWireRadius(),rgb,(double)col.a/255.0,8,transform_matrix);
 						}
 						break;
 					}
