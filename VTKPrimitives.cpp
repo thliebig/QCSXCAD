@@ -82,7 +82,7 @@ VTKPrimitives::VTKPrimitives()
 {
 }
 
-void VTKPrimitives::AddCube(const double *start, const double *stop, double *dRGB, double dOpacity, double* tf_matrix)
+void VTKPrimitives::AddCube(const double *start, const double *stop, double *dRGB, double dOpacity, const double* tf_matrix)
 {
 	double coords[6] = {start[0],stop[0],start[1],stop[1],start[2],stop[2]};
 	double help;
@@ -109,7 +109,7 @@ void VTKPrimitives::AddCube(const double *start, const double *stop, double *dRG
 	AddCube(coords,dRGB,dOpacity,tf_matrix);
 }
 
-void VTKPrimitives::AddCube(double *dCoords, double *dRGB, double dOpacity, double* tf_matrix)
+void VTKPrimitives::AddCube(double *dCoords, double *dRGB, double dOpacity, const double* tf_matrix)
 {
 	//create a simple cartesian cube...
 	vtkCubeSource *Source = vtkCubeSource::New();
@@ -137,7 +137,7 @@ void VTKPrimitives::AddCube(double *dCoords, double *dRGB, double dOpacity, doub
 	SourceMapper->Delete();
 }
 
-void VTKPrimitives::AddCylindricalCube(const double *start, const double *stop, double *dRGB, double dOpacity, double* tf_matrix)
+void VTKPrimitives::AddCylindricalCube(const double *start, const double *stop, double *dRGB, double dOpacity, const double* tf_matrix)
 {
 	double coords[6] = {start[0],stop[0],start[1],stop[1],start[2],stop[2]};
 	double help;
@@ -155,7 +155,7 @@ void VTKPrimitives::AddCylindricalCube(const double *start, const double *stop, 
 }
 
 
-void VTKPrimitives::AddCylindricalCube(double *dCoords, double *dRGB, double dOpacity, double* tf_matrix)
+void VTKPrimitives::AddCylindricalCube(double *dCoords, double *dRGB, double dOpacity, const double* tf_matrix)
 {
 	vtkPolyDataAlgorithm* PDSource = NULL;
 	vtkPolyDataAlgorithm* PDFilter = NULL;
@@ -257,7 +257,7 @@ void VTKPrimitives::AddCylindricalCube(double *dCoords, double *dRGB, double dOp
 	vtrans->Delete();
 }
 
-void VTKPrimitives::AddPlane(double *dOrigin, double* dP1, double* dP2, double *dRGB, double dOpacity, double* tf_matrix)
+void VTKPrimitives::AddPlane(double *dOrigin, double* dP1, double* dP2, double *dRGB, double dOpacity, const double* tf_matrix)
 {
 	double out[3];
 	vtkPlaneSource *Source = vtkPlaneSource::New();
@@ -288,7 +288,7 @@ void VTKPrimitives::AddPlane(double *dOrigin, double* dP1, double* dP2, double *
 }
 
 
-void VTKPrimitives::AddDisc(double *dCoords, unsigned int uiQtyCoords, double *dRGB, double dOpacity, double* tf_matrix)
+void VTKPrimitives::AddDisc(double *dCoords, unsigned int uiQtyCoords, double *dRGB, double dOpacity, const double* tf_matrix)
 {
 	unsigned int i=0,j=0;//,h=0;//,k=0;
 //	vtkIdType pts[6][4]={{0,1,2,3}, {4,5,6,7}, {0,1,5,4},
@@ -349,7 +349,7 @@ void VTKPrimitives::AddDisc(double *dCoords, unsigned int uiQtyCoords, double *d
 }
 
 
-void VTKPrimitives::AddClosedPoly(double *dCoords, unsigned int uiQtyCoords, double *dExtrusionVector, double *dRGB, double dOpacity, double* tf_matrix)
+void VTKPrimitives::AddClosedPoly(double *dCoords, unsigned int uiQtyCoords, double *dExtrusionVector, double *dRGB, double dOpacity, const double* tf_matrix)
 {  //complete
 	unsigned int i=0;
 	vtkPoints *points = vtkPoints::New();
@@ -400,7 +400,7 @@ void VTKPrimitives::AddClosedPoly(double *dCoords, unsigned int uiQtyCoords, dou
 	vtrans->Delete();
 }
 
-void VTKPrimitives::AddLinePoly(double *dCoords, unsigned int uiQtyCoords, unsigned int LineWidth, double *dRGB, double dOpacity, double* tf_matrix)
+void VTKPrimitives::AddLinePoly(const double *dCoords, unsigned int uiQtyCoords, unsigned int LineWidth, double *dRGB, double dOpacity, const double* tf_matrix)
 { //complete
 	unsigned int i=0;
 	vtkPoints *points = vtkPoints::New();
@@ -444,7 +444,7 @@ void VTKPrimitives::AddLinePoly(double *dCoords, unsigned int uiQtyCoords, unsig
 	vtrans->Delete();
 }
 
-void VTKPrimitives::AddTubePoly(double *dCoords, unsigned int uiQtyCoords, double TubeRadius, double *dRGB, double dOpacity, int iResolution, double* tf_matrix)
+void VTKPrimitives::AddTubePoly(const double *dCoords, unsigned int uiQtyCoords, double TubeRadius, double *dRGB, double dOpacity, int iResolution, const double* tf_matrix)
 { //complete
 	unsigned int i=0;
 	vtkPoints *points = vtkPoints::New();
@@ -494,13 +494,13 @@ void VTKPrimitives::AddTubePoly(double *dCoords, unsigned int uiQtyCoords, doubl
 	vtrans->Delete();
 }
 
-void VTKPrimitives::AddCylinder2(const double *dAxisStart, const double* dAxisStop, float fRadius, double *dRGB, double dOpacity, int iResolution, double* tf_matrix)
+void VTKPrimitives::AddCylinder2(const double *dAxisStart, const double* dAxisStop, float fRadius, double *dRGB, double dOpacity, int iResolution, const double* tf_matrix)
 {
 	double direction[3] = {dAxisStop[0]-dAxisStart[0],dAxisStop[1]-dAxisStart[1],dAxisStop[2]-dAxisStart[2]};
 	AddCylinder(dAxisStart,direction,fRadius,dRGB,dOpacity,iResolution,tf_matrix);
 }
 
-void VTKPrimitives::AddCylinder(const double *dCenter, const double *dExtrusionVector, float fRadius, double *dRGB, double dOpacity, int iResolution, double* tf_matrix)
+void VTKPrimitives::AddCylinder(const double *dCenter, const double *dExtrusionVector, float fRadius, double *dRGB, double dOpacity, int iResolution, const double* tf_matrix)
 {
 	double alpha=0,beta=0;
 	double length=sqrt( dExtrusionVector[0]*dExtrusionVector[0]+dExtrusionVector[1]*dExtrusionVector[1]+dExtrusionVector[2]*dExtrusionVector[2] ) ;
@@ -545,7 +545,7 @@ void VTKPrimitives::AddCylinder(const double *dCenter, const double *dExtrusionV
 	SourceMapper->Delete();
 }
 
-void VTKPrimitives::AddSphere(const double *dCenter, float fRadius, double *dRGB, double dOpacity, int iResolution, double* tf_matrix)
+void VTKPrimitives::AddSphere(const double *dCenter, float fRadius, double *dRGB, double dOpacity, int iResolution, const double* tf_matrix)
 {//complete
 	vtkSphereSource *Source = vtkSphereSource::New();
 	vtkPolyDataMapper *SourceMapper = vtkPolyDataMapper::New();
@@ -576,7 +576,7 @@ void VTKPrimitives::AddSphere(const double *dCenter, float fRadius, double *dRGB
 	vtrans->Delete();
 }
 
-void VTKPrimitives::AddArrow(double *dStart, double *dEnd, double *dRGB, double dOpacity, int iResolution, double* tf_matrix)
+void VTKPrimitives::AddArrow(double *dStart, double *dEnd, double *dRGB, double dOpacity, int iResolution, const double* tf_matrix)
 {
 	double alpha=0,beta=0;
 	double dvector[3]={dEnd[0]-dStart[0],dEnd[1]-dStart[1],dEnd[2]-dStart[2]};
@@ -625,7 +625,7 @@ void VTKPrimitives::AddArrow(double *dStart, double *dEnd, double *dRGB, double 
 	SourceMapper->Delete();
 }
 
-void VTKPrimitives::AddLabel(char *cText, double *dCoords, double *dRGB, double dOpacity, double dscale, double* tf_matrix)
+void VTKPrimitives::AddLabel(char *cText, double *dCoords, double *dRGB, double dOpacity, double dscale, const double* tf_matrix)
 {
 	vtkVectorText *text = vtkVectorText::New();
 	vtkPolyDataMapper *Mapper = vtkPolyDataMapper::New();
@@ -657,7 +657,7 @@ void VTKPrimitives::AddLabel(char *cText, double *dCoords, double *dRGB, double 
 	vtrans->Delete();
 }
 
-void VTKPrimitives::AddRotationalPoly(double *dCoords, unsigned int uiQtyCoords, double *fRotAxis, double *dRGB, double dOpacity, int iResolution, double* tf_matrix)
+void VTKPrimitives::AddRotationalPoly(const double *dCoords, unsigned int uiQtyCoords, const double *fRotAxis, double *dRGB, double dOpacity, int iResolution, const double* tf_matrix)
 {//complete, noch nicht ausgiebig getestet!!!
 	unsigned int i=0;
 	double start[3]={0,0,0},vector[3]={0,0,0},origin[3]={0,0,0},Footpoint[3]={0,0,0},Basepoint[3]={0,0,0},point[3]={0,0,0};
@@ -749,7 +749,7 @@ void VTKPrimitives::AddRotationalPoly(double *dCoords, unsigned int uiQtyCoords,
 	Mapper->Delete();
 }
 
-void VTKPrimitives::AddRotationalSolid(double *dPoint, double fRadius, double *fRotAxis, double *dRGB, double dOpacity, int iResolution, double* tf_matrix)
+void VTKPrimitives::AddRotationalSolid(const double *dPoint, double fRadius, const double *fRotAxis, double *dRGB, double dOpacity, int iResolution, const double* tf_matrix)
 {
 	vtkPoints *points = vtkPoints::New();
 	vtkCellArray *poly = vtkCellArray::New();
@@ -824,7 +824,7 @@ void VTKPrimitives::AddRotationalSolid(double *dPoint, double fRadius, double *f
 }
 
 
-void VTKPrimitives::AddSurface(double *dCoords, unsigned int uiQtyCoords, double *dRGB, double dOpacity, double* tf_matrix)
+void VTKPrimitives::AddSurface(double *dCoords, unsigned int uiQtyCoords, double *dRGB, double dOpacity, const double* tf_matrix)
 {//complete
 	unsigned int i=0;
 	vtkPoints *points = vtkPoints::New();
@@ -870,7 +870,7 @@ void VTKPrimitives::AddSurface(double *dCoords, unsigned int uiQtyCoords, double
 
 
 
-void VTKPrimitives::AddSTLObject(char *Filename, double *dCenter, double *dRGB, double dOpacity, double* tf_matrix)
+void VTKPrimitives::AddSTLObject(char *Filename, double *dCenter, double *dRGB, double dOpacity, const double* tf_matrix)
 { //complete??
 	vtkSTLReader *part = vtkSTLReader::New();
 	part->SetFileName(Filename);
@@ -991,7 +991,7 @@ double VTKPrimitives::VectorAngel(double dV1_1, double dV1_2, double dV1_3, doub
 }
 
 
-double VTKPrimitives::DistancePointLine(double *dpoint,double *dstart,double *dvector, double *dFootpoint)
+double VTKPrimitives::DistancePointLine(const double *dpoint, const double *dstart, const double *dvector, double *dFootpoint)
 {
 	double dpos=0;
 	dpos= ( (dpoint[0]-dstart[0])*dvector[0]+(dpoint[1]-dstart[1])*dvector[1]+(dpoint[2]-dstart[2])*dvector[2] ) /(dvector[0]*dvector[0]+dvector[1]*dvector[1]+dvector[2]*dvector[2]);
@@ -999,12 +999,12 @@ double VTKPrimitives::DistancePointLine(double *dpoint,double *dstart,double *dv
 	return sqrt( (dpoint[0]-dFootpoint[0])*(dpoint[0]-dFootpoint[0]) + (dpoint[1]-dFootpoint[1])*(dpoint[1]-dFootpoint[1]) + (dpoint[2]-dFootpoint[2])*(dpoint[2]-dFootpoint[2]) );
 }
 
-double VTKPrimitives::DistancePointPoint(double *dpoint1, double *dpoint2)
+double VTKPrimitives::DistancePointPoint(const double *dpoint1, const double *dpoint2)
 {
 	return sqrt( (dpoint1[0]-dpoint2[0])*(dpoint1[0]-dpoint2[0]) + (dpoint1[1]-dpoint2[1])*(dpoint1[1]-dpoint2[1]) + (dpoint1[2]-dpoint2[2])*(dpoint1[2]-dpoint2[2]) );
 }
 
-double* VTKPrimitives::TransformCylindricalCoords(double* in, double* out, unsigned int nrPoints)
+double* VTKPrimitives::TransformCylindricalCoords(const double* in, double* out, unsigned int nrPoints)
 {
 	unsigned int i,j,k;
 	for (unsigned int n=0;n<nrPoints;++n)
