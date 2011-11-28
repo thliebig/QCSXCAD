@@ -86,6 +86,7 @@ void VTKPrimitives::AddCube(const double *start, const double *stop, double *dRG
 {
 	double coords[6] = {start[0],stop[0],start[1],stop[1],start[2],stop[2]};
 	double help;
+	int dim=0;
 	//swap start stop if start>stop
 	for (int n=0;n<3;++n)
 	{
@@ -95,7 +96,16 @@ void VTKPrimitives::AddCube(const double *start, const double *stop, double *dRG
 			coords[2*n+1]=coords[2*n];
 			coords[2*n]=help;
 		}
+		if (coords[2*n]!=coords[2*n+1])
+			++dim;
 	}
+	if (dim==0)
+	{
+		cerr << "VTKPrimitives::AddCube: Warning, can't draw a Point Box... skipping" << endl;
+		return;
+	}
+	if (dim==1)
+		return AddLinePoly(coords,2,1,dRGB,dOpacity);
 	AddCube(coords,dRGB,dOpacity,tf_matrix);
 }
 
