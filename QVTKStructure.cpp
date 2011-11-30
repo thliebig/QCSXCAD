@@ -375,20 +375,17 @@ void QVTKStructure::RenderGeometry()
 					}
 					case CSPrimitives::POLYGON:
 					case CSPrimitives::LINPOLY:
+					case CSPrimitives::ROTPOLY:
 					{
 						CSPrimPolygon* poly = NULL;
 						if (prim->GetType()==CSPrimitives::POLYGON)
 							poly = prim->ToPolygon();
-						else
+						else if (prim->GetType()==CSPrimitives::LINPOLY)
 							poly = prim->ToLinPoly();
-						int normDir = 0;
+						else if (prim->GetType()==CSPrimitives::ROTPOLY)
+							poly = prim->ToRotPoly();
+						int normDir = poly->GetNormDir();
 						double elev = poly->GetElevation();
-						double dExtrusionVector[3] = {0,0,0};
-						if (poly->GetNormDir(0) != 0) normDir = 0;
-						else if (poly->GetNormDir(1) != 0) normDir = 1;
-						else if (poly->GetNormDir(2) != 0) normDir = 2;
-						if (prim->GetType()==CSPrimitives::LINPOLY)
-							dExtrusionVector[normDir] = prim->ToLinPoly()->GetLength();
 						int nP = (normDir+1)%3;
 						int nPP = (normDir+2)%3;
 						int nrPts = poly->GetQtyCoords();
@@ -399,7 +396,20 @@ void QVTKStructure::RenderGeometry()
 							dCoords[nP*nrPts + n] = poly->GetCoord(2*n);
 							dCoords[nPP*nrPts + n] = poly->GetCoord(2*n+1);
 						}
-						vtkPrims->AddClosedPoly(dCoords,nrPts,dExtrusionVector,rgb,(double)col.a/255.0,transform_matrix);
+						double dVector[6] = {0,0,0,0,0,0};
+						if (prim->GetType()==CSPrimitives::POLYGON)
+							vtkPrims->AddClosedPoly(dCoords,nrPts,dVector,rgb,(double)col.a/255.0,transform_matrix);
+						if (prim->GetType()==CSPrimitives::LINPOLY)
+						{
+							dVector[normDir] = prim->ToLinPoly()->GetLength();
+							vtkPrims->AddClosedPoly(dCoords,nrPts,dVector,rgb,(double)col.a/255.0,transform_matrix);
+						}
+						if (prim->GetType()==CSPrimitives::ROTPOLY)
+						{
+							dVector[2*prim->ToRotPoly()->GetRotAxisDir()+1]=1;
+							double angles[2] = {prim->ToRotPoly()->GetAngle(0)*180/PI,prim->ToRotPoly()->GetAngle(1)*180/PI};
+							vtkPrims->AddRotationalPoly(dCoords,nrPts,dVector,angles,rgb,(double)col.a/255.0,32,transform_matrix);
+						}
 						break;
 					}
 					case CSPrimitives::CURVE:

@@ -81,7 +81,7 @@ public:
 	void AddLabel(char *cText, double *dCoords, double *dRGB, double dOpacity, double dscale=1.0, const double* tf_matrix=0);
 	/// Add a rotated polygon to scene
 	/*! \param *dCoords Set Points as X1,X2,...,Xn,Y1,Y2,...,Yn,Z1,Z2,...Zn for polygon. \param uiQtyCoords Set Quantity of Points X,Y,Z \param *fRotAxis Set rotation axis (X1,X2,Y1,Y2,Z1,Z2) \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness) \param iResolution Set resolution of discretisation*/
-	void AddRotationalPoly(const double *dCoords, unsigned int uiQtyCoords, const double *fRotAxis, double *dRGB, double dOpacity, int iResolution, const double* tf_matrix=0);//complete
+	void AddRotationalPoly(const double *dCoords, unsigned int uiQtyCoords, const double *fRotAxis, double StartStopAngle[2], double *dRGB, double dOpacity, int iResolution, const double* tf_matrix=0);//complete
 	/// Add a rotated circle (torus) to scene
 	/*! \param dPoint Set point in 3D space \param fRadius Set radius of the torus \param *fRotAxis Set rotation axis (X1,X2,Y1,Y2,Z1,Z2) \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness) \param iResolution Set resolution of discretisation*/
 	void AddRotationalSolid(const double *dPoint, double fRadius, const double *fRotAxis, double *dRGB, double dOpacity, int iResolution, const double* tf_matrix=0); //complete

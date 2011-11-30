@@ -358,7 +358,8 @@ void VTKPrimitives::AddClosedPoly(double *dCoords, unsigned int uiQtyCoords, dou
 	vtkLinearExtrusionFilter *extrude = vtkLinearExtrusionFilter::New();
 	vtkPolyDataMapper *Mapper = vtkPolyDataMapper::New();
 	vtkActor *Actor = vtkActor::New();
-	for (i=0; i<uiQtyCoords;i++) points->InsertPoint(i,dCoords[i],dCoords[uiQtyCoords+i],dCoords[2*uiQtyCoords+i]);
+	for (i=0; i<uiQtyCoords;i++)
+		points->InsertPoint(i,dCoords[i],dCoords[uiQtyCoords+i],dCoords[2*uiQtyCoords+i]);
 	poly->InsertNextCell(uiQtyCoords+1);
 	for (i=0; i<uiQtyCoords ;i++) poly->InsertCellPoint(i);
 	poly->InsertCellPoint(0);
@@ -657,10 +658,10 @@ void VTKPrimitives::AddLabel(char *cText, double *dCoords, double *dRGB, double 
 	vtrans->Delete();
 }
 
-void VTKPrimitives::AddRotationalPoly(const double *dCoords, unsigned int uiQtyCoords, const double *fRotAxis, double *dRGB, double dOpacity, int iResolution, const double* tf_matrix)
-{//complete, noch nicht ausgiebig getestet!!!
+void VTKPrimitives::AddRotationalPoly(const double *dCoords, unsigned int uiQtyCoords, const double *fRotAxis, double StartStopAngle[2], double *dRGB, double dOpacity, int iResolution, const double* tf_matrix)
+{
 	unsigned int i=0;
-	double start[3]={0,0,0},vector[3]={0,0,0},origin[3]={0,0,0},Footpoint[3]={0,0,0},Basepoint[3]={0,0,0},point[3]={0,0,0};
+	double start[3]={0,0,0},vector[3]={0,0,0};
 	double *radius,*level;
 
 	vtkPoints *points = vtkPoints::New();
@@ -668,59 +669,52 @@ void VTKPrimitives::AddRotationalPoly(const double *dCoords, unsigned int uiQtyC
 	vtkPolyData *profile = vtkPolyData::New();
 	vtkRotationalExtrusionFilter *extrude = vtkRotationalExtrusionFilter::New();
 	vtkTransform *transform = vtkTransform::New();
+	vtkTransform *InvTransform = vtkTransform::New();
 	vtkTransformPolyDataFilter *transformFilter = vtkTransformPolyDataFilter::New();
+	vtkTransformPolyDataFilter *InvTransformFilter = vtkTransformPolyDataFilter::New();
 	vtkPolyDataMapper *Mapper = vtkPolyDataMapper::New();
 	vtkActor *Actor = vtkActor::New();
 
 	vector[0]=fRotAxis[1]-fRotAxis[0];
 	vector[1]=fRotAxis[3]-fRotAxis[2];
 	vector[2]=fRotAxis[5]-fRotAxis[4];
+	double vec_len = sqrt(vector[0]*vector[0]+vector[1]*vector[1]+vector[2]*vector[2]);
+	double vec_unit[3]={vector[0]/vec_len,vector[1]/vec_len,vector[2]/vec_len};
 	start[0]=fRotAxis[0];
 	start[1]=fRotAxis[2];
 	start[2]=fRotAxis[4];
 
-	DistancePointLine(origin,start,vector,Footpoint);
+	double d = sqrt(vec_unit[1]*vec_unit[1]+vec_unit[2]*vec_unit[2]);
+	double alpha = atan2(vec_unit[1],vec_unit[2])/acos(-1)*180;
+	double beta = atan2(-vec_unit[0],d)/acos(-1)*180;
 
-	//debugging
-//	for (i=0; i<6; i++) fprintf(stderr,"\n Achse: [%i]: %f",i,fRotAxis[i]);
-//	fprintf(stderr,"\n Richtungsvektor: %f %f %f",vector[0],vector[1],vector[2]);
-//	fprintf(stderr,"\n Fusspunkt: %f %f %f",Footpoint[0],Footpoint[1],Footpoint[2]);
-//	fprintf(stderr,"\n Start: %f %f %f",start[0],start[1],start[2]);
-
-	radius=(double *)calloc(uiQtyCoords,sizeof(double));
-	level=(double *)calloc(uiQtyCoords,sizeof(double));
-
+	for (i=0; i<uiQtyCoords;i++)
+		points->InsertPoint(i,dCoords[i],dCoords[uiQtyCoords+i],dCoords[2*uiQtyCoords+i]);
 	poly->InsertNextCell(uiQtyCoords+1);
-
-	for (i=0;i<uiQtyCoords;i++)
-	{
-		for (int j=0; j<3; j++) point[j]=dCoords[uiQtyCoords*j+i];
-		radius[i]=DistancePointLine(point,start,vector,Basepoint);
-		level[i]=DistancePointPoint(Basepoint,Footpoint);
-		points->InsertPoint(i,radius[i],0,level[i]);
-		poly->InsertCellPoint(i);
-	}
+	for (i=0; i<uiQtyCoords ;i++) poly->InsertCellPoint(i);
 	poly->InsertCellPoint(0);
 	profile->SetPoints(points);
-	profile->SetLines(poly);
-	extrude->SetInput(profile);
+	profile->SetPolys(poly);
+	vtkTriangleFilter *tf = vtkTriangleFilter::New();
+	tf->SetInput(profile);
+
+	InvTransform->Translate(-start[0],-start[1],-start[2]);
+	InvTransform->RotateX(alpha);
+	InvTransform->RotateY(beta);
+
+	InvTransformFilter->SetInput(tf->GetOutput());
+	InvTransformFilter->SetTransform(InvTransform);
+
+	extrude->SetInput(InvTransformFilter->GetOutput());
 	extrude->SetResolution(iResolution);
-	extrude->SetAngle(90.0);
+	extrude->SetAngle(StartStopAngle[1]-StartStopAngle[0]);
 
+	transform->RotateZ(-StartStopAngle[0]);
 
-	double alpha=VectorAngel(vector[0],sqrt(vector[1]*vector[1]+vector[2]*vector[2]),0,0,1,0);
-	double beta=VectorAngel(0,vector[1],vector[2],0,1,0);
-	if (fRotAxis[0]>0) alpha=-alpha;
-	if (fRotAxis[2]<0) beta=-beta;
-	fprintf(stderr," alpha: %f  beta: %f \n",alpha,beta);
-	transform->Translate(Footpoint);
-//	transform->RotateX(-beta);
-//	transform->RotateZ(alpha);
-//	transform->RotateWXYZ(-90,1,0,0);
-
-	transform->RotateWXYZ(beta,1,0,0);
-	transform->RotateWXYZ(alpha,0,0,1);
-	transform->RotateWXYZ(-90,1,0,0);
+	transform->Translate(-start[0],-start[1],-start[2]);
+	transform->RotateX(alpha);
+	transform->RotateY(beta);
+	transform->Inverse();
 
 	transform->PostMultiply();
 	if (tf_matrix)
@@ -746,6 +740,8 @@ void VTKPrimitives::AddRotationalPoly(const double *dCoords, unsigned int uiQtyC
 	extrude->Delete();
 	transform->Delete();
 	transformFilter->Delete();
+	InvTransform->Delete();
+	InvTransformFilter->Delete();
 	Mapper->Delete();
 }
 
@@ -989,7 +985,6 @@ double VTKPrimitives::VectorAngel(double dV1_1, double dV1_2, double dV1_3, doub
 	else angel=acos(angel)*180/PI;
 	return angel;
 }
-
 
 double VTKPrimitives::DistancePointLine(const double *dpoint, const double *dstart, const double *dvector, double *dFootpoint)
 {
