@@ -240,10 +240,7 @@ void QGeometryPlot::paintEvent(QPaintEvent * /* event */)
 				{
 					CSPrimPolygon* poly=prim->ToPolygon();
 					double elev = poly->GetElevation();
-					int normDir = 0;
-					if (poly->GetNormDir(0) != 0) normDir = 0;
-					else if (poly->GetNormDir(1) != 0) normDir = 1;
-					else if (poly->GetNormDir(2) != 0) normDir = 2;
+					int normDir = poly->GetNormDir();
 					int nrPts = poly->GetQtyCoords();
 					QPointF points[nrPts+1];
 					for (int n=0;n<nrPts;++n)

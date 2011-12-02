@@ -96,10 +96,7 @@ void export_pov::export_properties( QTextStream &stream, vector<CSProperties*> p
 				size_t count = -1;
 				double *array = 0;
 				array = polygon->GetAllCoords( count, array );
-				int normDir = 0;
-				for (int a=0; a<3; a++)
-					if (polygon->GetNormDir(a) > 0)
-						normDir = a;
+				int normDir = polygon->GetNormDir();
 				double elevation = polygon->GetElevation();
 				export_polygon( stream, count, array, elevation, normDir, default_obj_modifier );
 			}
@@ -117,7 +114,7 @@ void export_pov::export_properties( QTextStream &stream, vector<CSProperties*> p
 				double radius = primitive->GetWireRadius();
 				size_t count  = primitive->GetNumberOfPoints();
 				double *array = new double[count*3];
-				for (int i=0; i<count; i++)
+				for (unsigned int i=0; i<count; i++)
 					primitive->GetPoint(i,array+i*3);
 				export_wire( stream, count, array, radius, default_obj_modifier );
 				delete[] array;
@@ -128,7 +125,7 @@ void export_pov::export_properties( QTextStream &stream, vector<CSProperties*> p
 				double radius = m_epsilon;
 				size_t count  = primitive->GetNumberOfPoints();
 				double *array = new double[count*3];
-				for (int i=0; i<count; i++)
+				for (unsigned int i=0; i<count; i++)
 					primitive->GetPoint(i,array+i*3);
 				export_wire( stream, count, array, radius, default_obj_modifier );
 				delete[] array;
@@ -162,7 +159,7 @@ void export_pov::export_polygon( QTextStream &stream, size_t count, double *arra
 	//NormDir = [CSX_polygon.NormDir.ATTRIBUTE.X CSX_polygon.NormDir.ATTRIBUTE.Y CSX_polygon.NormDir.ATTRIBUTE.Z];
 	QString str = "prism { linear_spline linear_sweep %1, %2, %3";
 	str = str.arg(elevation - m_epsilon).arg(elevation + m_epsilon).arg(count+1);
-	for (int a=0; a<count; a++)
+	for (unsigned int a=0; a<count; a++)
 	{
 		// iterate over all vertices
 		str += ", " + pov_vect2( array + a*2 );
@@ -183,7 +180,7 @@ void export_pov::export_cylinder( QTextStream &stream, double start[3], double s
 void export_pov::export_wire( QTextStream &stream, size_t count, double *array, double radius, QString object_modifier )
 {
 	QString str = "sphere_sweep { linear_spline, " + QString::number(count);
-	for (int a=0; a<count; a++)
+	for (unsigned int a=0; a<count; a++)
 	{
 		// iterate over all vertices
 		str += ", " + pov_vect(array+a*3) + ", " + QString::number(radius);

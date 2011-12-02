@@ -449,9 +449,9 @@ QCSPrimPolygonLayout::QCSPrimPolygonLayout(CSPrimPolygon* prim, QWidget *parent)
 	
 	addWidget(new QLabel(tr("Polygon Plane")),0,0);	
 	NormVec = new QComboBox();
-	NormVec->addItem(tr("xy-plane"));
 	NormVec->addItem(tr("yz-plane"));
 	NormVec->addItem(tr("zx-plane"));
+	NormVec->addItem(tr("xy-plane"));
 	QObject::connect(NormVec,SIGNAL(currentIndexChanged(int)),this,SLOT(NormVecChanged()));
 	addWidget(NormVec,0,1);
 	
@@ -479,24 +479,7 @@ QCSPrimPolygonLayout::~QCSPrimPolygonLayout()
 void QCSPrimPolygonLayout::SetValues()
 {
 	int ind = NormVec->currentIndex();
-	clPoly->SetNormDir(0,0.0);
-	clPoly->SetNormDir(1,0.0);
-	clPoly->SetNormDir(2,0.0);
-	switch (ind)
-	{
-	case 0:
-		clPoly->SetNormDir(2,1.0);
-		break;
-	case 1:
-		clPoly->SetNormDir(0,1.0);
-		break;
-	case 2:
-		clPoly->SetNormDir(1,1.0);
-		break;
-	default:
-		clPoly->SetNormDir(2,1.0);
-		break;
-	}
+	clPoly->SetNormDir(ind);
 	ParameterScalar* ps;
 	bool bOk;
 	double dVal;
@@ -533,12 +516,7 @@ void QCSPrimPolygonLayout::SetValues()
 
 void QCSPrimPolygonLayout::GetValues()
 {
-	if (clPoly->GetNormDir(0))
-		NormVec->setCurrentIndex(1);
-	else if (clPoly->GetNormDir(1))
-		NormVec->setCurrentIndex(2);
-	else if (clPoly->GetNormDir(2))
-		NormVec->setCurrentIndex(0);
+	NormVec->setCurrentIndex(clPoly->GetNormDir());
 	ParameterScalar* ps;
 	ps=clPoly->GetElevationPS();
 	if (ps->GetMode()) Elevation->setText(ps->GetString().c_str());

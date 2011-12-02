@@ -118,10 +118,7 @@ void export_X3D::export_properties( QDomElement Scene, vector<CSProperties*> pro
 				size_t count = -1;
 				double *array = 0;
 				array = polygon->GetAllCoords( count, array );
-				int normDir = 0;
-				for (int a=0; a<3; a++)
-					if (polygon->GetNormDir(a) > 0)
-						normDir = a;
+				int normDir = polygon->GetNormDir();
 				double elevation = polygon->GetElevation();
 				export_polygon( Scene, count, array, elevation, normDir, Material.cloneNode().toElement() );
 			}
