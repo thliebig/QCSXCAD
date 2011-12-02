@@ -35,9 +35,9 @@ SOURCES += QCSXCAD.cpp \
     QGeometryPlot.cpp
 win32 { 
     DEFINES += BUILD_QCSXCAD_LIB
-    
     # DEFINES += __GYM2XML__
-    include(localPathes.pri)
+	VTK_DIR = ..\vtk
+	VTK_BIN_DIR = ..\vtk\bin
     INCLUDEPATH += . \
         $$VTK_BIN_DIR\.. \
         $$VTK_DIR \
@@ -53,7 +53,8 @@ win32 {
         $$VTK_DIR\Rendering \
         $$VTK_DIR\Utilities \
         $$VTK_DIR\Widgets \
-        ..\CSXCAD
+        ..\CSXCAD \
+	..\tinyxml
     
     # ..\Gym2XML
     LIBS += $$VTK_BIN_DIR\libQVTK.dll \
@@ -72,7 +73,8 @@ win32 {
         $$VTK_BIN_DIR\libvtksys.dll \
         $$VTK_BIN_DIR\libvtkzlib.dll \
         $$VTK_BIN_DIR\libvtkfreetype.dll \
-        ..\CSXCAD\release\CSXCAD.dll
+        ..\CSXCAD\release\CSXCAD.dll \
+	..\tinyxml\release\tinyxml2.dll
 }
 
 # ..\Gym2XML\release\Gym2XML.dll
