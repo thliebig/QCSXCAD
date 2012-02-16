@@ -177,12 +177,12 @@ protected:
 	QLineEdit* Excitation[3];
 };
 
-class QCSPropChargeBoxGB : public QCSPropertyGroupBox
+class QCSPropProbeBoxGB : public QCSPropertyGroupBox
 {
 	Q_OBJECT
 public:
-	QCSPropChargeBoxGB(CSPropProbeBox *prop, QWidget *parent=NULL);
-	virtual ~QCSPropChargeBoxGB();
+	QCSPropProbeBoxGB(CSPropProbeBox *prop, QWidget *parent=NULL);
+	virtual ~QCSPropProbeBoxGB();
 
 public slots:
 	virtual void SetValues();

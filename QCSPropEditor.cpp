@@ -120,7 +120,7 @@ QCSPropertyGroupBox* QCSPropEditor::BuildPropGroupBox(CSProperties* clProp)
 			propGB = new QCSPropElectrodeGB(clProp->ToElectrode());
 			break;
 		case CSProperties::PROBEBOX:
-			propGB = new QCSPropChargeBoxGB(clProp->ToProbeBox());
+			propGB = new QCSPropProbeBoxGB(clProp->ToProbeBox());
 			break;
 		case CSProperties::DUMPBOX:
 			propGB = new QCSPropDumpBoxGB(clProp->ToDumpBox(),m_SimMode);
@@ -505,7 +505,7 @@ void QCSPropElectrodeGB::TypeChanged(int index)
 }
 
 /***************************QCSPropChargeBoxGB**************************************/
-QCSPropChargeBoxGB::QCSPropChargeBoxGB(CSPropProbeBox *prop, QWidget *parent) : QCSPropertyGroupBox(parent)
+QCSPropProbeBoxGB::QCSPropProbeBoxGB(CSPropProbeBox *prop, QWidget *parent) : QCSPropertyGroupBox(parent)
 {
 	clProp=prop;
 	TypeName=QString(tr("Probe Box"));
@@ -523,16 +523,16 @@ QCSPropChargeBoxGB::QCSPropChargeBoxGB(CSPropProbeBox *prop, QWidget *parent) : 
 	setLayout(layout);
 }
 
-QCSPropChargeBoxGB::~QCSPropChargeBoxGB()
+QCSPropProbeBoxGB::~QCSPropProbeBoxGB()
 {
 }
 
-void QCSPropChargeBoxGB::SetValues()
+void QCSPropProbeBoxGB::SetValues()
 {
 	clProp->SetNumber((unsigned int)Number->value());
 }
 
-void QCSPropChargeBoxGB::GetValues()
+void QCSPropProbeBoxGB::GetValues()
 {
 	Number->setValue(clProp->GetNumber());
 }
