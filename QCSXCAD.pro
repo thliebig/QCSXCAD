@@ -1,10 +1,11 @@
 TEMPLATE = lib
 TARGET = QCSXCAD
+VERSION = 0.1.3
 
 # add git revision
-QMAKE_CXXFLAGS += -DGIT_VERSION=\\\"`git \
-    describe \
-    --tags`\\\"
+GITREV = $$system(git describe --tags)
+DEFINES += GIT_VERSION=\\\"$$GITREV\\\"
+
 MOC_DIR = moc
 OBJECTS_DIR = obj
 QT += core \
@@ -36,8 +37,8 @@ SOURCES += QCSXCAD.cpp \
 win32 { 
     DEFINES += BUILD_QCSXCAD_LIB
     # DEFINES += __GYM2XML__
-	VTK_DIR = ..\vtk
-	VTK_BIN_DIR = ..\vtk\bin
+    VTK_DIR = ..\vtk
+    VTK_BIN_DIR = ..\vtk\bin
     INCLUDEPATH += . \
         $$VTK_BIN_DIR\.. \
         $$VTK_DIR \
@@ -79,15 +80,17 @@ win32 {
 
 # ..\Gym2XML\release\Gym2XML.dll
 unix { 
-    VERSION = 0.2.0
     INCLUDEPATH += ../CSXCAD \
         ../tinyxml
     LIBS += -L../CSXCAD \
         -lCSXCAD
     INCLUDEPATH += /usr/include/vtk-5.2 \
 		/usr/include/vtk-5.4 \
-		/usr/include/vtk-5.6
-	LIBS += -lvtkCommon \
+		/usr/include/vtk-5.6 \
+		/usr/include/vtk-5.8 \
+		/usr/include/vtk
+    INCLUDEPATH += /usr/include/CSXCAD
+    LIBS += -lvtkCommon \
         -lvtkDICOMParser \
         -lvtkFiltering \
         -lvtkGenericFiltering \
@@ -107,46 +110,35 @@ unix {
 FORMS += 
 RESOURCES += resources.qrc
 DEFINES += BUILD_QCSXCAD_LIB
-QMAKE_CXXFLAGS_DEBUG = -O0 \
-    -g
+QMAKE_CXXFLAGS_DEBUG = -O0 -g
 
-# to use ABI2 target:
-# qmake CONFIG+="ABI2 bits64" -o Makefile.ABI2-64 QCSXCAD.pro
-# make -fMakefile.ABI2-64
-ABI2 { 
-    CONFIG -= debug \
-        debug_and_release
-    CONFIG += release
-    QMAKE_CFLAGS_RELEASE = -O2 \
-        -fabi-version=2
-    QMAKE_CXXFLAGS_RELEASE = -O2 \
-        -fabi-version=2
-    QMAKE_CC = apgcc
-    QMAKE_CXX = apg++
-    QMAKE_LINK = apg++
-    QMAKE_LINK_SHLIB = apg++
-    QMAKE_LFLAGS_RPATH = 
-    QMAKE_LFLAGS = \'-Wl,-rpath,\$$ORIGIN/lib\'
-}
-bits64 { 
-    QMAKE_CXXFLAGS_RELEASE += -m64 \
-        -march=athlon64
-    QMAKE_LFLAGS_RELEASE += -m64 \
-        -march=athlon64
-    OBJECTS_DIR = ABI2-64
-    LIBS = ../CSXCAD/ABI2-64/libCSXCAD.so
-}
-bits32 { 
-    QMAKE_CXXFLAGS_RELEASE += -m32 \
-        -march=pentium3
-    QMAKE_LFLAGS_RELEASE += -m32 \
-        -march=pentium3
-    OBJECTS_DIR = ABI2-32
-    LIBS = ../CSXCAD/ABI2-32/libCSXCAD.so
-}
-ABI2 { 
-    DESTDIR = $$OBJECTS_DIR
-    MOC_DIR = $$OBJECTS_DIR
-    UI_DIR = $$OBJECTS_DIR
-    RCC_DIR = $$OBJECTS_DIR
-}
+
+
+
+#
+# create tar file
+#
+tarball.target = tarball
+tarball.commands = git archive --format=tar --prefix=QCSXCAD-$$VERSION/ HEAD | bzip2 > QCSXCAD-$${VERSION}.tar.bz2
+
+QMAKE_EXTRA_TARGETS += tarball
+
+
+#
+# INSTALL
+#
+install.target = install
+install.commands = mkdir -p \"$(INSTALL_ROOT)/usr/lib$$LIB_SUFFIX\"
+install.commands += && mkdir -p \"$(INSTALL_ROOT)/usr/include/QCSXCAD\"
+install.commands += && cp -at \"$(INSTALL_ROOT)/usr/include/QCSXCAD/\" $$HEADERS
+install.commands += && cp -at \"$(INSTALL_ROOT)/usr/lib$$LIB_SUFFIX/\" libQCSXCAD.so*
+
+QMAKE_EXTRA_TARGETS += install
+
+
+#
+# create .PHONY target
+#
+phony.target = .PHONY
+phony.depends = $$QMAKE_EXTRA_TARGETS
+QMAKE_EXTRA_TARGETS += phony
