@@ -1,0 +1,17 @@
+Source: qcsxcad
+Section: contrib/libdevel
+Priority: optional
+Maintainer: Sebastian Held <sebastian.held@gmx.de>
+Build-Depends: debhelper (>=7.0.50~), libqt4-dev, qt4-qmake, libtinyxml-dev, libvtk5-qt4-dev, csxcad-dev
+
+Package: qcsxcad
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: Qt bindings for CSXCAD
+ Qt bindings for CSXCAD
+
+Package: qcsxcad-dev
+Architecture: any
+Depends: ${shlibs:Depends} qcsxcad (= ${binary:Version})
+Description: Development files for qcsxcad
+ The qcsxcad-dev package contains libraries and header files for developing applications that use qcsxcad.
