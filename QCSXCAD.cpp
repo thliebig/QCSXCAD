@@ -960,7 +960,6 @@ void QCSXCAD::BuildToolBar()
 	newAct = newObjct->addAction(tr("2D"),this,SLOT(View2D()));
 	ActViewGrp->addAction(newAct);
 	newAct->setCheckable(true);
-	newAct->setChecked(true);
 	newAct = newObjct->addAction(tr("3D"),this,SLOT(View3D()));
 	newAct->setCheckable(true);
 	ActViewGrp->addAction(newAct);
