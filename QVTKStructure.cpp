@@ -49,6 +49,8 @@
 #include "vtkCallbackCommand.h"
 #include "vtkWindowToImageFilter.h"
 #include "vtkPNGWriter.h"
+#include <vtkStructuredGrid.h>
+#include <vtkStructuredGridGeometryFilter.h>
 
 #include "CSTransform.h"
 
@@ -72,21 +74,6 @@ QVTKStructure::QVTKStructure()
 	SetBackgroundColor(255,255,255);
 
 	SetCallback(VTKWidget->GetRenderWindow()->GetInteractor());
-
-	//test cube....
-//	vtkCubeSource *Source = vtkCubeSource::New();
-//	vtkPolyDataMapper *SourceMapper = vtkPolyDataMapper::New();
-//	vtkActor *SourceActor = vtkActor::New();
-//	Source->SetBounds(0,1000,0,1000,0,2000);
-//	SourceMapper->SetInput(Source->GetOutput());
-//	SourceActor->SetMapper(SourceMapper);
-//	SourceActor->GetProperty()->SetColor(0,1,0);
-//	//SourceActor->GetProperty()->SetOpacity(dOpacity);
-//	ren->AddActor(SourceActor);
-//	//polydata->AddItem(Source->GetOutput());
-//	Source->Delete();
-//	SourceMapper->Delete();
-//	SourceActor->Delete();
 }
 
 QVTKStructure::~QVTKStructure()
@@ -160,28 +147,6 @@ void QVTKStructure::RenderGrid()
 	if (clCS==NULL) return;
 	CSRectGrid* CSGrid = clCS->GetGrid();
 
-	vtkRectilinearGrid *grid = vtkRectilinearGrid::New();
-	vtkDoubleArray *Coords[3];
-	int iQty[3];
-	// =  vtkDoubleArray::New();
-	//vtkDoubleArray *yCoords =  vtkDoubleArray::New();
-	//vtkDoubleArray *zCoords =  vtkDoubleArray::New();
-
-	for (int n=0;n<3;++n)
-	{
-		iQty[n]=CSGrid->GetQtyLines(n);
-		Coords[n]=vtkDoubleArray::New();
-		for (int m=0;m<iQty[n];++m) Coords[n]->InsertNextValue(CSGrid->GetLine(n,m));
-	}
-	if (iQty[0]*iQty[1]*iQty[2]==0)
-	{
-		for (int n=0;n<3;++n) Coords[n]->Delete();
-		return;
-	}
-    grid->SetDimensions(iQty[0],iQty[1],iQty[2]);
-    grid->SetXCoordinates(Coords[0]);
-    grid->SetYCoordinates(Coords[1]);
-    grid->SetZCoordinates(Coords[2]);
 	for (int i=0; i<3; i++)
 	{
 		if (ActorGridPlane[i]!=NULL)
@@ -189,42 +154,139 @@ void QVTKStructure::RenderGrid()
 			ren->RemoveActor(ActorGridPlane[i]);
 			ActorGridPlane[i]->Delete();
 		}
-		ActorGridPlane[i] = vtkActor::New();
-		vtkPolyDataMapper *gridMapper = vtkPolyDataMapper::New();
-	    vtkRectilinearGridGeometryFilter *plane = vtkRectilinearGridGeometryFilter::New();
-	    plane->SetInput(grid);
-		switch (i)
-		{
-		case 0:
-			{
-				plane->SetExtent(0,iQty[0]-1, 0,iQty[1]-1, 0,0);
-				break;
-			}
-		case 1:
-			{
-				plane->SetExtent(0,iQty[0]-1, 0,0, 0,iQty[2]-1);
-				break;
-			}
-		case 2:
-			{
-				plane->SetExtent(0,0, 0,iQty[1]-1, 0,iQty[2]-1);
-				break;
-			}
-		}
-		gridMapper->SetInput(plane->GetOutput());
-		//WireFrameOnlyActorCol->AddItem(Actor);
-		ActorGridPlane[i]->SetMapper(gridMapper);
-	    ActorGridPlane[i]->GetProperty()->SetColor(0,0,0);
-		ActorGridPlane[i]->GetProperty()->SetDiffuse(0);
-		ActorGridPlane[i]->GetProperty()->SetAmbient(1);
-	    ActorGridPlane[i]->GetProperty()->SetRepresentationToWireframe();
-		ren->AddActor(ActorGridPlane[i]);
-		gridMapper->Delete();
-		plane->Delete();
-		Coords[i]->Delete();
 	}
-	SetGridOpacity(GridOpacity);
-	grid->Delete();
+
+	if (CSGrid->GetMeshType()==CARTESIAN)
+	{
+		vtkRectilinearGrid *grid = vtkRectilinearGrid::New();
+		vtkDoubleArray *Coords[3];
+		int iQty[3];
+
+		for (int n=0;n<3;++n)
+		{
+			iQty[n]=CSGrid->GetQtyLines(n);
+			Coords[n]=vtkDoubleArray::New();
+			for (int m=0;m<iQty[n];++m) Coords[n]->InsertNextValue(CSGrid->GetLine(n,m));
+		}
+		if (iQty[0]*iQty[1]*iQty[2]==0)
+		{
+			for (int n=0;n<3;++n) Coords[n]->Delete();
+			return;
+		}
+		grid->SetDimensions(iQty[0],iQty[1],iQty[2]);
+		grid->SetXCoordinates(Coords[0]);
+		grid->SetYCoordinates(Coords[1]);
+		grid->SetZCoordinates(Coords[2]);
+		for (int n=0;n<3;++n)
+			Coords[n]->Delete();
+
+		for (int i=0; i<3; i++)
+		{
+			ActorGridPlane[i] = vtkActor::New();
+			vtkPolyDataMapper *gridMapper = vtkPolyDataMapper::New();
+			vtkRectilinearGridGeometryFilter *plane = vtkRectilinearGridGeometryFilter::New();
+			plane->SetInput(grid);
+			switch (i)
+			{
+			case 0:
+				{
+					plane->SetExtent(0,iQty[0]-1, 0,iQty[1]-1, 0,0);
+					break;
+				}
+			case 1:
+				{
+					plane->SetExtent(0,iQty[0]-1, 0,0, 0,iQty[2]-1);
+					break;
+				}
+			case 2:
+				{
+					plane->SetExtent(0,0, 0,iQty[1]-1, 0,iQty[2]-1);
+					break;
+				}
+			}
+			gridMapper->SetInput(plane->GetOutput());
+			ActorGridPlane[i]->SetMapper(gridMapper);
+			ActorGridPlane[i]->GetProperty()->SetColor(0,0,0);
+			ActorGridPlane[i]->GetProperty()->SetDiffuse(0);
+			ActorGridPlane[i]->GetProperty()->SetAmbient(1);
+			ActorGridPlane[i]->GetProperty()->SetRepresentationToWireframe();
+			ren->AddActor(ActorGridPlane[i]);
+			gridMapper->Delete();
+			plane->Delete();
+		}
+		SetGridOpacity(GridOpacity);
+		grid->Delete();
+	}
+	else if (CSGrid->GetMeshType()==CYLINDRICAL)
+	{
+		vtkStructuredGrid* grid = vtkStructuredGrid::New();
+
+		unsigned int uiQty[3];
+		double* lines[3]={NULL,NULL,NULL};
+		for (unsigned int n=0;n<3;++n)
+			lines[n] = CSGrid->GetLines(n,lines[n],uiQty[n]);
+
+		grid->SetDimensions(uiQty[0],uiQty[1],uiQty[2]);
+		vtkPoints *points = vtkPoints::New();
+		points->SetNumberOfPoints(uiQty[0]*uiQty[1]*uiQty[2]);
+		double r[3];
+		int id=0;
+		for (unsigned int k=0; k<uiQty[2]; ++k)
+			for (unsigned int j=0; j<uiQty[1]; ++j)
+				for (unsigned int i=0; i<uiQty[0]; ++i)
+				{
+					r[0] = lines[0][i] * cos(lines[1][j]);
+					r[1] = lines[0][i] * sin(lines[1][j]);
+					r[2] = lines[2][k];
+					points->SetPoint(id++,r);
+				}
+		grid->SetPoints(points);
+		points->Delete();
+		for (unsigned int n=0;n<3;++n)
+		{
+			delete[] lines[n];
+			lines[n] = NULL;
+		}
+		// draw only planes r-a (0) and r-z (1), plane z-a (2) obstructs the view on the structure
+		for (int i=0; i<2; i++)
+		{
+			ActorGridPlane[i] = vtkActor::New();
+			vtkPolyDataMapper *gridMapper = vtkPolyDataMapper::New();
+			vtkStructuredGridGeometryFilter *plane = vtkStructuredGridGeometryFilter::New();
+			plane->SetInput(grid);
+			switch (i)
+			{
+			case 0:
+				{
+					plane->SetExtent(0,uiQty[0]-1, 0,uiQty[1]-1, 0,0);
+					break;
+				}
+			case 1:
+				{
+					plane->SetExtent(0,uiQty[0]-1, 0,0, 0,uiQty[2]-1);
+					break;
+				}
+			case 2:
+				{ // skipped, see above, plane z-a obstructs the view on the structure
+					plane->SetExtent(uiQty[0]-1,uiQty[0]-1, 0,uiQty[1]-1, 0,uiQty[2]-1);
+					break;
+				}
+			}
+			gridMapper->SetInput(plane->GetOutput());
+			ActorGridPlane[i]->SetMapper(gridMapper);
+			ActorGridPlane[i]->GetProperty()->SetColor(0,0,0);
+			ActorGridPlane[i]->GetProperty()->SetDiffuse(0);
+			ActorGridPlane[i]->GetProperty()->SetAmbient(1);
+			ActorGridPlane[i]->GetProperty()->SetRepresentationToWireframe();
+			ren->AddActor(ActorGridPlane[i]);
+			gridMapper->Delete();
+			plane->Delete();
+		}
+		SetGridOpacity(GridOpacity);
+		grid->Delete();
+	}
+	else
+		cerr << "QVTKStructure::RenderGrid(): Error, unknown grid type!" << endl;
 }
 
 void QVTKStructure::SetGridOpacity(int val)
@@ -504,12 +566,11 @@ void QVTKStructure::KeyPress(vtkObject *caller, unsigned long eid, void *clientd
 	{
 		case 's':
 			{
-//				vtkActor *Actor;
-//				WireFrameOnlyActorCol->InitTraversal();
-//				while (Actor=WireFrameOnlyActorCol->GetNextActor() )  Actor->GetProperty()->SetRepresentationToWireframe();
-				GridPlanes[0]->GetProperty()->SetRepresentationToWireframe();
-				GridPlanes[1]->GetProperty()->SetRepresentationToWireframe();
-				GridPlanes[2]->GetProperty()->SetRepresentationToWireframe();
+				for (int n=0;n<3;++n)
+				{
+					if (GridPlanes[n])
+						GridPlanes[n]->GetProperty()->SetRepresentationToWireframe();
+				}
 				iren->Render();
 				break;
 			}
