@@ -981,6 +981,8 @@ void QCSXCAD::BuildToolBar()
 
 void QCSXCAD::View2D()
 {
+	if (clGrid.GetMeshType()==CYLINDRICAL)
+		QMessageBox::warning(this, tr("2D View Mode Warning"),tr("The 2D view mode is not yet adepted to handle a cylindrical mesh and some primitives defined with cylindrical coordinates."));
 	ViewLevel=VIEW_2D;
 	StackWidget->setCurrentIndex(ViewLevel);
 	StructureVTK->SetUpdateMode(false);
