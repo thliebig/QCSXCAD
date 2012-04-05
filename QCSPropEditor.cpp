@@ -16,6 +16,7 @@
 */
 
 #include "QCSPropEditor.h"
+#include "QCSXCAD_Global.h"
 #include "iostream"
 #include "time.h"
 
@@ -217,6 +218,7 @@ QGroupBox* QCSPropEditor::BuildGeneral()
 	QGridLayout* grid = new QGridLayout();
 
 	Name = new QLineEdit(QString(clProp->GetName().c_str()));
+	Name->setEnabled(QCSX_Settings.GetEdit());
 	grid->addWidget(new QLabel(tr("Name: ")),0,0);
 	grid->addWidget(Name,0,1);
 	grid->addWidget(new QLabel(QString(tr("ID: %1")).arg(clProp->GetID())),0,2);
@@ -230,6 +232,7 @@ QGroupBox* QCSPropEditor::BuildGeneral()
 	TypeCB->addItem(tr("Probe Box"),QVariant(CSProperties::PROBEBOX));
 	TypeCB->addItem(tr("Res Box"),QVariant(CSProperties::RESBOX));
 	TypeCB->addItem(tr("Dump Box"),QVariant(CSProperties::DUMPBOX));
+	TypeCB->setEnabled(QCSX_Settings.GetEdit());
 	grid->addWidget(TypeCB,1,1,1,2);
 	QObject::connect(TypeCB,SIGNAL(currentIndexChanged(int)),this,SLOT(ChangeType(int)));
 
@@ -266,16 +269,17 @@ QLayout* QCSPropEditor::BuildButtons()
 	QHBoxLayout* lay = new QHBoxLayout();
 
 	QPushButton* ok = new QPushButton(tr("Ok"));
-	QPushButton* reset = new QPushButton(tr("Reset"));
-	QPushButton* cancel = new QPushButton(tr("Cancel"));
-
 	QObject::connect(ok,SIGNAL(clicked()),this,SLOT(Save()));
-	QObject::connect(reset,SIGNAL(clicked()),this,SLOT(Reset()));
-	QObject::connect(cancel,SIGNAL(clicked()),this,SLOT(Cancel()));
-
 	lay->addWidget(ok);
-	lay->addWidget(reset);
-	lay->addWidget(cancel);
+	if (QCSX_Settings.GetEdit())
+	{
+		QPushButton* reset = new QPushButton(tr("Reset"));
+		QObject::connect(reset,SIGNAL(clicked()),this,SLOT(Reset()));
+		lay->addWidget(reset);
+		QPushButton* cancel = new QPushButton(tr("Cancel"));
+		QObject::connect(cancel,SIGNAL(clicked()),this,SLOT(Cancel()));
+		lay->addWidget(cancel);
+	}
 	lay->addStretch();
 
 	return lay;
@@ -404,6 +408,7 @@ QCSPropElectrodeGB::QCSPropElectrodeGB(CSPropElectrode *prop, QWidget *parent) :
 
 	Number = new QSpinBox();
 	Number->setRange(0,999);
+	Number->setEnabled(QCSX_Settings.GetEdit());
 	layout->addWidget(new QLabel(tr("Number: ")),0,0);
 	layout->addWidget(Number,0,1);
 
@@ -412,6 +417,7 @@ QCSPropElectrodeGB::QCSPropElectrodeGB(CSPropElectrode *prop, QWidget *parent) :
 	Type->addItem(tr("Electric field (hard)"));
 	Type->addItem(tr("Magnetic field (soft)"));
 	Type->addItem(tr("Magnetic field (hard)"));
+	Type->setEnabled(QCSX_Settings.GetEdit());
 	layout->addWidget(new QLabel(tr("Type: ")),0,2);
 	layout->addWidget(Type,0,3,1,3);
 	QObject::connect(Type,SIGNAL(currentIndexChanged(int)),this,SLOT(TypeChanged(int)));
@@ -427,7 +433,6 @@ QCSPropElectrodeGB::QCSPropElectrodeGB(CSPropElectrode *prop, QWidget *parent) :
 	layout->addWidget(new QLabel(tr("Excitation Z:")),1,4);
 	Excitation[2] = new QLineEdit();
 	layout->addWidget(Excitation[2],1,5);
-
 
 	layout->addWidget(new QLabel(tr("Analytic Fct (X): ")),2,0);
 	FctLine[0] = new QLineEdit();
@@ -494,12 +499,12 @@ void QCSPropElectrodeGB::TypeChanged(int index)
 	switch (index)
 	{
 	default:
-		Excitation[0]->setEnabled(true);
-		Excitation[1]->setEnabled(true);
-		Excitation[2]->setEnabled(true);
-		FctLine[0]->setEnabled(true);
-		FctLine[1]->setEnabled(true);
-		FctLine[2]->setEnabled(true);
+		Excitation[0]->setEnabled(true & QCSX_Settings.GetEdit());
+		Excitation[1]->setEnabled(true & QCSX_Settings.GetEdit());
+		Excitation[2]->setEnabled(true & QCSX_Settings.GetEdit());
+		FctLine[0]->setEnabled(true & QCSX_Settings.GetEdit());
+		FctLine[1]->setEnabled(true & QCSX_Settings.GetEdit());
+		FctLine[2]->setEnabled(true & QCSX_Settings.GetEdit());
 		break;
 	}
 }
@@ -515,6 +520,7 @@ QCSPropProbeBoxGB::QCSPropProbeBoxGB(CSPropProbeBox *prop, QWidget *parent) : QC
 
 	Number = new QSpinBox();
 	Number->setRange(0,999);
+	Number->setEnabled(QCSX_Settings.GetEdit());
 	layout->addWidget(new QLabel(tr("Number: ")),0,0);
 	layout->addWidget(Number,0,1);
 
@@ -548,6 +554,7 @@ QCSPropResBoxGB::QCSPropResBoxGB(CSPropResBox *prop, QWidget *parent) : QCSPrope
 
 	Factor = new QSpinBox();
 	Factor->setRange(2,16);
+	Factor->setEnabled(QCSX_Settings.GetEdit());
 	layout->addWidget(new QLabel(tr("Resolution Factor: ")),0,0);
 	layout->addWidget(Factor,0,1);
 

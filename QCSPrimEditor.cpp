@@ -16,6 +16,7 @@
 */
 
 #include "QCSPrimEditor.h"
+#include "QCSXCAD_Global.h"
 
 QCSPrimEditor::QCSPrimEditor(ContinuousStructure *CS, CSPrimitives* prim, QWidget* parent) : QDialog(parent)
 {
@@ -110,8 +111,10 @@ QGroupBox* QCSPrimEditor::BuildGeneral()
 	PrioSpinBox = new QSpinBox();
 	PrioSpinBox->setRange(-1,1000);
 	PrioSpinBox->setValue(CSPrim->GetPriority());	
+	PrioSpinBox->setEnabled(QCSX_Settings.GetEdit());
 	grid->addWidget(PrioSpinBox,0,2);
 	PropertiesComboBox = new QComboBox();
+	PropertiesComboBox->setEnabled(QCSX_Settings.GetEdit());
 	
 	UpdatePropertyCB();
 	
@@ -128,18 +131,19 @@ QLayout* QCSPrimEditor::BuildButtons()
 	QHBoxLayout* lay = new QHBoxLayout();
 	
 	QPushButton* ok = new QPushButton(tr("Ok"));
-	QPushButton* reset = new QPushButton(tr("Reset"));
-	QPushButton* cancel = new QPushButton(tr("Cancel"));
-	
 	QObject::connect(ok,SIGNAL(clicked()),this,SLOT(Save()));
-	QObject::connect(reset,SIGNAL(clicked()),this,SLOT(Reset()));
-	QObject::connect(cancel,SIGNAL(clicked()),this,SLOT(Cancel()));
-	
 	lay->addWidget(ok);
-	lay->addWidget(reset);
-	lay->addWidget(cancel);
-	lay->addStretch();
+	if (QCSX_Settings.GetEdit())
+	{
+		QPushButton* reset = new QPushButton(tr("Reset"));
+		QObject::connect(reset,SIGNAL(clicked()),this,SLOT(Reset()));
+		lay->addWidget(reset);
+		QPushButton* cancel = new QPushButton(tr("Cancel"));
+		QObject::connect(cancel,SIGNAL(clicked()),this,SLOT(Cancel()));
+		lay->addWidget(cancel);
+	}
 		
+	lay->addStretch();
 	return lay;
 }
 
@@ -223,6 +227,9 @@ QCSPrimBoxLayout::QCSPrimBoxLayout(CSPrimBox* prim, QWidget *parent) : QCSPrimit
 	Lines[3]=new QLineEdit();addWidget(Lines[3],3,3);
 	addWidget(new QLabel("Z:"),3,4);
 	Lines[5]=new QLineEdit();addWidget(Lines[5],3,5);
+
+	for (int i=0;i<6;++i)
+		Lines[i]->setEnabled(QCSX_Settings.GetEdit());
 	
 	GetValues();
 }
@@ -271,6 +278,9 @@ QCSPrimSphereLayout::QCSPrimSphereLayout(CSPrimSphere* prim, QWidget *parent) : 
 	addWidget(new QLabel(tr("Radius")),2,0,1,2); 
 	Lines[3]=new QLineEdit();addWidget(Lines[3],2,3,1,4);
 	
+	for (int i=0;i<4;++i)
+		Lines[i]->setEnabled(QCSX_Settings.GetEdit());
+
 	GetValues();
 }
 
@@ -338,6 +348,9 @@ QCSPrimCylinderLayout::QCSPrimCylinderLayout(CSPrimCylinder* prim, QWidget *pare
 	addWidget(new QLabel(tr("Radius")),4,0,1,2); 
 	Lines[6]=new QLineEdit();addWidget(Lines[6],4,3,1,4);
 	
+	for (int i=0;i<7;++i)
+		Lines[i]->setEnabled(QCSX_Settings.GetEdit());
+
 	GetValues();
 }
 
@@ -388,14 +401,17 @@ QCSPrimMultiBoxLayout::QCSPrimMultiBoxLayout(CSPrimMultiBox* prim, QWidget *pare
 	QPushButton *addButton = new QPushButton("Add Box");
 	QObject::connect(addButton,SIGNAL(clicked()),this,SLOT(NewBox()));
 	addWidget(addButton,0,0);
-	
+	addButton->setEnabled(QCSX_Settings.GetEdit());
+
 	QPushButton *editButton = new QPushButton("Edit Box");
 	QObject::connect(editButton,SIGNAL(clicked()),this,SLOT(EditBox()));
 	addWidget(editButton,0,1);
+	editButton->setEnabled(QCSX_Settings.GetEdit());
 
 	QPushButton *deleteButton = new QPushButton("Delete Box");
 	QObject::connect(deleteButton,SIGNAL(clicked()),this,SLOT(DeleteBox()));
 	addWidget(deleteButton,0,2);
+	deleteButton->setEnabled(QCSX_Settings.GetEdit());
 
 	qBoxList = new QListWidget();
 	addWidget(qBoxList,1,0,1,3);
@@ -403,6 +419,7 @@ QCSPrimMultiBoxLayout::QCSPrimMultiBoxLayout(CSPrimMultiBox* prim, QWidget *pare
 	{
 		qBoxList->addItem(tr("Box #%1").arg(i));
 	}
+	qBoxList->setEnabled(QCSX_Settings.GetEdit());
 
 	GetValues();
 }
@@ -454,10 +471,12 @@ QCSPrimPolygonLayout::QCSPrimPolygonLayout(CSPrimPolygon* prim, QWidget *parent)
 	NormVec->addItem(tr("xy-plane"));
 	QObject::connect(NormVec,SIGNAL(currentIndexChanged(int)),this,SLOT(NormVecChanged()));
 	addWidget(NormVec,0,1);
+	NormVec->setEnabled(QCSX_Settings.GetEdit());
 	
 	addWidget(new QLabel(tr("Polygon Elevation")),1,0);	
 	Elevation = new QLineEdit();;
 	addWidget(Elevation,1,1);
+	Elevation->setEnabled(QCSX_Settings.GetEdit());
 
 	QGroupBox* gb = new QGroupBox(tr("Polygon Vertices"));
 	QFormLayout* gbl = new QFormLayout();
@@ -466,9 +485,11 @@ QCSPrimPolygonLayout::QCSPrimPolygonLayout(CSPrimPolygon* prim, QWidget *parent)
 	
 	CoordLineX = new QLineEdit();
 	gbl->addRow(tr("X_1"),CoordLineX);
+	CoordLineX->setEnabled(QCSX_Settings.GetEdit());
 	CoordLineY = new QLineEdit();
 	gbl->addRow(tr("X_2"),CoordLineY);
-	
+	CoordLineY->setEnabled(QCSX_Settings.GetEdit());
+
 	GetValues();
 }
 
@@ -578,7 +599,7 @@ QCSPrimUserDefinedLayout::QCSPrimUserDefinedLayout(CSPrimUserDefined* prim, QWid
 	CoordSystem->addItem("Cartesian & Cylindrical Coord. System (x,y,z,r,a)");
 	CoordSystem->addItem("Cartesian & Spherical Coord. System (x,y,z,r,a,t)");
 	addWidget(CoordSystem,row++,0);
-	
+	CoordSystem->setEnabled(QCSX_Settings.GetEdit());
 	
 	QGroupBox* SysShiftGrp = new QGroupBox(tr("Shift Coordinate System"));
 	addWidget(SysShiftGrp,row++,0);
@@ -595,11 +616,13 @@ QCSPrimUserDefinedLayout::QCSPrimUserDefinedLayout(CSPrimUserDefined* prim, QWid
 	lay->addWidget(new QLabel(tr("Z-Shift:")),2,0);
 	CoordShift[2]=new QLineEdit();
 	lay->addWidget(CoordShift[2],2,1);
+	for (int i=0;i<3;++i)
+		CoordShift[i]->setEnabled(QCSX_Settings.GetEdit());
 	
 	addWidget(new QLabel(tr("Define Bool-Function for this Primitive in chosen Coord. System:")),row++,0);
 	FunctionLine = new QLineEdit();
 	addWidget(FunctionLine,row++,0);
-
+	FunctionLine->setEnabled(QCSX_Settings.GetEdit());
 	
 	GetValues();
 }

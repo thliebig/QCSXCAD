@@ -58,6 +58,9 @@ protected:
 	//QComboBox* UnitLength;
 	QLineEdit* UnitLength;
 	QSlider* OpacitySlider;
+	QLabel* m_DirNames[3];
+
+	QString GetDirName(int ny);
 
 	double* GetDoubleArrayFromString(int *count, QString qsValue);
 };

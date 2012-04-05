@@ -16,6 +16,7 @@
 */
 
 #include "QParameterGui.h"
+#include "QCSXCAD_Global.h"
 
 QParameter::QParameter(Parameter* para, QWidget* parent) : QGroupBox(parent)
 {
@@ -255,6 +256,7 @@ QParameterSet::QParameterSet(QWidget* parent) : QWidget(parent), ParameterSet()
 	
 	QPushButton* btn = new QPushButton(tr("New"));
 	QObject::connect(btn,SIGNAL(clicked()),this,SLOT(NewParameter()));
+	btn->setEnabled(QCSX_Settings.GetEdit());
 	grid->addWidget(btn,2,0);
 	
 	setLayout(grid);

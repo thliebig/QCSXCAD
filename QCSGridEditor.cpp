@@ -17,10 +17,7 @@
 
 #include "QCSGridEditor.h"
 #include "CSRectGrid.h"
-//#include "fparser.hh"
-//#include <stdio.h>
-//#include <stdlib.h>
-//#include <iostream>
+#include "QCSXCAD_Global.h"
 
 QCSGridEditor::QCSGridEditor(CSRectGrid* grid, QWidget* parent) : QWidget(parent)
 {
@@ -33,10 +30,11 @@ QCSGridEditor::QCSGridEditor(CSRectGrid* grid, QWidget* parent) : QWidget(parent
 	lay->addWidget(new QLabel(tr("Max")),0,2);
 	lay->addWidget(new QLabel(tr("Lines")),0,3);
 
-	lay->addWidget(new QLabel("X"),1,0);
-	lay->addWidget(new QLabel("Y"),2,0);
-	lay->addWidget(new QLabel("Z"),3,0);
-
+	for (int n=0;n<3;++n)
+	{
+		m_DirNames[n] = new QLabel(GetDirName(n));
+		lay->addWidget(m_DirNames[n],n+1,0);
+	}
 
 	QLabel* label=NULL;
 	for (unsigned int i=0;i<6;++i)
@@ -54,20 +52,25 @@ QCSGridEditor::QCSGridEditor(CSRectGrid* grid, QWidget* parent) : QWidget(parent
 		lay->setAlignment(label,Qt::AlignCenter);
 		NodeQty.append(label);
 	}
-	QPushButton* PB = new QPushButton(QIcon(":/images/edit.png"),tr("Edit"));
+
+	QString EditText = tr("Edit");
+	if (QCSX_Settings.GetEdit()==false)
+		EditText = tr("View");
+	QPushButton* PB = new QPushButton(QIcon(":/images/edit.png"),EditText);
 	QObject::connect(PB,SIGNAL(clicked()),this,SLOT(EditX()));
 	lay->addWidget(PB,1,4);
 
-	PB = new QPushButton(QIcon(":/images/edit.png"),tr("Edit"));
+	PB = new QPushButton(QIcon(":/images/edit.png"),EditText);
 	QObject::connect(PB,SIGNAL(clicked()),this,SLOT(EditY()));
 	lay->addWidget(PB,2,4);
 
-	PB = new QPushButton(QIcon(":/images/edit.png"),tr("Edit"));
+	PB = new QPushButton(QIcon(":/images/edit.png"),EditText);
 	QObject::connect(PB,SIGNAL(clicked()),this,SLOT(EditZ()));
 	lay->addWidget(PB,3,4);
 
 	lay->addWidget(new QLabel(tr("Drawing unit [m]:")),4,0,1,2);
 	UnitLength = new QLineEdit("1");
+	UnitLength->setEnabled(QCSX_Settings.GetEdit());
 	QObject::connect(UnitLength,SIGNAL(textEdited(QString)),this,SLOT(SetDeltaUnit(QString)));
 	lay->addWidget(UnitLength,4,2,1,3);
 
@@ -115,10 +118,9 @@ void QCSGridEditor::BuildInHomogenDisc()
 //	lay->addWidget(new QLabel(tr("Y")),3,0);
 //	lay->addWidget(new QLabel(tr("Z")),4,0);
 	QLineEdit* function[3];
-	QStringList coordVars;coordVars << "x" << "y" << "z";
-	function[0] = new QLineEdit(coordVars.at(0));
-	function[1] = new QLineEdit(coordVars.at(1));
-	function[2] = new QLineEdit(coordVars.at(2));
+	function[0] = new QLineEdit(GetDirName(0));
+	function[1] = new QLineEdit(GetDirName(1));
+	function[2] = new QLineEdit(GetDirName(2));
 	lay->addWidget(new QLabel("X:"),2,0);
 	lay->addWidget(new QLabel("f(x)="),2,4);
 	lay->addWidget(function[0],2,5);
@@ -224,11 +226,11 @@ void QCSGridEditor::BuildHomogenDisc()
 //	lay->addWidget(new QLabel(tr("Y")),3,0);
 //	lay->addWidget(new QLabel(tr("Z")),4,0);
 	QCheckBox* Check[3];
-	Check[0] = new QCheckBox(tr("X"));
+	Check[0] = new QCheckBox(GetDirName(0));
 	lay->addWidget(Check[0],2,0);
-	Check[1] = new QCheckBox(tr("Y"));
+	Check[1] = new QCheckBox(GetDirName(1));
 	lay->addWidget(Check[1],3,0);
-	Check[2] = new QCheckBox(tr("Z"));
+	Check[2] = new QCheckBox(GetDirName(2));
 	lay->addWidget(Check[2],4,0);
 	QLineEdit* BoxLine[6];
 	QSpinBox* Nodes[3];
@@ -378,30 +380,36 @@ double* QCSGridEditor::GetDoubleArrayFromString(int *count, QString qsValue)
 
 void QCSGridEditor::Edit(int direct)
 {
-	QStringList coordVars;coordVars << "x" << "y" << "z";
-
 	QTextEdit *Line = new QTextEdit(clGrid->GetLinesAsString(direct).c_str());
+	Line->setReadOnly(QCSX_Settings.GetEdit()==false);
 	QDialog* EditDisc = new QDialog(this);
 
-	EditDisc->setWindowTitle(tr("Edit Discratisation"));
+	if (QCSX_Settings.GetEdit())
+		EditDisc->setWindowTitle(tr("Edit Discratisation"));
+	else
+		EditDisc->setWindowTitle(tr("View Discratisation"));
 	QGridLayout* lay = new QGridLayout();
 
 	lay->addWidget(Line,0,0,1,4);
 
-	lay->addWidget(new QLabel(tr("Allowed syntax example: 0,10, 20, 30:1.5e1:100, 50 , sqrt(1000:-10:200)")),1,0,1,4);
+	if (QCSX_Settings.GetEdit())
+		lay->addWidget(new QLabel(tr("Allowed syntax example: 0,10, 20, 30:1.5e1:100, 50 , sqrt(1000:-10:200)")),1,0,1,4);
 	QPushButton* PB = new QPushButton(tr("Ok"));
 	QObject::connect(PB,SIGNAL(clicked()),EditDisc,SLOT(accept()));
 	lay->addWidget(PB,2,1);
-	PB = new QPushButton(tr("Cancel"));
-	QObject::connect(PB,SIGNAL(clicked()),EditDisc,SLOT(reject()));
-	lay->addWidget(PB,2,2);
+	if (QCSX_Settings.GetEdit())
+	{
+		PB = new QPushButton(tr("Cancel"));
+		QObject::connect(PB,SIGNAL(clicked()),EditDisc,SLOT(reject()));
+		lay->addWidget(PB,2,2);
+	}
 
 	lay->setRowStretch(0,1);
 	lay->setColumnStretch(0,1);
 	lay->setColumnStretch(3,1);
 
 	EditDisc->setLayout(lay);
-	if (EditDisc->exec()==QDialog::Accepted)
+	if (EditDisc->exec()==QDialog::Accepted && QCSX_Settings.GetEdit())
 	{
 		clGrid->ClearLines(direct);
 		QStringList gridValues = Line->toPlainText().split(",");
@@ -427,7 +435,7 @@ void QCSGridEditor::Edit(int direct)
 					qre.indexIn(qsValue);
 					QString seq = qre.cap();
 //					cerr << "found-->" << seq.toStdString() <<  endl;
-					QString function = qsValue.replace(QRegExp(FloatExp + ":" + FloatExp + ":" + FloatExp),coordVars.at(direct));
+					QString function = qsValue.replace(QRegExp(FloatExp + ":" + FloatExp + ":" + FloatExp),GetDirName(direct));
 //					cerr << function.toStdString() << endl;
 					int count=0;
 					double* values = GetDoubleArrayFromString(&count,seq);
@@ -501,6 +509,7 @@ void QCSGridEditor::Update()
 		SimBox.at(2*i)->setText(QString("%1").arg(clGrid->GetLine(i,0)));
 		SimBox.at(2*i+1)->setText(QString("%1").arg(clGrid->GetLine(i,clGrid->GetQtyLines(i)-1)));
 		NodeQty.at(i)->setText(QString("%1").arg(clGrid->GetQtyLines(i)));
+		m_DirNames[i]->setText(GetDirName(i));
 	}
 	UnitLength->setText(QString("%1").arg(clGrid->GetDeltaUnit()));
 	emit GridChanged();
@@ -509,4 +518,33 @@ void QCSGridEditor::Update()
 void QCSGridEditor::SetOpacity(int val)
 {
 	OpacitySlider->setValue(val);
+}
+
+QString QCSGridEditor::GetDirName(int ny)
+{
+	if (clGrid->GetMeshType()==0)
+	{
+		switch (ny)
+		{
+		case 0:
+			return "x";
+		case 1:
+			return "y";
+		case 2:
+			return "z";
+		}
+	}
+	if (clGrid->GetMeshType()==1)
+	{
+		switch (ny)
+		{
+		case 0:
+			return "r";
+		case 1:
+			return QChar(0xb1, 0x03);
+		case 2:
+			return "z";
+		}
+	}
+	return "";
 }

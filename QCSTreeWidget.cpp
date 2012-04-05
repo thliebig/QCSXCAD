@@ -16,6 +16,7 @@
 */
 
 #include "QCSTreeWidget.h"
+#include "QCSXCAD_Global.h"
 
 QCSTreeWidget::QCSTreeWidget(ContinuousStructure* CS, QWidget * parent) : QTreeWidget(parent)
 {
@@ -120,26 +121,33 @@ void QCSTreeWidget::RefreshItem(int index)
 void QCSTreeWidget::contextMenuEvent(QContextMenuEvent *event)
 {
 	QMenu menu(this);
-	QMenu* primM = menu.addMenu(QIcon(":/images/edit_add.png"),tr("New Primitive"));
-	primM->addAction(tr("Box"),this,SIGNAL(NewBox()));
-	primM->addAction(tr("Multi-Box"),this,SIGNAL(NewMultiBox()));
-	primM->addAction(tr("Sphere"),this,SIGNAL(NewSphere()));
-	primM->addAction(tr("Cylinder"),this,SIGNAL(NewCylinder()));
-	primM->addAction(tr("User Defined"),this,SIGNAL(NewUserDefined()));
-	
-	QMenu* propM = menu.addMenu(QIcon(":/images/edit_add.png"),tr("New Property"));
-	propM->addAction(tr("Material"),this,SIGNAL(NewMaterial()));
-	propM->addAction(tr("Metal"),this,SIGNAL(NewMetal()));
-	propM->addAction(tr("Electrode"),this,SIGNAL(NewElectrode()));
-	propM->addAction(tr("Probe-Box"),this,SIGNAL(NewChargeBox()));
-	propM->addAction(tr("Res-Box"),this,SIGNAL(NewResBox()));
-	propM->addAction(tr("Dump-Box"),this,SIGNAL(NewDumpBox()));
-	
-	menu.addSeparator();
-	
-	menu.addAction(QIcon(":/images/edit.png"),tr("Edit"),this,SIGNAL(Edit()));
-	menu.addAction(QIcon(":/images/editcopy.png"),tr("Copy"),this,SIGNAL(Copy()));
-	menu.addAction(QIcon(":/images/edit_remove.png"),tr("Delete"),this,SIGNAL(Delete()));
+	if (QCSX_Settings.GetEdit())
+	{
+		QMenu* primM = menu.addMenu(QIcon(":/images/edit_add.png"),tr("New Primitive"));
+		primM->addAction(tr("Box"),this,SIGNAL(NewBox()));
+		primM->addAction(tr("Multi-Box"),this,SIGNAL(NewMultiBox()));
+		primM->addAction(tr("Sphere"),this,SIGNAL(NewSphere()));
+		primM->addAction(tr("Cylinder"),this,SIGNAL(NewCylinder()));
+		primM->addAction(tr("User Defined"),this,SIGNAL(NewUserDefined()));
+
+		QMenu* propM = menu.addMenu(QIcon(":/images/edit_add.png"),tr("New Property"));
+		propM->addAction(tr("Material"),this,SIGNAL(NewMaterial()));
+		propM->addAction(tr("Metal"),this,SIGNAL(NewMetal()));
+		propM->addAction(tr("Electrode"),this,SIGNAL(NewElectrode()));
+		propM->addAction(tr("Probe-Box"),this,SIGNAL(NewChargeBox()));
+		propM->addAction(tr("Res-Box"),this,SIGNAL(NewResBox()));
+		propM->addAction(tr("Dump-Box"),this,SIGNAL(NewDumpBox()));
+
+		menu.addSeparator();
+
+		menu.addAction(QIcon(":/images/edit.png"),tr("Edit"),this,SIGNAL(Edit()));
+		menu.addAction(QIcon(":/images/editcopy.png"),tr("Copy"),this,SIGNAL(Copy()));
+		menu.addAction(QIcon(":/images/edit_remove.png"),tr("Delete"),this,SIGNAL(Delete()));
+	}
+	else
+	{
+		menu.addAction(QIcon(":/images/edit.png"),tr("View"),this,SIGNAL(Edit()));
+	}
 
 	menu.exec(event->globalPos());
 }

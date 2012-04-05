@@ -58,6 +58,10 @@ QCSXCAD::QCSXCAD(QWidget *parent) : QMainWindow(parent)
 //	Layout->setColumnStretch(3,1);
 //	Layout->setRowStretch(4,1);
 
+	QStringList argList=qApp->arguments();
+	for (int i=2;i<argList.size();++i)
+		QCSX_Settings.parseCommandLineArgument(argList.at(i));
+
 	ViewLevel=VIEW_2D;
 
 	StructureVTK = new QVTKStructure();
@@ -877,8 +881,10 @@ void QCSXCAD::BuildToolBar()
 	QToolBar *mainTB = addToolBar(tr("General"));
 	mainTB->setObjectName("General_ToolBar");
 
-	mainTB->addAction(QIcon(":/images/filenew.png"),tr("New"),this,SLOT(New()));
-	mainTB->addAction(QIcon(":/images/down.png"),tr("Import"),this,SLOT(ImportGeometry()));
+	if (QCSX_Settings.GetEdit())
+		mainTB->addAction(QIcon(":/images/filenew.png"),tr("New"),this,SLOT(New()));
+	if (QCSX_Settings.GetEdit())
+		mainTB->addAction(QIcon(":/images/down.png"),tr("Import"),this,SLOT(ImportGeometry()));
 	mainTB->addAction(QIcon(":/images/up.png"),tr("Export"),this,SLOT(ExportGeometry()));
 
 
@@ -891,48 +897,53 @@ void QCSXCAD::BuildToolBar()
 	ItemTB->addAction(QIcon(":/images/bulb.png"),tr("ShowAll"),this,SLOT(ShowAll()));
 	ItemTB->addAction(QIcon(":/images/bulb_off.png"),tr("HideAll"),this,SLOT(HideAll()));
 
-	QToolBar *newObjct = addToolBar(tr("add new Primitive"));
-	newObjct->setObjectName("New_Primitive_ToolBar");
-
+	QToolBar *newObjct = NULL;
 	QAction* newAct = NULL;
-	newAct = newObjct->addAction(tr("Box"),this,SLOT(NewBox()));
-	newAct->setToolTip(tr("add new Box"));
 
-	newAct = newObjct->addAction(tr("MultiBox"),this,SLOT(NewMultiBox()));
-	newAct->setToolTip(tr("add new Multi-Box"));
+	if (QCSX_Settings.GetEdit())
+	{
+		newObjct = addToolBar(tr("add new Primitive"));
+		newObjct->setObjectName("New_Primitive_ToolBar");
 
-	newAct = newObjct->addAction(tr("Sphere"),this,SLOT(NewSphere()));
-	newAct->setToolTip(tr("add new Sphere"));
+		newAct = newObjct->addAction(tr("Box"),this,SLOT(NewBox()));
+		newAct->setToolTip(tr("add new Box"));
 
-	newAct = newObjct->addAction(tr("Cylinder"),this,SLOT(NewCylinder()));
-	newAct->setToolTip(tr("add new Cylinder"));
+		newAct = newObjct->addAction(tr("MultiBox"),this,SLOT(NewMultiBox()));
+		newAct->setToolTip(tr("add new Multi-Box"));
 
-	newAct = newObjct->addAction(tr("Polygon"),this,SLOT(NewPolygon()));
-	newAct->setToolTip(tr("add new Polygon"));
+		newAct = newObjct->addAction(tr("Sphere"),this,SLOT(NewSphere()));
+		newAct->setToolTip(tr("add new Sphere"));
 
-	newAct = newObjct->addAction(tr("User Defined"),this,SLOT(NewUserDefined()));
-	newAct->setToolTip(tr("add new User Definied Primitive"));
+		newAct = newObjct->addAction(tr("Cylinder"),this,SLOT(NewCylinder()));
+		newAct->setToolTip(tr("add new Cylinder"));
 
-	newObjct = addToolBar(tr("add new Property"));
-	newObjct->setObjectName("New_Property_ToolBar");
+		newAct = newObjct->addAction(tr("Polygon"),this,SLOT(NewPolygon()));
+		newAct->setToolTip(tr("add new Polygon"));
 
-	newAct = newObjct->addAction(tr("Material"),this,SLOT(NewMaterial()));
-	newAct->setToolTip(tr("add new Material-Property"));
+		newAct = newObjct->addAction(tr("User Defined"),this,SLOT(NewUserDefined()));
+		newAct->setToolTip(tr("add new User Definied Primitive"));
 
-	newAct = newObjct->addAction(tr("Metal"),this,SLOT(NewMetal()));
-	newAct->setToolTip(tr("add new Metal-Property"));
+		newObjct = addToolBar(tr("add new Property"));
+		newObjct->setObjectName("New_Property_ToolBar");
 
-	newAct = newObjct->addAction(tr("Electrode"),this,SLOT(NewElectrode()));
-	newAct->setToolTip(tr("add new Electrode-Property"));
+		newAct = newObjct->addAction(tr("Material"),this,SLOT(NewMaterial()));
+		newAct->setToolTip(tr("add new Material-Property"));
 
-	newAct = newObjct->addAction(tr("ProbeBox"),this,SLOT(NewChargeBox()));
-	newAct->setToolTip(tr("add new Probe-Box-Property"));
+		newAct = newObjct->addAction(tr("Metal"),this,SLOT(NewMetal()));
+		newAct->setToolTip(tr("add new Metal-Property"));
 
-	newAct = newObjct->addAction(tr("ResBox"),this,SLOT(NewResBox()));
-	newAct->setToolTip(tr("add new Res-Box-Property"));
+		newAct = newObjct->addAction(tr("Electrode"),this,SLOT(NewElectrode()));
+		newAct->setToolTip(tr("add new Electrode-Property"));
 
-	newAct = newObjct->addAction(tr("DumpBox"),this,SLOT(NewDumpBox()));
-	newAct->setToolTip(tr("add new Dump-Box-Property"));
+		newAct = newObjct->addAction(tr("ProbeBox"),this,SLOT(NewChargeBox()));
+		newAct->setToolTip(tr("add new Probe-Box-Property"));
+
+		newAct = newObjct->addAction(tr("ResBox"),this,SLOT(NewResBox()));
+		newAct->setToolTip(tr("add new Res-Box-Property"));
+
+		newAct = newObjct->addAction(tr("DumpBox"),this,SLOT(NewDumpBox()));
+		newAct->setToolTip(tr("add new Dump-Box-Property"));
+	}
 
 	newObjct = addToolBar(tr("Zoom"));
 	newObjct->setObjectName("Zoom_ToolBar");
@@ -964,8 +975,8 @@ void QCSXCAD::BuildToolBar()
 	newAct->setCheckable(true);
 	ActViewGrp->addAction(newAct);
 
-
-	addToolBar(GridEditor->BuildToolbar());
+	if (QCSX_Settings.GetEdit())
+		addToolBar(GridEditor->BuildToolbar());
 }
 
 void QCSXCAD::View2D()
