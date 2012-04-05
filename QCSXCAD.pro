@@ -33,7 +33,8 @@ SOURCES += QCSXCAD.cpp \
     VTKPrimitives.cpp \
     export_x3d.cpp \
     export_pov.cpp \
-    QGeometryPlot.cpp
+    QGeometryPlot.cpp \
+    QCSXCAD_Global.cpp
 win32 { 
     DEFINES += BUILD_QCSXCAD_LIB
     # DEFINES += __GYM2XML__

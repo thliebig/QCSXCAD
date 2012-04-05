@@ -34,4 +34,21 @@
 #define QCSXCAD_EXPORT
 #endif
 
+class QCSXCAD_Global
+{
+public:
+	QCSXCAD_Global();
+	bool parseCommandLineArgument( QString argv );
+
+	void ShowArguments(std::ostream& ostr, std::string front=std::string());
+
+	void SetEdit(bool val) {m_EnableEdit=val;}
+	bool GetEdit() {return m_EnableEdit;}
+
+protected:
+	bool m_EnableEdit;
+};
+
+extern QCSXCAD_Global QCSX_Settings;
+
 #endif /*QCSXCAD_GLOBAL_H_*/
