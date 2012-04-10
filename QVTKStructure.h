@@ -62,6 +62,9 @@ public slots:
 	void setZX();
 	void SetPropOpacity(unsigned int uiID, int val);
 	void RenderGrid();
+	void RenderGridX(int plane_pos);
+	void RenderGridY(int plane_pos);
+	void RenderGridZ(int plane_pos);
 	void RenderGeometry();
 
 	//! Export the current view to an image file (currently only png)
@@ -71,7 +74,7 @@ public slots:
 	void ExportProperty2STL(unsigned int uiID, QString filename, double scale = 1.0);
 
 protected slots:
-	void RenderGridDir(int dir, int plane_pos);
+	void RenderGridDir(int dir, unsigned int plane_pos);
 
 protected:
 	typedef struct

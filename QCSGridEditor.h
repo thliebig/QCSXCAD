@@ -30,11 +30,18 @@ public:
 	virtual ~QCSGridEditor();
 
 	QToolBar* BuildToolbar();
+	QWidget* BuildPlanePosWidget();
+
+	QString GetDirName(int ny);
+	QString GetNormName(int ny);
 
 signals:
 	void OpacityChange(int);
 	void signalDetectEdges(int);
 	void GridChanged();
+	void GridPlaneXChanged(int);
+	void GridPlaneYChanged(int);
+	void GridPlaneZChanged(int);
 
 public slots:
 	void Update();
@@ -43,6 +50,9 @@ public slots:
 	void EditY();
 	void EditZ();
 	void Edit(int direct);
+	void SetGridPlaneX(int pos);
+	void SetGridPlaneY(int pos);
+	void SetGridPlaneZ(int pos);
 
 protected slots:
 	void BuildHomogenDisc();
@@ -59,8 +69,9 @@ protected:
 	QLineEdit* UnitLength;
 	QSlider* OpacitySlider;
 	QLabel* m_DirNames[3];
-
-	QString GetDirName(int ny);
+	QSlider* m_PlanePos[3];
+	QLabel* m_NormNames[3];
+	QLabel* m_PlanePosValue[3];
 
 	double* GetDoubleArrayFromString(int *count, QString qsValue);
 };

@@ -221,10 +221,28 @@ void QVTKStructure::RenderGrid()
 	RenderGridDir(0,0);
 	RenderGridDir(1,0);
 	RenderGridDir(2,0);
-	SetGridOpacity(GridOpacity);
 }
 
-void QVTKStructure::RenderGridDir(int dir, int plane_pos)
+void QVTKStructure::RenderGridX(int plane_pos)
+{
+	RenderGridDir(0,plane_pos);
+	VTKWidget->GetRenderWindow()->GetInteractor()->Render();
+}
+
+void QVTKStructure::RenderGridY(int plane_pos)
+{
+	RenderGridDir(1,plane_pos);
+	VTKWidget->GetRenderWindow()->GetInteractor()->Render();
+
+}
+
+void QVTKStructure::RenderGridZ(int plane_pos)
+{
+	RenderGridDir(2,plane_pos);
+	VTKWidget->GetRenderWindow()->GetInteractor()->Render();
+}
+
+void QVTKStructure::RenderGridDir(int dir, unsigned int plane_pos)
 {
 	if (ActorGridPlane[dir]!=NULL)
 	{
@@ -241,6 +259,11 @@ void QVTKStructure::RenderGridDir(int dir, int plane_pos)
 
 	for (int n=0;n<3;++n)
 		uiQty[n]=CSGrid->GetQtyLines(n);
+	if (plane_pos>=uiQty[dir])
+	{
+		cerr << "QVTKStructure::RenderGridDir: requested plane postion is out of range, resetting to max value!" << endl;
+		plane_pos = uiQty[dir]-1;
+	}
 
 	if (CSGrid->GetMeshType()==CARTESIAN)
 	{
@@ -257,7 +280,7 @@ void QVTKStructure::RenderGridDir(int dir, int plane_pos)
 		grid_plane->SetInput(m_Rect_Grid);
 		switch (dir)
 		{
-		case 0:
+		case 2:
 		{
 			grid_plane->SetExtent(0,uiQty[0]-1, 0,uiQty[1]-1, plane_pos,plane_pos);
 			break;
@@ -267,7 +290,7 @@ void QVTKStructure::RenderGridDir(int dir, int plane_pos)
 			grid_plane->SetExtent(0,uiQty[0]-1, plane_pos,plane_pos, 0,uiQty[2]-1);
 			break;
 		}
-		case 2:
+		case 0:
 		{
 			grid_plane->SetExtent(plane_pos,plane_pos, 0,uiQty[1]-1, 0,uiQty[2]-1);
 			break;
@@ -285,13 +308,12 @@ void QVTKStructure::RenderGridDir(int dir, int plane_pos)
 			return;
 		}
 
-		// draw only planes r-a (0) and r-z (1), plane z-a (2) obstructs the view on the structure
 		vtkStructuredGridGeometryFilter *grid_plane = vtkStructuredGridGeometryFilter::New();
 		plane = grid_plane;
 		grid_plane->SetInput(m_Struct_Grid);
 		switch (dir)
 		{
-		case 0:
+		case 2:
 		{
 			grid_plane->SetExtent(0,uiQty[0]-1, 0,uiQty[1]-1, plane_pos,plane_pos);
 			break;
@@ -301,8 +323,8 @@ void QVTKStructure::RenderGridDir(int dir, int plane_pos)
 			grid_plane->SetExtent(0,uiQty[0]-1, plane_pos,plane_pos, 0,uiQty[2]-1);
 			break;
 		}
-		case 2:
-		{ // skipped, see above, plane z-a obstructs the view on the structure
+		case 0:
+		{
 			grid_plane->SetExtent(plane_pos,plane_pos, 0,uiQty[1]-1, 0,uiQty[2]-1);
 			break;
 		}
@@ -317,6 +339,7 @@ void QVTKStructure::RenderGridDir(int dir, int plane_pos)
 	ActorGridPlane[dir]->GetProperty()->SetDiffuse(0);
 	ActorGridPlane[dir]->GetProperty()->SetAmbient(1);
 	ActorGridPlane[dir]->GetProperty()->SetRepresentationToWireframe();
+	ActorGridPlane[dir]->GetProperty()->SetOpacity((double)GridOpacity/255.0);
 	ren->AddActor(ActorGridPlane[dir]);
 	gridMapper->Delete();
 	plane->Delete();

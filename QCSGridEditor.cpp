@@ -99,6 +99,48 @@ QToolBar* QCSGridEditor::BuildToolbar()
 	return TB;
 }
 
+QWidget* QCSGridEditor::BuildPlanePosWidget()
+{
+	QWidget* PPWid = new QWidget();
+	QGridLayout* lay = new QGridLayout();
+
+	for (int n=0;n<3;++n)
+	{
+		m_NormNames[n] = new QLabel(GetNormName(n)+ tr(" plane:"));
+		lay->addWidget( m_NormNames[n] ,n,0);
+		m_PlanePos[n] = new QSlider();
+		m_PlanePos[n]->setOrientation(Qt::Horizontal);
+		lay->addWidget(m_PlanePos[n],n,1);
+		m_PlanePosValue[n] = new QLabel();
+		lay->addWidget(m_PlanePosValue[n],n,2);
+	}
+	QObject::connect(m_PlanePos[0],SIGNAL(valueChanged(int)),this,SIGNAL(GridPlaneXChanged(int)));
+	QObject::connect(m_PlanePos[1],SIGNAL(valueChanged(int)),this,SIGNAL(GridPlaneYChanged(int)));
+	QObject::connect(m_PlanePos[2],SIGNAL(valueChanged(int)),this,SIGNAL(GridPlaneZChanged(int)));
+
+	QObject::connect(m_PlanePos[0],SIGNAL(valueChanged(int)),this,SLOT(SetGridPlaneX(int)));
+	QObject::connect(m_PlanePos[1],SIGNAL(valueChanged(int)),this,SLOT(SetGridPlaneY(int)));
+	QObject::connect(m_PlanePos[2],SIGNAL(valueChanged(int)),this,SLOT(SetGridPlaneZ(int)));
+
+	PPWid->setLayout(lay);
+	return PPWid;
+}
+
+void QCSGridEditor::SetGridPlaneX(int pos)
+{
+	m_PlanePosValue[0]->setText(QString("%1 = %2").arg(GetDirName(0)).arg(clGrid->GetLine(0,pos)));
+}
+
+void QCSGridEditor::SetGridPlaneY(int pos)
+{
+	m_PlanePosValue[1]->setText(QString("%1 = %2").arg(GetDirName(1)).arg(clGrid->GetLine(1,pos)));
+}
+
+void QCSGridEditor::SetGridPlaneZ(int pos)
+{
+	m_PlanePosValue[2]->setText(QString("%1 = %2").arg(GetDirName(2)).arg(clGrid->GetLine(2,pos)));
+}
+
 void QCSGridEditor::BuildInHomogenDisc()
 {
 	QDialog* HomogenDisc = new QDialog();
@@ -510,7 +552,12 @@ void QCSGridEditor::Update()
 		SimBox.at(2*i+1)->setText(QString("%1").arg(clGrid->GetLine(i,clGrid->GetQtyLines(i)-1)));
 		NodeQty.at(i)->setText(QString("%1").arg(clGrid->GetQtyLines(i)));
 		m_DirNames[i]->setText(GetDirName(i));
+		m_PlanePos[i]->setRange(0,clGrid->GetQtyLines(i)-1);
+		m_NormNames[i]->setText(GetNormName(i)+ tr(" plane: "));
 	}
+	SetGridPlaneX(m_PlanePos[0]->value());
+	SetGridPlaneY(m_PlanePos[0]->value());
+	SetGridPlaneZ(m_PlanePos[0]->value());
 	UnitLength->setText(QString("%1").arg(clGrid->GetDeltaUnit()));
 	emit GridChanged();
 }
@@ -544,6 +591,35 @@ QString QCSGridEditor::GetDirName(int ny)
 			return QChar(0xb1, 0x03);
 		case 2:
 			return "z";
+		}
+	}
+	return "";
+}
+
+QString QCSGridEditor::GetNormName(int ny)
+{
+	if (clGrid->GetMeshType()==0)
+	{
+		switch (ny)
+		{
+		case 0:
+			return "yz";
+		case 1:
+			return "zx";
+		case 2:
+			return "xy";
+		}
+	}
+	if (clGrid->GetMeshType()==1)
+	{
+		switch (ny)
+		{
+		case 0:
+			return QString(QChar(0xb1, 0x03)) + "z";
+		case 1:
+			return "zr";
+		case 2:
+			return "r" + QString(QChar(0xb1, 0x03));
 		}
 	}
 	return "";

@@ -110,6 +110,9 @@ QCSXCAD::QCSXCAD(QWidget *parent) : QMainWindow(parent)
 	QObject::connect(GridEditor,SIGNAL(OpacityChange(int)),StructureVTK,SLOT(SetGridOpacity(int)));
 	QObject::connect(GridEditor,SIGNAL(signalDetectEdges(int)),this,SLOT(DetectEdges(int)));
 	QObject::connect(GridEditor,SIGNAL(GridChanged()),StructureVTK,SLOT(RenderGrid()));
+	QObject::connect(GridEditor,SIGNAL(GridPlaneXChanged(int)),StructureVTK,SLOT(RenderGridX(int)));
+	QObject::connect(GridEditor,SIGNAL(GridPlaneYChanged(int)),StructureVTK,SLOT(RenderGridY(int)));
+	QObject::connect(GridEditor,SIGNAL(GridPlaneZChanged(int)),StructureVTK,SLOT(RenderGridZ(int)));
 
 	dock = new QDockWidget(tr("Rectilinear Grid"),this);
 	dock->setAllowedAreas(Qt::LeftDockWidgetArea);
@@ -122,6 +125,13 @@ QCSXCAD::QCSXCAD(QWidget *parent) : QMainWindow(parent)
 	QObject::connect(QParaSet,SIGNAL(ParameterChanged()),this,SLOT(CheckGeometry()));
 	QObject::connect(QParaSet,SIGNAL(ParameterChanged()),this,SLOT(setModified()));
 	clParaSet=QParaSet;
+
+	dock = new QDockWidget(tr("Rectilinear Grid - Plane Position"),this);
+	dock->setAllowedAreas(Qt::LeftDockWidgetArea);
+	dock->setWidget(GridEditor->BuildPlanePosWidget());
+	dock->setFeatures(QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
+	dock->setObjectName("Grid_Plane_Pos");
+	addDockWidget(Qt::LeftDockWidgetArea,dock);
 
 	dock = new QDockWidget(tr("Parameter"),this);
 	dock->setAllowedAreas(Qt::LeftDockWidgetArea);
