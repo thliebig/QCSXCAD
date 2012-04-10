@@ -29,6 +29,8 @@ class vtkActor;
 class ContinuousStructure;
 class VTKPrimitives;
 class vtkObject;
+class vtkRectilinearGrid;
+class vtkStructuredGrid;
 
 class QVTKStructure : public QObject
 {
@@ -68,6 +70,9 @@ public slots:
 	void ExportProperty2PolyDataVTK(unsigned int uiID, QString filename, double scale = 1.0);
 	void ExportProperty2STL(unsigned int uiID, QString filename, double scale = 1.0);
 
+protected slots:
+	void RenderGridDir(int dir, int plane_pos);
+
 protected:
 	typedef struct
 	{
@@ -87,6 +92,8 @@ protected:
 	ContinuousStructure* clCS;
 	QVector<VTKLayerStruct> LayerPrimitives;
 
+	vtkRectilinearGrid *m_Rect_Grid;
+	vtkStructuredGrid *m_Struct_Grid;
 	vtkActor* ActorGridPlane[3];
 	int GridOpacity; //remember the grid opacity
 

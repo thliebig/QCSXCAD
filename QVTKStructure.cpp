@@ -60,6 +60,8 @@ QVTKStructure::QVTKStructure()
 	ActorGridPlane[0]=NULL;
 	ActorGridPlane[1]=NULL;
 	ActorGridPlane[2]=NULL;
+	m_Rect_Grid = NULL;
+	m_Struct_Grid = NULL;
 
 	iResolution=16;
 
@@ -78,6 +80,7 @@ QVTKStructure::QVTKStructure()
 
 QVTKStructure::~QVTKStructure()
 {
+	clear();
 }
 
 void QVTKStructure::AddAxes()
@@ -139,6 +142,12 @@ void QVTKStructure::clear()
 			ActorGridPlane[i]=NULL;
 		}
 	}
+	if (m_Rect_Grid)
+		m_Rect_Grid->Delete();
+	m_Rect_Grid=NULL;
+	if (m_Struct_Grid)
+		m_Struct_Grid->Delete();
+	m_Struct_Grid=NULL;
 }
 
 
@@ -147,18 +156,11 @@ void QVTKStructure::RenderGrid()
 	if (clCS==NULL) return;
 	CSRectGrid* CSGrid = clCS->GetGrid();
 
-	for (int i=0; i<3; i++)
-	{
-		if (ActorGridPlane[i]!=NULL)
-		{
-			ren->RemoveActor(ActorGridPlane[i]);
-			ActorGridPlane[i]->Delete();
-		}
-	}
-
 	if (CSGrid->GetMeshType()==CARTESIAN)
 	{
-		vtkRectilinearGrid *grid = vtkRectilinearGrid::New();
+		if (m_Rect_Grid)
+			m_Rect_Grid->Delete();
+		m_Rect_Grid = vtkRectilinearGrid::New();
 		vtkDoubleArray *Coords[3];
 		int iQty[3];
 
@@ -173,60 +175,25 @@ void QVTKStructure::RenderGrid()
 			for (int n=0;n<3;++n) Coords[n]->Delete();
 			return;
 		}
-		grid->SetDimensions(iQty[0],iQty[1],iQty[2]);
-		grid->SetXCoordinates(Coords[0]);
-		grid->SetYCoordinates(Coords[1]);
-		grid->SetZCoordinates(Coords[2]);
+		m_Rect_Grid->SetDimensions(iQty[0],iQty[1],iQty[2]);
+		m_Rect_Grid->SetXCoordinates(Coords[0]);
+		m_Rect_Grid->SetYCoordinates(Coords[1]);
+		m_Rect_Grid->SetZCoordinates(Coords[2]);
 		for (int n=0;n<3;++n)
 			Coords[n]->Delete();
-
-		for (int i=0; i<3; i++)
-		{
-			ActorGridPlane[i] = vtkActor::New();
-			vtkPolyDataMapper *gridMapper = vtkPolyDataMapper::New();
-			vtkRectilinearGridGeometryFilter *plane = vtkRectilinearGridGeometryFilter::New();
-			plane->SetInput(grid);
-			switch (i)
-			{
-			case 0:
-				{
-					plane->SetExtent(0,iQty[0]-1, 0,iQty[1]-1, 0,0);
-					break;
-				}
-			case 1:
-				{
-					plane->SetExtent(0,iQty[0]-1, 0,0, 0,iQty[2]-1);
-					break;
-				}
-			case 2:
-				{
-					plane->SetExtent(0,0, 0,iQty[1]-1, 0,iQty[2]-1);
-					break;
-				}
-			}
-			gridMapper->SetInput(plane->GetOutput());
-			ActorGridPlane[i]->SetMapper(gridMapper);
-			ActorGridPlane[i]->GetProperty()->SetColor(0,0,0);
-			ActorGridPlane[i]->GetProperty()->SetDiffuse(0);
-			ActorGridPlane[i]->GetProperty()->SetAmbient(1);
-			ActorGridPlane[i]->GetProperty()->SetRepresentationToWireframe();
-			ren->AddActor(ActorGridPlane[i]);
-			gridMapper->Delete();
-			plane->Delete();
-		}
-		SetGridOpacity(GridOpacity);
-		grid->Delete();
 	}
 	else if (CSGrid->GetMeshType()==CYLINDRICAL)
 	{
-		vtkStructuredGrid* grid = vtkStructuredGrid::New();
+		if (m_Struct_Grid)
+			m_Struct_Grid->Delete();
+		m_Struct_Grid = vtkStructuredGrid::New();
 
 		unsigned int uiQty[3];
 		double* lines[3]={NULL,NULL,NULL};
 		for (unsigned int n=0;n<3;++n)
 			lines[n] = CSGrid->GetLines(n,lines[n],uiQty[n]);
 
-		grid->SetDimensions(uiQty[0],uiQty[1],uiQty[2]);
+		m_Struct_Grid->SetDimensions(uiQty[0],uiQty[1],uiQty[2]);
 		vtkPoints *points = vtkPoints::New();
 		points->SetNumberOfPoints(uiQty[0]*uiQty[1]*uiQty[2]);
 		double r[3];
@@ -240,53 +207,120 @@ void QVTKStructure::RenderGrid()
 					r[2] = lines[2][k];
 					points->SetPoint(id++,r);
 				}
-		grid->SetPoints(points);
+		m_Struct_Grid->SetPoints(points);
 		points->Delete();
 		for (unsigned int n=0;n<3;++n)
 		{
 			delete[] lines[n];
 			lines[n] = NULL;
 		}
-		// draw only planes r-a (0) and r-z (1), plane z-a (2) obstructs the view on the structure
-		for (int i=0; i<2; i++)
-		{
-			ActorGridPlane[i] = vtkActor::New();
-			vtkPolyDataMapper *gridMapper = vtkPolyDataMapper::New();
-			vtkStructuredGridGeometryFilter *plane = vtkStructuredGridGeometryFilter::New();
-			plane->SetInput(grid);
-			switch (i)
-			{
-			case 0:
-				{
-					plane->SetExtent(0,uiQty[0]-1, 0,uiQty[1]-1, 0,0);
-					break;
-				}
-			case 1:
-				{
-					plane->SetExtent(0,uiQty[0]-1, 0,0, 0,uiQty[2]-1);
-					break;
-				}
-			case 2:
-				{ // skipped, see above, plane z-a obstructs the view on the structure
-					plane->SetExtent(uiQty[0]-1,uiQty[0]-1, 0,uiQty[1]-1, 0,uiQty[2]-1);
-					break;
-				}
-			}
-			gridMapper->SetInput(plane->GetOutput());
-			ActorGridPlane[i]->SetMapper(gridMapper);
-			ActorGridPlane[i]->GetProperty()->SetColor(0,0,0);
-			ActorGridPlane[i]->GetProperty()->SetDiffuse(0);
-			ActorGridPlane[i]->GetProperty()->SetAmbient(1);
-			ActorGridPlane[i]->GetProperty()->SetRepresentationToWireframe();
-			ren->AddActor(ActorGridPlane[i]);
-			gridMapper->Delete();
-			plane->Delete();
-		}
-		SetGridOpacity(GridOpacity);
-		grid->Delete();
 	}
 	else
 		cerr << "QVTKStructure::RenderGrid(): Error, unknown grid type!" << endl;
+
+	RenderGridDir(0,0);
+	RenderGridDir(1,0);
+	RenderGridDir(2,0);
+	SetGridOpacity(GridOpacity);
+}
+
+void QVTKStructure::RenderGridDir(int dir, int plane_pos)
+{
+	if (ActorGridPlane[dir]!=NULL)
+	{
+		ren->RemoveActor(ActorGridPlane[dir]);
+		ActorGridPlane[dir]->Delete();
+	}
+
+	ActorGridPlane[dir] = vtkActor::New();
+	vtkPolyDataMapper *gridMapper = vtkPolyDataMapper::New();
+	vtkPolyDataAlgorithm *plane = NULL;
+
+	CSRectGrid* CSGrid = clCS->GetGrid();
+	int uiQty[3];
+
+	for (int n=0;n<3;++n)
+		uiQty[n]=CSGrid->GetQtyLines(n);
+
+	if (CSGrid->GetMeshType()==CARTESIAN)
+	{
+		if (m_Rect_Grid==NULL)
+		{
+			ActorGridPlane[dir]->Delete();
+			gridMapper->Delete();
+			ActorGridPlane[dir]=NULL;
+			cerr << "QVTKStructure::RenderGridDir: Error, rect grid mesh was not created, skipping drawing..." << endl;
+			return;
+		}
+		vtkRectilinearGridGeometryFilter *grid_plane = vtkRectilinearGridGeometryFilter::New();
+		plane = grid_plane;
+		grid_plane->SetInput(m_Rect_Grid);
+		switch (dir)
+		{
+		case 0:
+		{
+			grid_plane->SetExtent(0,uiQty[0]-1, 0,uiQty[1]-1, plane_pos,plane_pos);
+			break;
+		}
+		case 1:
+		{
+			grid_plane->SetExtent(0,uiQty[0]-1, plane_pos,plane_pos, 0,uiQty[2]-1);
+			break;
+		}
+		case 2:
+		{
+			grid_plane->SetExtent(plane_pos,plane_pos, 0,uiQty[1]-1, 0,uiQty[2]-1);
+			break;
+		}
+		}
+	}
+	else if (CSGrid->GetMeshType()==CYLINDRICAL)
+	{
+		if (m_Struct_Grid==NULL)
+		{
+			ActorGridPlane[dir]->Delete();
+			gridMapper->Delete();
+			ActorGridPlane[dir]=NULL;
+			cerr << "QVTKStructure::RenderGridDir: Error, structured grid mesh was not created, skipping drawing..." << endl;
+			return;
+		}
+
+		// draw only planes r-a (0) and r-z (1), plane z-a (2) obstructs the view on the structure
+		vtkStructuredGridGeometryFilter *grid_plane = vtkStructuredGridGeometryFilter::New();
+		plane = grid_plane;
+		grid_plane->SetInput(m_Struct_Grid);
+		switch (dir)
+		{
+		case 0:
+		{
+			grid_plane->SetExtent(0,uiQty[0]-1, 0,uiQty[1]-1, plane_pos,plane_pos);
+			break;
+		}
+		case 1:
+		{
+			grid_plane->SetExtent(0,uiQty[0]-1, plane_pos,plane_pos, 0,uiQty[2]-1);
+			break;
+		}
+		case 2:
+		{ // skipped, see above, plane z-a obstructs the view on the structure
+			grid_plane->SetExtent(plane_pos,plane_pos, 0,uiQty[1]-1, 0,uiQty[2]-1);
+			break;
+		}
+		}
+	}
+	else
+		cerr << "QVTKStructure::RenderGrid(): Error, unknown grid type!" << endl;
+
+	gridMapper->SetInput(plane->GetOutput());
+	ActorGridPlane[dir]->SetMapper(gridMapper);
+	ActorGridPlane[dir]->GetProperty()->SetColor(0,0,0);
+	ActorGridPlane[dir]->GetProperty()->SetDiffuse(0);
+	ActorGridPlane[dir]->GetProperty()->SetAmbient(1);
+	ActorGridPlane[dir]->GetProperty()->SetRepresentationToWireframe();
+	ren->AddActor(ActorGridPlane[dir]);
+	gridMapper->Delete();
+	plane->Delete();
+
 }
 
 void QVTKStructure::SetGridOpacity(int val)
@@ -396,113 +430,113 @@ void QVTKStructure::RenderGeometry()
 					primCS=clCS->GetCoordInputType();
 				switch (prim->GetType())
 				{
-					case CSPrimitives::BOX:
+				case CSPrimitives::BOX:
+				{
+					CSPrimBox* box = prim->ToBox();
+					if (primCS==CARTESIAN)
+						vtkPrims->AddCube(box->GetStartCoord()->GetCartesianCoords(),box->GetStopCoord()->GetCartesianCoords(),rgb,(double)col.a/255.0,transform_matrix);
+					else if (primCS==CYLINDRICAL)
+						vtkPrims->AddCylindricalCube(box->GetStartCoord()->GetCylindricalCoords(),box->GetStopCoord()->GetCylindricalCoords(),rgb,(double)col.a/255.0,transform_matrix);
+					break;
+				}
+				case CSPrimitives::MULTIBOX:
+				{
+					CSPrimMultiBox* multibox = prim->ToMultiBox();
+					int qtyPts=multibox->GetQtyBoxes()*2;
+					double *coords = new double[qtyPts*3];
+					for (int a=0;a<qtyPts;a=a+2)
 					{
-						CSPrimBox* box = prim->ToBox();
-						if (primCS==CARTESIAN)
-							vtkPrims->AddCube(box->GetStartCoord()->GetCartesianCoords(),box->GetStopCoord()->GetCartesianCoords(),rgb,(double)col.a/255.0,transform_matrix);
-						else if (primCS==CYLINDRICAL)
-							vtkPrims->AddCylindricalCube(box->GetStartCoord()->GetCylindricalCoords(),box->GetStopCoord()->GetCylindricalCoords(),rgb,(double)col.a/255.0,transform_matrix);
-						break;
+						coords[a]=multibox->GetCoord(3*a);
+						coords[a+1]=multibox->GetCoord(3*a+1);
+						coords[qtyPts+a]=multibox->GetCoord(3*a+2);
+						coords[qtyPts+a+1]=multibox->GetCoord(3*a+3);
+						coords[2*qtyPts+a]=multibox->GetCoord(3*a+4);
+						coords[2*qtyPts+a+1]=multibox->GetCoord(3*a+5);
 					}
-					case CSPrimitives::MULTIBOX:
+					vtkPrims->AddDisc(coords,qtyPts,rgb,(double)col.a/255.0,transform_matrix);
+					delete[] coords;
+					break;
+				}
+				case CSPrimitives::SPHERE:
+				{
+					CSPrimSphere* sphere = prim->ToSphere();
+					vtkPrims->AddSphere(sphere->GetCenter()->GetCartesianCoords(),sphere->GetRadius(),rgb,(double)col.a/255.0,iResolution,transform_matrix);
+					break;
+				}
+				case CSPrimitives::CYLINDER:
+				{
+					CSPrimCylinder* cylinder = prim->ToCylinder();
+					vtkPrims->AddCylinder2(cylinder->GetAxisStartCoord()->GetCartesianCoords(),cylinder->GetAxisStopCoord()->GetCartesianCoords(),cylinder->GetRadius(),rgb,(double)col.a/255.0,iResolution,transform_matrix);
+					break;
+				}
+				case CSPrimitives::POLYGON:
+				case CSPrimitives::LINPOLY:
+				case CSPrimitives::ROTPOLY:
+				{
+					CSPrimPolygon* poly = NULL;
+					if (prim->GetType()==CSPrimitives::POLYGON)
+						poly = prim->ToPolygon();
+					else if (prim->GetType()==CSPrimitives::LINPOLY)
+						poly = prim->ToLinPoly();
+					else if (prim->GetType()==CSPrimitives::ROTPOLY)
+						poly = prim->ToRotPoly();
+					int normDir = poly->GetNormDir();
+					double elev = poly->GetElevation();
+					int nP = (normDir+1)%3;
+					int nPP = (normDir+2)%3;
+					int nrPts = poly->GetQtyCoords();
+					double dCoords[3*nrPts];
+					for (int n=0;n<nrPts;++n)
 					{
-						CSPrimMultiBox* multibox = prim->ToMultiBox();
-						int qtyPts=multibox->GetQtyBoxes()*2;
-						double *coords = new double[qtyPts*3];
-						for (int a=0;a<qtyPts;a=a+2)
-						{
-							coords[a]=multibox->GetCoord(3*a);
-							coords[a+1]=multibox->GetCoord(3*a+1);
-							coords[qtyPts+a]=multibox->GetCoord(3*a+2);
-							coords[qtyPts+a+1]=multibox->GetCoord(3*a+3);
-							coords[2*qtyPts+a]=multibox->GetCoord(3*a+4);
-							coords[2*qtyPts+a+1]=multibox->GetCoord(3*a+5);
-						}
-						vtkPrims->AddDisc(coords,qtyPts,rgb,(double)col.a/255.0,transform_matrix);
-						delete[] coords;
-						break;
+						dCoords[normDir*nrPts + n] = elev;
+						dCoords[nP*nrPts + n] = poly->GetCoord(2*n);
+						dCoords[nPP*nrPts + n] = poly->GetCoord(2*n+1);
 					}
-					case CSPrimitives::SPHERE:
+					double dVector[6] = {0,0,0,0,0,0};
+					if (prim->GetType()==CSPrimitives::POLYGON)
+						vtkPrims->AddClosedPoly(dCoords,nrPts,dVector,rgb,(double)col.a/255.0,transform_matrix);
+					if (prim->GetType()==CSPrimitives::LINPOLY)
 					{
-						CSPrimSphere* sphere = prim->ToSphere();
-						vtkPrims->AddSphere(sphere->GetCenter()->GetCartesianCoords(),sphere->GetRadius(),rgb,(double)col.a/255.0,iResolution,transform_matrix);
-						break;
+						dVector[normDir] = prim->ToLinPoly()->GetLength();
+						vtkPrims->AddClosedPoly(dCoords,nrPts,dVector,rgb,(double)col.a/255.0,transform_matrix);
 					}
-					case CSPrimitives::CYLINDER:
+					if (prim->GetType()==CSPrimitives::ROTPOLY)
 					{
-						CSPrimCylinder* cylinder = prim->ToCylinder();
-						vtkPrims->AddCylinder2(cylinder->GetAxisStartCoord()->GetCartesianCoords(),cylinder->GetAxisStopCoord()->GetCartesianCoords(),cylinder->GetRadius(),rgb,(double)col.a/255.0,iResolution,transform_matrix);
-						break;
+						dVector[2*prim->ToRotPoly()->GetRotAxisDir()+1]=1;
+						double angles[2] = {prim->ToRotPoly()->GetAngle(0)*180/PI,prim->ToRotPoly()->GetAngle(1)*180/PI};
+						vtkPrims->AddRotationalPoly(dCoords,nrPts,dVector,angles,rgb,(double)col.a/255.0,32,transform_matrix);
 					}
-					case CSPrimitives::POLYGON:
-					case CSPrimitives::LINPOLY:
-					case CSPrimitives::ROTPOLY:
-					{
-						CSPrimPolygon* poly = NULL;
-						if (prim->GetType()==CSPrimitives::POLYGON)
-							poly = prim->ToPolygon();
-						else if (prim->GetType()==CSPrimitives::LINPOLY)
-							poly = prim->ToLinPoly();
-						else if (prim->GetType()==CSPrimitives::ROTPOLY)
-							poly = prim->ToRotPoly();
-						int normDir = poly->GetNormDir();
-						double elev = poly->GetElevation();
-						int nP = (normDir+1)%3;
-						int nPP = (normDir+2)%3;
-						int nrPts = poly->GetQtyCoords();
-						double dCoords[3*nrPts];
-						for (int n=0;n<nrPts;++n)
-						{
-							dCoords[normDir*nrPts + n] = elev;
-							dCoords[nP*nrPts + n] = poly->GetCoord(2*n);
-							dCoords[nPP*nrPts + n] = poly->GetCoord(2*n+1);
-						}
-						double dVector[6] = {0,0,0,0,0,0};
-						if (prim->GetType()==CSPrimitives::POLYGON)
-							vtkPrims->AddClosedPoly(dCoords,nrPts,dVector,rgb,(double)col.a/255.0,transform_matrix);
-						if (prim->GetType()==CSPrimitives::LINPOLY)
-						{
-							dVector[normDir] = prim->ToLinPoly()->GetLength();
-							vtkPrims->AddClosedPoly(dCoords,nrPts,dVector,rgb,(double)col.a/255.0,transform_matrix);
-						}
-						if (prim->GetType()==CSPrimitives::ROTPOLY)
-						{
-							dVector[2*prim->ToRotPoly()->GetRotAxisDir()+1]=1;
-							double angles[2] = {prim->ToRotPoly()->GetAngle(0)*180/PI,prim->ToRotPoly()->GetAngle(1)*180/PI};
-							vtkPrims->AddRotationalPoly(dCoords,nrPts,dVector,angles,rgb,(double)col.a/255.0,32,transform_matrix);
-						}
-						break;
-					}
-					case CSPrimitives::CURVE:
-					case CSPrimitives::WIRE:
-					{
-						CSPrimCurve* curve = NULL;
-						if (prim->GetType()==CSPrimitives::CURVE)
-							curve = prim->ToCurve();
-						else
-							curve = prim->ToWire();
+					break;
+				}
+				case CSPrimitives::CURVE:
+				case CSPrimitives::WIRE:
+				{
+					CSPrimCurve* curve = NULL;
+					if (prim->GetType()==CSPrimitives::CURVE)
+						curve = prim->ToCurve();
+					else
+						curve = prim->ToWire();
 
-						unsigned int nrP = (unsigned int)curve->GetNumberOfPoints();
-						double dCoords[3*nrP];
-						double xyz[3];
-						bool isCurve = (prim->GetType()==CSPrimitives::CURVE);
-						for (unsigned int n=0;n<nrP;++n)
-						{
-							curve->GetPoint(n,xyz,isCurve);
-							dCoords[0*nrP+n] = xyz[0];
-							dCoords[1*nrP+n] = xyz[1];
-							dCoords[2*nrP+n] = xyz[2];
-						}
-						if (isCurve)
-							vtkPrims->AddLinePoly(dCoords,nrP,1,rgb,(double)col.a/255.0);
-						else
-						{
-							CSPrimWire* wire = prim->ToWire();
-							vtkPrims->AddTubePoly(dCoords,nrP,wire->GetWireRadius(),rgb,(double)col.a/255.0,8,transform_matrix);
-						}
-						break;
+					unsigned int nrP = (unsigned int)curve->GetNumberOfPoints();
+					double dCoords[3*nrP];
+					double xyz[3];
+					bool isCurve = (prim->GetType()==CSPrimitives::CURVE);
+					for (unsigned int n=0;n<nrP;++n)
+					{
+						curve->GetPoint(n,xyz,isCurve);
+						dCoords[0*nrP+n] = xyz[0];
+						dCoords[1*nrP+n] = xyz[1];
+						dCoords[2*nrP+n] = xyz[2];
 					}
+					if (isCurve)
+						vtkPrims->AddLinePoly(dCoords,nrP,1,rgb,(double)col.a/255.0);
+					else
+					{
+						CSPrimWire* wire = prim->ToWire();
+						vtkPrims->AddTubePoly(dCoords,nrP,wire->GetWireRadius(),rgb,(double)col.a/255.0,8,transform_matrix);
+					}
+					break;
+				}
 				}
 			}
 		}
@@ -561,19 +595,19 @@ void QVTKStructure::KeyPress(vtkObject *caller, unsigned long eid, void *clientd
 	vtkRenderer *ren = ((KeyPressData *)clientdata)->ren;
 	int key;
 	key=iren->GetKeyCode();
-//	fprintf(stderr,"Event... EiD: %d Key: %d OpenGL?: %d\n",eid,key,renWin->SupportsOpenGL());
+	//	fprintf(stderr,"Event... EiD: %d Key: %d OpenGL?: %d\n",eid,key,renWin->SupportsOpenGL());
 	switch(key)
 	{
-		case 's':
-			{
-				for (int n=0;n<3;++n)
-				{
-					if (GridPlanes[n])
-						GridPlanes[n]->GetProperty()->SetRepresentationToWireframe();
-				}
-				iren->Render();
-				break;
-			}
+	case 's':
+	{
+		for (int n=0;n<3;++n)
+		{
+			if (GridPlanes[n])
+				GridPlanes[n]->GetProperty()->SetRepresentationToWireframe();
+		}
+		iren->Render();
+		break;
+	}
 	}
 }
 
@@ -593,5 +627,5 @@ void QVTKStructure::SetCallback(vtkRenderWindowInteractor *iren)
 	//VTKWidget->GetRenderWindow()->GetInteractor()->AddObserver(vtkCommand::KeyReleaseEvent, cb);
 
 	cb->Delete();
-//	free(cbData);
+	//	free(cbData);
 }
