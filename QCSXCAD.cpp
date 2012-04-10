@@ -876,6 +876,8 @@ void QCSXCAD::GUIUpdate()
 {
 	CSTree->UpdateTree();
 	GridEditor->Update();
+	for (int n=0;n<3;++n)
+		viewPlane[n]->setText(GridEditor->GetNormName(n));
 }
 
 void QCSXCAD::clear()
@@ -960,20 +962,9 @@ void QCSXCAD::BuildToolBar()
 
 	newAct = newObjct->addAction(QIcon(":/images/viewmagfit.png"),tr("Zoom fit"),this,SLOT(BestView()));
 
-	//QActionGroup* ActGrp = new QActionGroup(this);
-	newAct = newObjct->addAction(tr("XY"),this,SLOT(setXY()));
-//	connect(newAct,SIGNAL(triggered()),this,SLOT(setXY()));
-	//ActGrp->addAction(newAct);
-	//newAct->setCheckable(true);
-	//newAct->setChecked(true);
-	newAct = newObjct->addAction(tr("YZ"),this,SLOT(setYZ()));
-//	connect(newAct,SIGNAL(triggered()),this,SLOT(setYZ()));
-	//newAct->setCheckable(true);
-	//ActGrp->addAction(newAct);
-	newAct = newObjct->addAction(tr("ZX"),this,SLOT(setZX()));
-//	connect(newAct,SIGNAL(triggered()),this,SLOT(setZX()));
-	//newAct->setCheckable(true);
-	//ActGrp->addAction(newAct);
+	viewPlane[2] = newObjct->addAction(GridEditor->GetNormName(2),this,SLOT(setXY()));
+	viewPlane[0] = newObjct->addAction(GridEditor->GetNormName(0),this,SLOT(setYZ()));
+	viewPlane[1] = newObjct->addAction(GridEditor->GetNormName(1),this,SLOT(setZX()));
 
 	addToolBarBreak();
 

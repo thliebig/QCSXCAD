@@ -154,9 +154,7 @@ protected:
 	QVTKStructure* StructureVTK;
 	QStackedWidget* StackWidget;
 
-//	QString QFilename;
-//	QString relPath;
-
+	QAction* viewPlane[3];
 	void BuildToolBar();
 
 	bool bModified;
