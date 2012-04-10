@@ -155,6 +155,8 @@ void QVTKStructure::RenderGrid()
 {
 	if (clCS==NULL) return;
 	CSRectGrid* CSGrid = clCS->GetGrid();
+	if (CSGrid->isValid()==false)
+		return;
 
 	if (CSGrid->GetMeshType()==CARTESIAN)
 	{
