@@ -81,8 +81,7 @@ win32 {
 
 # ..\Gym2XML\release\Gym2XML.dll
 unix { 
-    INCLUDEPATH += ../CSXCAD \
-        ../tinyxml
+    INCLUDEPATH += ../CSXCAD
     LIBS += -L../CSXCAD \
         -lCSXCAD
     INCLUDEPATH += /usr/include/vtk-5.2 \
