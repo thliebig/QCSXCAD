@@ -59,8 +59,11 @@ QCSXCAD::QCSXCAD(QWidget *parent) : QMainWindow(parent)
 //	Layout->setRowStretch(4,1);
 
 	QStringList argList=qApp->arguments();
-	for (int i=2;i<argList.size();++i)
-		QCSX_Settings.parseCommandLineArgument(argList.at(i));
+	for (int i=1;i<argList.size();++i)
+	{
+		if (argList.at(i).startsWith("-"))
+			QCSX_Settings.parseCommandLineArgument(argList.at(i));
+	}
 
 	ViewLevel=VIEW_2D;
 

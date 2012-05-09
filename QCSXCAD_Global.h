@@ -34,7 +34,7 @@
 #define QCSXCAD_EXPORT
 #endif
 
-class QCSXCAD_Global
+class QCSXCAD_EXPORT QCSXCAD_Global
 {
 public:
 	QCSXCAD_Global();

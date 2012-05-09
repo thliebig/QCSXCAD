@@ -35,7 +35,6 @@ void QCSXCAD_Global::ShowArguments(ostream& ostr, string front)
 	ostr << front << "--disableEdit\tDisable Edit" << endl;
 }
 
-//! \brief This function initializes the object
 bool QCSXCAD_Global::parseCommandLineArgument( QString argv )
 {
 	if (argv.isEmpty())
@@ -47,6 +46,7 @@ bool QCSXCAD_Global::parseCommandLineArgument( QString argv )
 		SetEdit(false);
 		return true;
 	}
+	cerr << "QCSXCAD_Global::parseCommandLineArgument: Warning, unknown argument: " << argv.toStdString() << endl;
 	return false;
 }
 
