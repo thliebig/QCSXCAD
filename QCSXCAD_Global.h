@@ -49,6 +49,6 @@ protected:
 	bool m_EnableEdit;
 };
 
-extern QCSXCAD_Global QCSX_Settings;
+extern QCSXCAD_EXPORT QCSXCAD_Global QCSX_Settings;
 
 #endif /*QCSXCAD_GLOBAL_H_*/
