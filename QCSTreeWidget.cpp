@@ -73,7 +73,7 @@ void QCSTreeWidget::AddPropItem(CSProperties* prop)
 {
 	QString str;
 	if (prop==NULL) return;
-	str=QString(prop->GetTypeString().c_str())+"::";
+	str=QString(prop->GetTypeXMLString().c_str())+"::";
 	str+=QString(prop->GetName().c_str());
 		
 	QTreeWidgetItem* newItem = new QTreeWidgetItem(this,QStringList(str),0);
@@ -110,7 +110,7 @@ void QCSTreeWidget::RefreshItem(int index)
 	if (prop==NULL) return;
 	QTreeWidgetItem* item = topLevelItem(index);
 	if (item==NULL) return;
-	QString str=QString(prop->GetTypeString().c_str())+"::";
+	QString str=QString(prop->GetTypeXMLString().c_str())+"::";
 	str+=QString(prop->GetName().c_str());
 	item->setText(0,str);	
 	if (prop->GetVisibility()) item->setIcon(1,QIcon(":/images/bulb.png"));
