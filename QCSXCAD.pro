@@ -1,6 +1,8 @@
 TEMPLATE = lib
 TARGET = QCSXCAD
 
+VERSION = 0.1.3
+
 # add git revision
 GITREV = $$system(git describe --tags)
 DEFINES += GIT_VERSION=\\\"$$GITREV\\\"
@@ -36,48 +38,33 @@ SOURCES += QCSXCAD.cpp \
     QCSXCAD_Global.cpp
 win32 { 
     DEFINES += BUILD_QCSXCAD_LIB
+
+
+    # CSXCAD
+    INCLUDEPATH += ../CSXCAD
+    LIBS += -L../CSXCAD/release -lCSXCAD0
+
+    # tinyxml
+    INCLUDEPATH += ../tinyxml
+    LIBS += -L../tinyxml/release -ltinyxml2
+
+    # vtk
     VTK_DIR = ../vtk
-    VTK_BIN_DIR = ../vtk/bin
-    INCLUDEPATH += . \
-        $$VTK_BIN_DIR/.. \
+    INCLUDEPATH += $$VTK_BIN_DIR/.. \
         $$VTK_DIR \
         $$VTK_DIR/Common \
-        $$VTK_DIR/Common/Testing/Cxx \
         $$VTK_DIR/Filtering \
         $$VTK_DIR/GUISupport/Qt \
-        $$VTK_DIR/GenericFiltering \
         $$VTK_DIR/Graphics \
         $$VTK_DIR/Hybrid \
         $$VTK_DIR/IO \
-        $$VTK_DIR/Imaging \
         $$VTK_DIR/Rendering \
-        $$VTK_DIR/Utilities \
-        $$VTK_DIR/Widgets \
-        ../CSXCAD \
-	../tinyxml
+        $$VTK_DIR/Widgets
     
-    LIBS += $$VTK_BIN_DIR/libQVTK.dll \
-        $$VTK_BIN_DIR/libvtkHybrid.dll \
-        $$VTK_BIN_DIR/libvtkIO.dll \
-        $$VTK_BIN_DIR/libvtkImaging.dll \
-        $$VTK_BIN_DIR/libvtkRendering.dll \
-        $$VTK_BIN_DIR/libvtkWidgets.dll \
-        $$VTK_BIN_DIR/libvtkGraphics.dll \
-        $$VTK_BIN_DIR/libvtkFiltering.dll \
-        $$VTK_BIN_DIR/libvtkGenericFiltering.dll \
-        $$VTK_BIN_DIR/libvtkCommon.dll \
-        $$VTK_BIN_DIR/libvtkexoIIc.dll \
-        $$VTK_BIN_DIR/libvtkexpat.dll \
-        $$VTK_BIN_DIR/libvtkftgl.dll \
-        $$VTK_BIN_DIR/libvtksys.dll \
-        $$VTK_BIN_DIR/libvtkzlib.dll \
-        $$VTK_BIN_DIR/libvtkfreetype.dll \
-        ../CSXCAD/release/CSXCAD.dll \
-	../tinyxml/release/tinyxml2.dll
+    LIBS += -L../vtk/bin -lvtkCommon -lQVTK -lvtkRendering -lvtkGraphics -lvtkFiltering -lvtkIO -lvtkHybrid -lvtkWidgets
 }
 
 unix { 
-    VERSION = 0.1.3
     INCLUDEPATH += ../CSXCAD
     LIBS += -L../CSXCAD \
         -lCSXCAD
