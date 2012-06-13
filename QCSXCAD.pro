@@ -69,10 +69,11 @@ unix {
     LIBS += -L../CSXCAD \
         -lCSXCAD
     INCLUDEPATH += /usr/include/vtk-5.2 \
-		/usr/include/vtk-5.4 \
-		/usr/include/vtk-5.6 \
-		/usr/include/vtk-5.8 \
-		/usr/include/vtk
+        /usr/include/vtk-5.4 \
+        /usr/include/vtk-5.6 \
+        /usr/include/vtk-5.8 \
+        /usr/include/vtk-5.10 \
+        /usr/include/vtk
     INCLUDEPATH += /usr/include/CSXCAD
     LIBS += -lvtkCommon \
         -lvtkDICOMParser \
