@@ -1,7 +1,7 @@
 TEMPLATE = lib
 TARGET = QCSXCAD
 
-VERSION = 0.1.3
+VERSION = 0.3.0
 
 # add git revision
 GITREV = $$system(git describe --tags)
