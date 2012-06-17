@@ -581,6 +581,8 @@ void QCSPropResBoxGB::GetValues()
 /***************************QCSPropDumpBoxGB**************************************/
 QCSPropDumpBoxGB::QCSPropDumpBoxGB(CSPropDumpBox *prop, int SimMode, QWidget *parent) : QCSPropertyGroupBox(parent)
 {
+	UNUSED(SimMode);
+
 	clProp=prop;
 	TypeName=QString(tr("Dump Box"));
 	setTitle(tr("Dump Property"));

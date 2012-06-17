@@ -163,7 +163,7 @@ void export_X3D::export_polygon( QDomElement &elem, size_t count, double *array,
 	// VRML: cross section in xz-plane
 	QString crossSection;
 	crossSection = QString::number( array[0] ) + " " + QString::number( array[1] );
-	for (int i=2; i<count; i=i+2)
+	for (size_t i=2; i<count; i=i+2)
 	{
 		crossSection += ", " + QString::number( array[i] ) + " " + QString::number( array[i+1] );
 	}

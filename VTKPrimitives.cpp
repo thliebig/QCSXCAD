@@ -664,7 +664,6 @@ void VTKPrimitives::AddRotationalPoly(const double *dCoords, unsigned int uiQtyC
 {
 	unsigned int i=0;
 	double start[3]={0,0,0},vector[3]={0,0,0};
-	double *radius,*level;
 
 	vtkPoints *points = vtkPoints::New();
 	vtkCellArray *poly = vtkCellArray::New();
@@ -734,8 +733,6 @@ void VTKPrimitives::AddRotationalPoly(const double *dCoords, unsigned int uiQtyC
 	ActorColl->AddItem(Actor);
 	ren->AddActor(Actor);
 
-	free(level);
-	free(radius);
 	points->Delete();
 	poly->Delete();
 	profile->Delete();

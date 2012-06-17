@@ -7,6 +7,10 @@ VERSION = 0.3.0
 GITREV = $$system(git describe --tags)
 DEFINES += GIT_VERSION=\\\"$$GITREV\\\"
 
+# vtk includes deprecated header files; silence the corresponding warning
+QMAKE_CXXFLAGS += -Wno-deprecated
+
+
 MOC_DIR = moc
 OBJECTS_DIR = obj
 QT += core \

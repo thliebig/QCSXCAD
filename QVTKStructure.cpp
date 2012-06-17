@@ -261,7 +261,7 @@ void QVTKStructure::RenderGridDir(int dir, unsigned int plane_pos)
 
 	for (int n=0;n<3;++n)
 		uiQty[n]=CSGrid->GetQtyLines(n);
-	if (plane_pos>=uiQty[dir])
+	if ((int)plane_pos>=uiQty[dir])
 	{
 		cerr << "QVTKStructure::RenderGridDir: requested plane postion is out of range, resetting to max value!" << endl;
 		plane_pos = uiQty[dir]-1;
@@ -613,11 +613,15 @@ void QVTKStructure::ExportProperty2STL(unsigned int uiID, QString filename, doub
 
 void QVTKStructure::KeyPress(vtkObject *caller, unsigned long eid, void *clientdata, void *calldata)
 {
+	UNUSED(caller);
+	UNUSED(eid);
+	UNUSED(calldata);
+
 	//vtkInteractorStyle * istyle = (vtkInteractorStyle *) caller;
   	vtkRenderWindowInteractor * iren = ((KeyPressData *)clientdata)->iren;
 	//vtkRenderWindow *renWin = iren->GetRenderWindow();
 	vtkActor **GridPlanes = ((KeyPressData *)clientdata)->GridPlanes;
-	vtkRenderer *ren = ((KeyPressData *)clientdata)->ren;
+	//vtkRenderer *ren = ((KeyPressData *)clientdata)->ren;
 	int key;
 	key=iren->GetKeyCode();
 	//	fprintf(stderr,"Event... EiD: %d Key: %d OpenGL?: %d\n",eid,key,renWin->SupportsOpenGL());

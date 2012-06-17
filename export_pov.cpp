@@ -150,7 +150,9 @@ void export_pov::export_box( QTextStream &stream, double start[3], double stop[3
 
 void export_pov::export_polygon( QTextStream &stream, size_t count, double *array, double elevation, int normDir, QString object_modifier )
 {
+	UNUSED(normDir);
 	Q_ASSERT((count%2)==0);
+
 	count = count / 2; // now count is the number of 2D-vectors
 	if (count < 2)
 		return;
@@ -203,9 +205,9 @@ QString export_pov::get_camera()
 //	cout << "Camera position: " << pos[0] << ", " << pos[1] << ", " << pos[2] << endl;
 	double *focalpos = c->GetFocalPoint();
 //	cout << "Camera focal point: " << focalpos[0] << ", " << focalpos[1] << ", " << focalpos[2] << endl;
-	double distance = c->GetDistance();
+//	double distance = c->GetDistance();
 //	cout << "Camera distance (position to focal point): " << distance << endl;
-	double roll = c->GetRoll();
+//	double roll = c->GetRoll();
 //	cout << "Camera roll angle (about direction of projection): " << roll << "°" << endl;
 	double angle = c->GetViewAngle();
 //	cout << "Camera view angle: " << angle << "°" << endl;
