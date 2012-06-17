@@ -18,13 +18,14 @@
 # norootforbuild
 
 Name:           QCSXCAD
-Version:        0.1.3
-Release:        3
+Version:        0.3.0
+Release:        1
 Summary:        Qt bindings for CSXCAD
 Group:          Development/Languages/C and C++
 License:        LGPLv3
 URL:            http://www.openems.de
 Source0:        %{name}-%{version}.tar.bz2
+#Patch0:         install.patch
 # BuildArch:      noarch
 BuildRoot:      %_tmppath/%name-%version-build
 
@@ -64,6 +65,7 @@ developing applications that use %{name}.
 
 %prep
 %setup -q
+#%patch0 -p1
 
 %build
 %qmake QMAKE_CFLAGS="%optflags" QMAKE_CXXFLAGS="%optflags" LIB_SUFFIX="$(echo %_lib | cut -b4-)"
@@ -101,6 +103,8 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Sun Jun 17 2012 Sebastian Held <sebastian.held@gmx.de> - 0.3.0-1
+- new upstream version
 * Thu Dec 29 2011 Sebastian Held <sebastian.held@gmx.de> - 0.1.3-3
 - new upstream version
 * Wed Dec 28 2011 Sebastian Held <sebastian.held@gmx.de> - 0.1.3-2
