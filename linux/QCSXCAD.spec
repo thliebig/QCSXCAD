@@ -25,7 +25,7 @@ Group:          Development/Languages/C and C++
 License:        LGPLv3
 URL:            http://www.openems.de
 Source0:        %{name}-%{version}.tar.bz2
-#Patch0:         install.patch
+Patch0:         fedora17.diff
 # BuildArch:      noarch
 BuildRoot:      %_tmppath/%name-%version-build
 
@@ -65,7 +65,9 @@ developing applications that use %{name}.
 
 %prep
 %setup -q
-#%patch0 -p1
+%if 0%{?fedora} >= 17
+%patch0 -p1
+%endif
 
 %build
 %qmake QMAKE_CFLAGS="%optflags" QMAKE_CXXFLAGS="%optflags" LIB_SUFFIX="$(echo %_lib | cut -b4-)"

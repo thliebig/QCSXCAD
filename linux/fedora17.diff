@@ -1,0 +1,13 @@
+diff --git a/QCSXCAD.pro b/QCSXCAD.pro
+index 7cbf438..7d9e75c 100644
+--- a/QCSXCAD.pro
++++ b/QCSXCAD.pro
+@@ -79,7 +79,7 @@ unix {
+         /usr/include/vtk-5.10 \
+         /usr/include/vtk
+     INCLUDEPATH += /usr/include/CSXCAD
+-    LIBS += -lvtkCommon \
++    LIBS += -L/usr/lib/vtk -L/usr/lib64/vtk -lvtkCommon \
+         -lvtkDICOMParser \
+         -lvtkFiltering \
+         -lvtkGenericFiltering \
