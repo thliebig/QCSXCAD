@@ -149,12 +149,12 @@ protected:
 	CSPropMaterial* clProp;
 };
 
-class QCSPropElectrodeGB : public QCSPropertyGroupBox
+class QCSPropExcitationGB : public QCSPropertyGroupBox
 {
 	Q_OBJECT
 public:
-	QCSPropElectrodeGB(CSPropElectrode *prop, QWidget *parent=NULL);
-	virtual ~QCSPropElectrodeGB();
+	QCSPropExcitationGB(CSPropExcitation *prop, QWidget *parent=NULL);
+	virtual ~QCSPropExcitationGB();
 
 public slots:
 	virtual void SetValues();
@@ -167,7 +167,7 @@ signals:
 	void modified();
 
 protected:
-	CSPropElectrode* clProp;
+	CSPropExcitation* clProp;
 
 	QLineEdit* FctLine[3];
 

@@ -133,7 +133,7 @@ void QCSTreeWidget::contextMenuEvent(QContextMenuEvent *event)
 		QMenu* propM = menu.addMenu(QIcon(":/images/edit_add.png"),tr("New Property"));
 		propM->addAction(tr("Material"),this,SIGNAL(NewMaterial()));
 		propM->addAction(tr("Metal"),this,SIGNAL(NewMetal()));
-		propM->addAction(tr("Electrode"),this,SIGNAL(NewElectrode()));
+		propM->addAction(tr("Excitation"),this,SIGNAL(NewExcitation()));
 		propM->addAction(tr("Probe-Box"),this,SIGNAL(NewChargeBox()));
 		propM->addAction(tr("Res-Box"),this,SIGNAL(NewResBox()));
 		propM->addAction(tr("Dump-Box"),this,SIGNAL(NewDumpBox()));

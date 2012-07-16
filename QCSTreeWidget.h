@@ -58,7 +58,7 @@ signals:
 
 	void NewMaterial();
 	void NewMetal();
-	void NewElectrode();
+	void NewExcitation();
 	void NewChargeBox();
 	void NewResBox();
 	void NewDumpBox();

@@ -95,7 +95,7 @@ QCSXCAD::QCSXCAD(QWidget *parent) : QMainWindow(parent)
 
 	QObject::connect(CSTree,SIGNAL(NewMaterial()),this,SLOT(NewMaterial()));
 	QObject::connect(CSTree,SIGNAL(NewMetal()),this,SLOT(NewMetal()));
-	QObject::connect(CSTree,SIGNAL(NewElectrode()),this,SLOT(NewElectrode()));
+	QObject::connect(CSTree,SIGNAL(NewExcitation()),this,SLOT(NewExcitation()));
 	QObject::connect(CSTree,SIGNAL(NewChargeBox()),this,SLOT(NewChargeBox()));
 	QObject::connect(CSTree,SIGNAL(NewResBox()),this,SLOT(NewResBox()));
 	QObject::connect(CSTree,SIGNAL(NewDumpBox()),this,SLOT(NewDumpBox()));
@@ -640,9 +640,9 @@ void QCSXCAD::NewMetal()
 	NewProperty(new CSPropMetal(clParaSet));
 }
 
-void QCSXCAD::NewElectrode()
+void QCSXCAD::NewExcitation()
 {
-	NewProperty(new CSPropElectrode(clParaSet,GetQtyPropertyType(CSProperties::ELECTRODE)));
+	NewProperty(new CSPropExcitation(clParaSet,GetQtyPropertyType(CSProperties::EXCITATION)));
 }
 
 void QCSXCAD::NewChargeBox()
@@ -947,8 +947,8 @@ void QCSXCAD::BuildToolBar()
 		newAct = newObjct->addAction(tr("Metal"),this,SLOT(NewMetal()));
 		newAct->setToolTip(tr("add new Metal-Property"));
 
-		newAct = newObjct->addAction(tr("Electrode"),this,SLOT(NewElectrode()));
-		newAct->setToolTip(tr("add new Electrode-Property"));
+		newAct = newObjct->addAction(tr("Excitation"),this,SLOT(NewExcitation()));
+		newAct->setToolTip(tr("add new Excitation-Property"));
 
 		newAct = newObjct->addAction(tr("ProbeBox"),this,SLOT(NewChargeBox()));
 		newAct->setToolTip(tr("add new Probe-Box-Property"));

@@ -117,8 +117,8 @@ QCSPropertyGroupBox* QCSPropEditor::BuildPropGroupBox(CSProperties* clProp)
 			break;
 		case CSProperties::METAL:
 			break;
-		case CSProperties::ELECTRODE:
-			propGB = new QCSPropElectrodeGB(clProp->ToElectrode());
+		case CSProperties::EXCITATION:
+			propGB = new QCSPropExcitationGB(clProp->ToExcitation());
 			break;
 		case CSProperties::PROBEBOX:
 			propGB = new QCSPropProbeBoxGB(clProp->ToProbeBox());
@@ -181,8 +181,8 @@ void QCSPropEditor::ChangeType(int item)
 		case CSProperties::METAL:
 			clProp = new CSPropMetal(saveProp);
 			break;
-		case CSProperties::ELECTRODE:
-			clProp = new CSPropElectrode(saveProp);
+		case CSProperties::EXCITATION:
+			clProp = new CSPropExcitation(saveProp);
 			break;
 		case CSProperties::PROBEBOX:
 			clProp = new CSPropProbeBox(saveProp);
@@ -228,7 +228,7 @@ QGroupBox* QCSPropEditor::BuildGeneral()
 	TypeCB->addItem(tr("Unknown"),QVariant(CSProperties::UNKNOWN));
 	TypeCB->addItem(tr("Material"),QVariant(CSProperties::MATERIAL));
 	TypeCB->addItem(tr("Metal"),QVariant(CSProperties::METAL));
-	TypeCB->addItem(tr("Electrode"),QVariant(CSProperties::ELECTRODE));
+	TypeCB->addItem(tr("Excitation"),QVariant(CSProperties::EXCITATION));
 	TypeCB->addItem(tr("Probe Box"),QVariant(CSProperties::PROBEBOX));
 	TypeCB->addItem(tr("Res Box"),QVariant(CSProperties::RESBOX));
 	TypeCB->addItem(tr("Dump Box"),QVariant(CSProperties::DUMPBOX));
@@ -397,12 +397,12 @@ void QCSPropMaterialGB::GetValues()
 {
 }
 
-/***************************QCSPropElectrodeGB**************************************/
-QCSPropElectrodeGB::QCSPropElectrodeGB(CSPropElectrode *prop, QWidget *parent) : QCSPropertyGroupBox(parent)
+/***************************QCSPropExcitationGB**************************************/
+QCSPropExcitationGB::QCSPropExcitationGB(CSPropExcitation *prop, QWidget *parent) : QCSPropertyGroupBox(parent)
 {
 	clProp=prop;
-	TypeName=QString(tr("Electrode"));
-	setTitle(tr("Electrode Property"));
+	TypeName=QString(tr("Excitation"));
+	setTitle(tr("Excitation Property"));
 
 	QGridLayout* layout = new QGridLayout();
 
@@ -451,11 +451,11 @@ QCSPropElectrodeGB::QCSPropElectrodeGB(CSPropElectrode *prop, QWidget *parent) :
 	setLayout(layout);
 }
 
-QCSPropElectrodeGB::~QCSPropElectrodeGB()
+QCSPropExcitationGB::~QCSPropExcitationGB()
 {
 }
 
-void QCSPropElectrodeGB::SetValues()
+void QCSPropExcitationGB::SetValues()
 {
 	bool bOk;
 	double dVal;
@@ -474,7 +474,7 @@ void QCSPropElectrodeGB::SetValues()
 		clProp->SetWeightFunction(FctLine[i]->text().toLatin1().data(),i);
 }
 
-void QCSPropElectrodeGB::GetValues()
+void QCSPropExcitationGB::GetValues()
 {
 	string line;
 
@@ -493,7 +493,7 @@ void QCSPropElectrodeGB::GetValues()
 		FctLine[i]->setText(clProp->GetWeightFunction(i).c_str());
 }
 
-void QCSPropElectrodeGB::TypeChanged(int index)
+void QCSPropExcitationGB::TypeChanged(int index)
 {
 	//enable/disable certain lines, depending on the excitation typez
 	switch (index)

@@ -167,8 +167,8 @@ void QCSPrimEditor::UpdatePropertyCB()
 			case CSProperties::METAL:
 				str+=tr(" (Metal)");
 				break;
-			case CSProperties::ELECTRODE:
-				str+=tr(" (Electrode)");
+			case CSProperties::EXCITATION:
+				str+=tr(" (Excitation)");
 				break;
 			case CSProperties::PROBEBOX:
 				str+=tr(" (Charge-Box)");
