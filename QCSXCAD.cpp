@@ -351,11 +351,14 @@ TiXmlNode* QCSXCAD::ReadOpenEMS(TiXmlNode* openEMS)
 	if (element)
 	{
 		TiXmlElement* BC = element->FirstChildElement("BoundaryCond");
-		TiXmlAttribute *attr = BC->FirstAttribute();
-		while (attr)
+		if (BC)
 		{
-			m_BC[attr->Name()] = attr->Value();
-			attr = attr->Next();
+			TiXmlAttribute *attr = BC->FirstAttribute();
+			while (attr)
+			{
+				m_BC[attr->Name()] = attr->Value();
+				attr = attr->Next();
+			}
 		}
 	}
 	return openEMS;
