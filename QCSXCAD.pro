@@ -16,6 +16,7 @@ OBJECTS_DIR = obj
 QT += core \
     gui \
     xml
+
 HEADERS += QCSXCAD.h \
     QCSGridEditor.h \
     QCSPrimEditor.h \
@@ -40,32 +41,24 @@ SOURCES += QCSXCAD.cpp \
     export_pov.cpp \
     QGeometryPlot.cpp \
     QCSXCAD_Global.cpp
+
 win32 { 
     DEFINES += BUILD_QCSXCAD_LIB
 
+    WIN32_LIB_ROOT = ..
 
     # CSXCAD
-    INCLUDEPATH += ../CSXCAD
-    LIBS += -L../CSXCAD/release -lCSXCAD0
+    INCLUDEPATH += $$WIN32_LIB_ROOT/CSXCAD
+    LIBS += -L$$WIN32_LIB_ROOT/CSXCAD/release -lCSXCAD0
 
+    # #3rd party libraries#
     # tinyxml
-    INCLUDEPATH += ../tinyxml
-    LIBS += -L../tinyxml/release -ltinyxml2
+    INCLUDEPATH += $$WIN32_LIB_ROOT/tinyxml/include
+    LIBS += -L$$WIN32_LIB_ROOT/tinyxml/bin -ltinyxml2
 
     # vtk
-    VTK_DIR = ../vtk
-    INCLUDEPATH += $$VTK_BIN_DIR/.. \
-        $$VTK_DIR \
-        $$VTK_DIR/Common \
-        $$VTK_DIR/Filtering \
-        $$VTK_DIR/GUISupport/Qt \
-        $$VTK_DIR/Graphics \
-        $$VTK_DIR/Hybrid \
-        $$VTK_DIR/IO \
-        $$VTK_DIR/Rendering \
-        $$VTK_DIR/Widgets
-    
-    LIBS += -L../vtk/bin -lvtkCommon -lQVTK -lvtkRendering -lvtkGraphics -lvtkFiltering -lvtkIO -lvtkHybrid -lvtkWidgets
+    INCLUDEPATH +=   $$WIN32_LIB_ROOT/vtk/include/vtk-5.10
+    LIBS += -L$$WIN32_LIB_ROOT/vtk/bin -lvtkCommon -lQVTK -lvtkRendering -lvtkGraphics -lvtkFiltering -lvtkIO -lvtkHybrid -lvtkWidgets
 }
 
 unix { 
