@@ -83,9 +83,9 @@ public slots:
 	void ImportGeometry();
 	void ExportGeometry();
 	void ExportGeometry_Povray();
-	void ExportGeometry_X3D();
-	void ExportGeometry_PolyDataVTK();
-	void ExportGeometry_STL();
+	void ExportGeometry_X3D(QString filename=QString());
+	void ExportGeometry_PolyDataVTK(QString dirname=QString());
+	void ExportGeometry_STL(QString dirname=QString());
 
 	void ExportView2Image();
 

@@ -816,9 +816,10 @@ void QCSXCAD::ExportGeometry_Povray()
 //	povexp->Delete();
 }
 
-void QCSXCAD::ExportGeometry_X3D()
+void QCSXCAD::ExportGeometry_X3D(QString filename)
 {
-	QString filename = QFileDialog::getSaveFileName( this, tr("Save X3D-file"), QString(), tr("X3D files (*.x3d)") );
+	if (filename.isEmpty())
+		filename = QFileDialog::getSaveFileName( this, tr("Save X3D-file"), QString(), tr("X3D files (*.x3d)") );
 	if (filename.isEmpty())
 		return;
 
@@ -826,9 +827,10 @@ void QCSXCAD::ExportGeometry_X3D()
 	x3d.save( filename );
 }
 
-void QCSXCAD::ExportGeometry_PolyDataVTK()
+void QCSXCAD::ExportGeometry_PolyDataVTK(QString dirname)
 {
-	QString dirname = QFileDialog::getExistingDirectory(this, tr("Choose directory to save data"));
+	if (dirname.isEmpty())
+		dirname = QFileDialog::getExistingDirectory(this, tr("Choose directory to save data"));
 	int QtyProp = GetQtyProperties();
 	for (int i=0;i<QtyProp;++i)
 	{
@@ -848,9 +850,10 @@ void QCSXCAD::ExportGeometry_PolyDataVTK()
 	 }
 }
 
-void QCSXCAD::ExportGeometry_STL()
+void QCSXCAD::ExportGeometry_STL(QString dirname)
 {
-	QString dirname = QFileDialog::getExistingDirectory(this, tr("Choose directory to save data"));
+	if (dirname.isEmpty())
+		dirname = QFileDialog::getExistingDirectory(this, tr("Choose directory to save data"));
 	int QtyProp = GetQtyProperties();
 	for (int i=0;i<QtyProp;++i)
 	{
