@@ -46,7 +46,7 @@ bool QCSXCAD_Global::parseCommandLineArgument( QString argv )
 		SetEdit(false);
 		return true;
 	}
-	cerr << "QCSXCAD_Global::parseCommandLineArgument: Warning, unknown argument: " << argv.toStdString() << endl;
+//	cerr << "QCSXCAD_Global::parseCommandLineArgument: Warning, unknown argument: " << argv.toStdString() << endl;
 	return false;
 }
 
