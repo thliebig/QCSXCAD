@@ -197,7 +197,10 @@ void VTKPrimitives::AddCylindricalCube(double *dCoords, double *dRGB, double dOp
 			PDSource = Source;
 		}
 		else //line in a-direction
-			return AddLinePoly(dCoords,2,1,dRGB,dOpacity);
+		{
+			double out[6];
+			return AddLinePoly(TransformCylindricalCoords(dCoords,out,2),2,1,dRGB,dOpacity);
+		}
 
 		if (PDSource==NULL)
 			return;
@@ -213,11 +216,13 @@ void VTKPrimitives::AddCylindricalCube(double *dCoords, double *dRGB, double dOp
 	{
 		if (dCoords[0]==dCoords[1]) //line in z-direction
 		{
-			return AddLinePoly(dCoords,2,1,dRGB,dOpacity);
+			double out[6];
+			return AddLinePoly(TransformCylindricalCoords(dCoords,out,2),2,1,dRGB,dOpacity);
 		}
 		if (dCoords[4]==dCoords[5]) //line in r-direction
 		{
-			return AddLinePoly(dCoords,2,1,dRGB,dOpacity);
+			double out[6];
+			return AddLinePoly(TransformCylindricalCoords(dCoords,out,2),2,1,dRGB,dOpacity);
 		}
 
 		//rz-plane
