@@ -43,11 +43,11 @@ public:
 	/// Deconstructor
 	~VTKPrimitives();
 	/// Add a Cube to scene
-	/*! \param *dCoords Set points as room diagonal (Xmin,Xmax,Ymin,Ymax,Zmin,,Zmax) \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness)  */
+	/*! \param *dCoords Set points as room diagonal (Xmin,Xmax,Ymin,Ymax,Zmin,Zmax) \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness)  */
 	void AddCube(double *dCoords, double *dRGB, double dOpacity, const double* tf_matrix=0);	//complete
 	void AddCube(const double *dStart, const double *dStop, double *dRGB, double dOpacity, const double* tf_matrix=0);	//complete
 	/// Add a Cube in cylindrical coordinates to scene
-	/*! \param *dCoords Set points as room diagonal (Rmin,Rmax,Amin,Amax,Zmin,,Zmax) \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness)  */
+	/*! \param *dCoords Set points as room diagonal (Rmin,Rmax,Amin,Amax,Zmin,Zmax) \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness)  */
 	void AddCylindricalCube(double *dCoords, double *dRGB, double dOpacity, const double* tf_matrix=0);
 	void AddCylindricalCube(const double *dStart, const double *dStop, double *dRGB, double dOpacity, const double* tf_matrix=0);
 	/// Add a Plane to scene
