@@ -70,6 +70,8 @@ public:
 	void AddCylinder(const double *dCenterAxis, const double *dExtrusionVector, float fRadius, double *dRGB, double dOpacity, int iResolution, const double* tf_matrix=0); //complete
 	/*!  \param *dAxisStart Cylinder axis start point \param *dAxisStop Cylinder axis end point \param fRadius Set Radius \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness) \param iResolution Set resolution of discretisation*/
 	void AddCylinder2(const double *dAxisStart, const double* dAxisStop, float fRadius, double *dRGB, double dOpacity, int iResolution, const double* tf_matrix=0); //complete
+	/*! \brief Add a cylindrical shell to the scene. \param *dAxisStart Cylinder axis start point \param *dAxisStop Cylinder axis end point \param radius Set Radius \param shellWidth width of the cylindrical shell \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness) \param iResolution Set resolution of discretisation*/
+	void AddCylindricalShell(const double *dAxisStart, const double* dAxisStop, double radius, double shellWidth, double *dRGB, double dOpacity, int iResolution, const double *tf_matrix=0);
 	/// Add a Sphere to scene
 	/*! \param *dCenter Set Center Point in 3D space \param fRadius Set Radius \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness) \param iResolution Set resolution of discretisation*/
 	void AddSphere(const double *dCenter, float fRadius, double *dRGB, double dOpacity, int iResolution, const double* tf_matrix=0);	//complete

@@ -236,6 +236,88 @@ void QGeometryPlot::paintEvent(QPaintEvent * /* event */)
 					}
 					break;
 				}
+				case CSPrimitives::CYLINDRICALSHELL:
+				{  //erstmal nur kartesische Cylinder
+					CSPrimCylindricalShell* cylinder=prim->ToCylindricalShell();
+					double r0[3]={cylinder->GetCoord(0),cylinder->GetCoord(2),cylinder->GetCoord(4)};
+					double r1[3]={cylinder->GetCoord(1),cylinder->GetCoord(3),cylinder->GetCoord(5)};
+					double x1=(r0[x]-offsetX)/factor;
+					double y1=(r0[y]-offsetY)/factor;
+					double x2=(r1[x]-offsetX)/factor;
+					double y2=(r1[y]-offsetY)/factor;
+					double r=cylinder->GetRadius()/factor;
+					QPointF center( x1, height()-y1 );
+					double shellWidth = cylinder->GetShellWidth() / factor;
+					if (r0[1]==r1[1] && r0[2]==r1[2]) //x-ausdehnung
+					{
+						if (direct==0)
+						{
+							painter.drawEllipse( center, r-shellWidth/2, r-shellWidth/2 );
+							painter.drawEllipse( center, r+shellWidth/2, r+shellWidth/2 );
+						}
+						else if (direct==2)
+						{
+							QRectF rect1( x1, height()-(y2+r+shellWidth/2), x2-x1, y2-y1+2*(r+shellWidth/2) );
+							painter.drawRect( rect1 );
+							QRectF rect2( x1, height()-(y2+r-shellWidth/2), x2-x1, y2-y1+2*(r-shellWidth/2) );
+							painter.drawRect( rect2 );
+						}
+						else if (direct==1)
+						{
+							QRectF rect1( x1-(r+shellWidth/2), height()-y2, x2-x1+2*(r+shellWidth/2), y2-y1 );
+							painter.drawRect( rect1 );
+							QRectF rect2( x1-(r-shellWidth/2), height()-y2, x2-x1+2*(r-shellWidth/2), y2-y1 );
+							painter.drawRect( rect2 );
+						}
+					}
+					else if (r0[0]==r1[0] && r0[2]==r1[2]) //y-ausdehnung
+					{
+						if (direct==1)
+						{
+							painter.drawEllipse( center, r-shellWidth/2, r-shellWidth/2 );
+							painter.drawEllipse( center, r+shellWidth/2, r+shellWidth/2 );
+						}
+						else if (direct==0)
+						{
+							QRectF rect1( x1, height()-(y2+r+shellWidth/2), x2-x1, y2-y1+2*(r+shellWidth/2) );
+							painter.drawRect( rect1 );
+							QRectF rect2( x1, height()-(y2+r-shellWidth/2), x2-x1, y2-y1+2*(r-shellWidth/2) );
+							painter.drawRect( rect2 );
+						}
+						else if (direct==2)
+						{
+							QRectF rect1( x1-(r+shellWidth/2), height()-y2, x2-x1+2*(r+shellWidth/2), y2-y1 );
+							painter.drawRect( rect1 );
+							QRectF rect2( x1-(r-shellWidth/2), height()-y2, x2-x1+2*(r-shellWidth/2), y2-y1 );
+							painter.drawRect( rect2 );
+						}
+					}
+					else if (r0[1]==r1[1] && r0[0]==r1[0]) //z-ausdehnung
+					{
+						if (direct==2)
+						{
+							painter.drawEllipse( center, r-shellWidth/2, r-shellWidth/2 );
+							painter.drawEllipse( center, r+shellWidth/2, r+shellWidth/2 );
+						}
+						else if (direct==1)
+						{
+							QRectF rect1( x1, height()-(y2+r+shellWidth/2), x2-x1, y2-y1+2*(r+shellWidth/2) );
+							painter.drawRect( rect1 );
+							QRectF rect2( x1, height()-(y2+r-shellWidth/2), x2-x1, y2-y1+2*(r-shellWidth/2) );
+							painter.drawRect( rect2 );
+						}
+						else if (direct==0)
+						{
+							QRectF rect1( x1-(r+shellWidth/2), height()-y2, x2-x1+2*(r+shellWidth/2), y2-y1 );
+							painter.drawRect( rect1 );
+							QRectF rect2( x1-(r-shellWidth/2), height()-y2, x2-x1+2*(r-shellWidth/2), y2-y1 );
+							painter.drawRect( rect2 );
+						}
+					}
+					else
+						qDebug() << "invalid cylindricalshell";
+					break;
+				}
 				case CSPrimitives::POLYGON:
 				{
 					CSPrimPolygon* poly=prim->ToPolygon();

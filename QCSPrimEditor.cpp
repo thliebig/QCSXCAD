@@ -44,6 +44,10 @@ QCSPrimEditor::QCSPrimEditor(ContinuousStructure *CS, CSPrimitives* prim, QWidge
 			CSPrimEdit = new QCSPrimCylinderLayout(CSPrim->ToCylinder());
 			setWindowTitle(tr("Cylinder Editor"));
 			break;
+		case CSPrimitives::CYLINDRICALSHELL:
+			CSPrimEdit = new QCSPrimCylindricalShellLayout(CSPrim->ToCylindricalShell());
+			setWindowTitle(tr("CylindricalShell Editor"));
+			break;
 		case CSPrimitives::POLYGON:
 			CSPrimEdit = new QCSPrimPolygonLayout(CSPrim->ToPolygon());
 			setWindowTitle(tr("Polygon Editor"));
@@ -328,7 +332,7 @@ void QCSPrimSphereLayout::GetValues()
 QCSPrimCylinderLayout::QCSPrimCylinderLayout(CSPrimCylinder* prim, QWidget *parent) : QCSPrimitiveLayout(parent)
 {
 	clCylinder=prim;
-	
+
 	addWidget(new QLabel(tr("Start Point")),0,0,1,6);
 	addWidget(new QLabel("X:"),1,0);
 	Lines[0]=new QLineEdit();addWidget(Lines[0],1,1);
@@ -336,7 +340,7 @@ QCSPrimCylinderLayout::QCSPrimCylinderLayout(CSPrimCylinder* prim, QWidget *pare
 	Lines[2]=new QLineEdit();addWidget(Lines[2],1,3);
 	addWidget(new QLabel("Z:"),1,4);
 	Lines[4]=new QLineEdit();addWidget(Lines[4],1,5);
-	
+
 	addWidget(new QLabel(tr("End Point")),2,0,1,6);
 	addWidget(new QLabel("X:"),3,0);
 	Lines[1]=new QLineEdit();addWidget(Lines[1],3,1);
@@ -345,9 +349,9 @@ QCSPrimCylinderLayout::QCSPrimCylinderLayout(CSPrimCylinder* prim, QWidget *pare
 	addWidget(new QLabel("Z:"),3,4);
 	Lines[5]=new QLineEdit();addWidget(Lines[5],3,5);
 
-	addWidget(new QLabel(tr("Radius")),4,0,1,2); 
+	addWidget(new QLabel(tr("Radius")),4,0,1,2);
 	Lines[6]=new QLineEdit();addWidget(Lines[6],4,3,1,4);
-	
+
 	for (int i=0;i<7;++i)
 		Lines[i]->setEnabled(QCSX_Settings.GetEdit());
 
@@ -369,7 +373,7 @@ void QCSPrimCylinderLayout::SetValues()
 		dVal=line.toDouble(&bOk);
 		if (bOk) clCylinder->SetCoord(i,dVal);
 		else clCylinder->SetCoord(i,line.toLatin1().data());
-	}	
+	}
 
 	ParameterScalar* ps=clCylinder->GetRadiusPS();
 	line=Lines[6]->text();
@@ -391,6 +395,96 @@ void QCSPrimCylinderLayout::GetValues()
 	ps=clCylinder->GetRadiusPS();
 	if (ps->GetMode()) Lines[6]->setText(ps->GetString().c_str());
 	else Lines[6]->setText(QString("%1").arg(ps->GetValue()));
+}
+
+//****CylindricalShell
+QCSPrimCylindricalShellLayout::QCSPrimCylindricalShellLayout(CSPrimCylindricalShell* prim, QWidget *parent) : QCSPrimitiveLayout(parent)
+{
+	clCylindricalShell=prim;
+
+	addWidget(new QLabel(tr("Start Point")),0,0,1,6);
+	addWidget(new QLabel("X:"),1,0);
+	Lines[0]=new QLineEdit();addWidget(Lines[0],1,1);
+	addWidget(new QLabel("Y:"),1,2);
+	Lines[2]=new QLineEdit();addWidget(Lines[2],1,3);
+	addWidget(new QLabel("Z:"),1,4);
+	Lines[4]=new QLineEdit();addWidget(Lines[4],1,5);
+
+	addWidget(new QLabel(tr("End Point")),2,0,1,6);
+	addWidget(new QLabel("X:"),3,0);
+	Lines[1]=new QLineEdit();addWidget(Lines[1],3,1);
+	addWidget(new QLabel("Y:"),3,2);
+	Lines[3]=new QLineEdit();addWidget(Lines[3],3,3);
+	addWidget(new QLabel("Z:"),3,4);
+	Lines[5]=new QLineEdit();addWidget(Lines[5],3,5);
+
+	addWidget(new QLabel(tr("Radius")),4,0,1,2);
+	Lines[6]=new QLineEdit();addWidget(Lines[6],4,3,1,4);
+
+	addWidget(new QLabel(tr("ShellWidth")),5,0,1,2);
+	Lines[7]=new QLineEdit();addWidget(Lines[7],5,3,1,4);
+
+	for (int i=0;i<8;++i)
+		Lines[i]->setEnabled(QCSX_Settings.GetEdit());
+
+	GetValues();
+}
+
+QCSPrimCylindricalShellLayout::~QCSPrimCylindricalShellLayout()
+{
+}
+
+void QCSPrimCylindricalShellLayout::SetValues()
+{
+	bool bOk;
+	double dVal;
+	QString line;
+	for (size_t i=0; i< 6; ++i)
+	{
+		line=Lines[i]->text();
+		dVal=line.toDouble(&bOk);
+		if (bOk) clCylindricalShell->SetCoord(i,dVal);
+		else clCylindricalShell->SetCoord(i,line.toLatin1().data());
+	}
+
+	ParameterScalar* ps = clCylindricalShell->GetRadiusPS();
+	line = Lines[6]->text();
+	dVal = line.toDouble(&bOk);
+	if (bOk)
+		ps->SetValue(dVal);
+	else
+		ps->SetValue(line.toLatin1().constData());
+
+	ps = clCylindricalShell->GetShellWidthPS();
+	line = Lines[7]->text();
+	dVal = line.toDouble(&bOk);
+	if (bOk)
+		ps->SetValue(dVal);
+	else
+		ps->SetValue(line.toLatin1().constData());
+}
+
+void QCSPrimCylindricalShellLayout::GetValues()
+{
+	ParameterScalar* ps;
+	for (size_t i=0; i< 6; ++i)
+	{
+		ps=clCylindricalShell->GetCoordPS(i);
+		if (ps->GetMode()) Lines[i]->setText(ps->GetString().c_str());
+		else Lines[i]->setText(QString("%1").arg(ps->GetValue()));
+	}
+
+	ps = clCylindricalShell->GetRadiusPS();
+	if (ps->GetMode())
+		Lines[6]->setText(ps->GetString().c_str());
+	else
+		Lines[6]->setText(QString("%1").arg(ps->GetValue()));
+
+	ps = clCylindricalShell->GetShellWidthPS();
+	if (ps->GetMode())
+		Lines[7]->setText(ps->GetString().c_str());
+	else
+		Lines[7]->setText(QString("%1").arg(ps->GetValue()));
 }
 
 /*****************MultiBox*****/

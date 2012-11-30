@@ -49,7 +49,7 @@
 #include "vtkAppendPolyData.h"
 #include "vtkXMLPolyDataWriter.h"
 #include "vtkSTLWriter.h"
-
+#include <vtkDiskSource.h>
 
 VTKPrimitives::VTKPrimitives(vtkRenderer *Renderer)
 {
@@ -551,6 +551,52 @@ void VTKPrimitives::AddCylinder(const double *dCenter, const double *dExtrusionV
 	transform->Delete();
 	transformFilter->Delete();
 	SourceMapper->Delete();
+}
+
+void VTKPrimitives::AddCylindricalShell(const double *dAxisStart, const double* dAxisStop, double radius, double shellWidth, double *dRGB, double dOpacity, int iResolution, const double* tf_matrix)
+{
+	const double dExtrusionVector[3] = {dAxisStop[0]-dAxisStart[0], dAxisStop[1]-dAxisStart[1], dAxisStop[2]-dAxisStart[2]};
+	double length = sqrt( dExtrusionVector[0]*dExtrusionVector[0] + dExtrusionVector[1]*dExtrusionVector[1] + dExtrusionVector[2]*dExtrusionVector[2] ) ;
+
+	// create a disk in xy plane
+	vtkDiskSource *diskSource = vtkDiskSource::New();
+	diskSource->SetInnerRadius( radius - shellWidth/2.0 );
+	diskSource->SetOuterRadius( radius + shellWidth/2.0 );
+	diskSource->SetCircumferentialResolution(iResolution);
+
+	// extrude in +z
+	vtkLinearExtrusionFilter *linearExtrusionFilter = vtkLinearExtrusionFilter::New();
+	linearExtrusionFilter->SetInputConnection( diskSource->GetOutputPort() );
+	linearExtrusionFilter->SetExtrusionTypeToNormalExtrusion();
+	linearExtrusionFilter->SetVector(0,0,length);
+
+	// create transform to correctly orient and move the cylinder shell
+	vtkTransform *transform = vtkTransform::New();
+	transform->PostMultiply();
+	double phi   = atan2( dExtrusionVector[1], dExtrusionVector[0] );
+	double theta = acos( dExtrusionVector[2] / length );
+	transform->RotateY( theta / M_PI * 180 );
+	transform->RotateZ( phi / M_PI * 180 );
+	transform->Translate( dAxisStart );
+	if (tf_matrix)
+		transform->Concatenate( tf_matrix );
+
+	vtkTransformPolyDataFilter *transformFilter = vtkTransformPolyDataFilter::New();
+	transformFilter->SetInputConnection( linearExtrusionFilter->GetOutputPort() );
+	transformFilter->SetTransform( transform );
+
+	vtkPolyDataMapper *mapper = vtkPolyDataMapper::New();
+	mapper->SetInputConnection( transformFilter->GetOutputPort() );
+	mapper->ScalarVisibilityOff();
+	vtkActor *actor = vtkActor::New();
+	actor->SetMapper( mapper );
+
+	m_PolyDataCollection->AddInput( transformFilter->GetOutput());
+	actor->GetProperty()->SetColor(dRGB);
+	actor->GetProperty()->SetOpacity(dOpacity);
+
+	ActorColl->AddItem(actor);
+	ren->AddActor(actor);
 }
 
 void VTKPrimitives::AddSphere(const double *dCenter, float fRadius, double *dRGB, double dOpacity, int iResolution, const double* tf_matrix)

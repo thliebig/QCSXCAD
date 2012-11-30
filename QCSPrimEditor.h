@@ -132,6 +132,25 @@ protected:
 	QLineEdit *Lines[7];
 };
 
+class QCSPrimCylindricalShellLayout : public QCSPrimitiveLayout
+{
+	Q_OBJECT
+public:
+	QCSPrimCylindricalShellLayout(CSPrimCylindricalShell* prim, QWidget *parent=NULL);
+	virtual ~QCSPrimCylindricalShellLayout();
+
+public slots:
+	virtual void SetValues();
+	virtual void GetValues();
+
+signals:
+	void modified();
+
+protected:
+	CSPrimCylindricalShell* clCylindricalShell;
+	QLineEdit *Lines[8];
+};
+
 class QCSPrimMultiBoxLayout : public QCSPrimitiveLayout
 {
 	Q_OBJECT
