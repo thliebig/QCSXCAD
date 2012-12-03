@@ -132,7 +132,7 @@ protected:
 	QLineEdit *Lines[7];
 };
 
-class QCSPrimCylindricalShellLayout : public QCSPrimitiveLayout
+class QCSPrimCylindricalShellLayout : public QCSPrimCylinderLayout
 {
 	Q_OBJECT
 public:
@@ -148,7 +148,7 @@ signals:
 
 protected:
 	CSPrimCylindricalShell* clCylindricalShell;
-	QLineEdit *Lines[8];
+	QLineEdit *m_ShellWidth;
 };
 
 class QCSPrimMultiBoxLayout : public QCSPrimitiveLayout
