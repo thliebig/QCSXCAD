@@ -28,6 +28,7 @@
 #define _VTKPRIMITIVES_H
 
 class vtkRenderer;
+class vtkPolyData;
 class vtkActorCollection;
 class vtkAppendPolyData;
 
@@ -90,7 +91,9 @@ public:
 	void AddSurface(double *dCoords, unsigned int uiQtyCoords, double *dRGB, double dOpacity, const double* tf_matrix=0);//complete
 	/// Add a STL-object to scene
 	/*! \param *Filename Set filename of STL object \param *dCenter Set point of origin for STL object \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness)*/
-	void AddSTLObject(char *Filename, double *dCenter, double *dRGB, double dOpacity, const double* tf_matrix=0);//complete
+	void AddSTLObject(const char *Filename, double *dCenter, double *dRGB, double dOpacity, const double* tf_matrix=0);//complete
+
+	void AddPolyData(vtkPolyData* polydata, double *dRGB, double dOpacity, const double* tf_matrix=0);
 	
 	void SetOpacity2All(double opacity);
 
@@ -102,6 +105,7 @@ public:
 
 	//! Write the collected poly-data into a ply file (should be a *.ply)
 	void WritePolyData2PLY(const char* filename, double scale=1.0);
+
 protected:
 	/// unusable constructor, only for inheritance 
 	VTKPrimitives();

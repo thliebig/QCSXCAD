@@ -866,7 +866,7 @@ void VTKPrimitives::AddSurface(double *dCoords, unsigned int uiQtyCoords, double
 
 
 
-void VTKPrimitives::AddSTLObject(char *Filename, double *dCenter, double *dRGB, double dOpacity, const double* tf_matrix)
+void VTKPrimitives::AddSTLObject(const char *Filename, double *dCenter, double *dRGB, double dOpacity, const double* tf_matrix)
 { //complete??
 	vtkSTLReader *part = vtkSTLReader::New();
 	part->SetFileName(Filename);
@@ -891,6 +891,34 @@ void VTKPrimitives::AddSTLObject(char *Filename, double *dCenter, double *dRGB, 
 	ActorColl->AddItem(partActor);
 	part->Delete();
 	partMapper->Delete();
+	filter->Delete();
+	vtrans->Delete();
+}
+
+void VTKPrimitives::AddPolyData(vtkPolyData* polydata, double *dRGB, double dOpacity, const double* tf_matrix)
+{
+	vtkPolyDataMapper *Mapper = vtkPolyDataMapper::New();
+
+	vtkTransformPolyDataFilter* filter = vtkTransformPolyDataFilter::New();
+	vtkTransform* vtrans = vtkTransform::New();
+	filter->SetInput(polydata);
+	if (tf_matrix)
+		vtrans->SetMatrix(tf_matrix);
+	filter->SetTransform(vtrans);
+
+	m_PolyDataCollection->AddInput(filter->GetOutput());
+	Mapper->SetInput(filter->GetOutput());
+	vtkActor *Actor = vtkActor::New();
+	Actor->SetMapper(Mapper);
+	Actor->GetProperty()->SetColor(dRGB);
+	Actor->GetProperty()->SetOpacity(dOpacity);
+
+
+	ActorColl->AddItem(Actor);
+	ren->AddActor(Actor);
+
+	polydata->Delete();
+	Mapper->Delete();
 	filter->Delete();
 	vtrans->Delete();
 }
