@@ -84,8 +84,12 @@ public slots:
 	void ExportGeometry();
 	void ExportGeometry_Povray();
 	void ExportGeometry_X3D(QString filename=QString());
+
+	//! Export geometry into a given directory and type
+	void ExportGeometry(QString dirname, int type);
 	void ExportGeometry_PolyDataVTK(QString dirname=QString());
 	void ExportGeometry_STL(QString dirname=QString());
+	void ExportGeometry_PLY(QString dirname=QString());
 
 	void ExportView2Image();
 
@@ -137,7 +141,6 @@ protected slots:
 protected:
 	//read supported files, return the root to a CSX
 	TiXmlNode* ReadOpenEMS(TiXmlNode* openEMS);
-
 
 	void NewPrimitive(CSPrimitives* newPrim);
 	void NewProperty(CSProperties* newProp);

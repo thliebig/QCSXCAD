@@ -827,7 +827,7 @@ void QCSXCAD::ExportGeometry_X3D(QString filename)
 	x3d.save( filename );
 }
 
-void QCSXCAD::ExportGeometry_PolyDataVTK(QString dirname)
+void QCSXCAD::ExportGeometry(QString dirname, int type)
 {
 	if (dirname.isEmpty())
 		dirname = QFileDialog::getExistingDirectory(this, tr("Choose directory to save data"));
@@ -844,33 +844,42 @@ void QCSXCAD::ExportGeometry_PolyDataVTK(QString dirname)
 			QString filename(dirname);
 			filename.append("/");
 			filename.append(prop->GetName().c_str());
-			filename.append(".vtp");
-			StructureVTK->ExportProperty2PolyDataVTK(uID,filename,clGrid.GetDeltaUnit());
+			switch (type)
+			{
+			case 0:
+				filename.append(".vtp");
+				StructureVTK->ExportProperty2PolyDataVTK(uID,filename,clGrid.GetDeltaUnit());
+				break;
+			case 1:
+				filename.append(".stl");
+				StructureVTK->ExportProperty2STL(uID,filename,clGrid.GetDeltaUnit());
+				break;
+			case 2:
+				filename.append(".ply");
+				StructureVTK->ExportProperty2PLY(uID,filename,clGrid.GetDeltaUnit());
+				break;
+			default:
+				QMessageBox::warning(this, "Export Dialog","Unkown export type, skipping...");
+				return;
+				break;
+			}
 		 }
 	 }
 }
 
+void QCSXCAD::ExportGeometry_PolyDataVTK(QString dirname)
+{
+	ExportGeometry(dirname, 0);
+}
+
 void QCSXCAD::ExportGeometry_STL(QString dirname)
 {
-	if (dirname.isEmpty())
-		dirname = QFileDialog::getExistingDirectory(this, tr("Choose directory to save data"));
-	int QtyProp = GetQtyProperties();
-	for (int i=0;i<QtyProp;++i)
-	{
-		CSProperties* prop = GetProperty(i);
-		if (prop==NULL) continue;
+	ExportGeometry(dirname, 1);
+}
 
-		 unsigned int uID = prop->GetUniqueID();
-
-		 if (prop->GetVisibility()==true)
-		 {
-			QString filename(dirname);
-			filename.append("/");
-			filename.append(prop->GetName().c_str());
-			filename.append(".stl");
-			StructureVTK->ExportProperty2STL(uID,filename,clGrid.GetDeltaUnit());
-		 }
-	 }
+void QCSXCAD::ExportGeometry_PLY(QString dirname)
+{
+	ExportGeometry(dirname, 2);
 }
 
 void QCSXCAD::ExportView2Image()

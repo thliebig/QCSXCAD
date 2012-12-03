@@ -49,6 +49,7 @@
 #include "vtkAppendPolyData.h"
 #include "vtkXMLPolyDataWriter.h"
 #include "vtkSTLWriter.h"
+#include "vtkPLYWriter.h"
 
 
 VTKPrimitives::VTKPrimitives(vtkRenderer *Renderer)
@@ -943,6 +944,41 @@ void VTKPrimitives::WritePolyData2STL(const char* filename, double scale)
 	filter->SetInput(m_PolyDataCollection->GetOutput());
 
 	vtkSTLWriter* writer  = vtkSTLWriter::New();
+	writer->SetFileName(filename);
+
+	if (scale==1.0)
+	{
+		writer->SetInput(filter->GetOutput());
+		writer->Write();
+	}
+	else
+	{
+		vtkTransform *transform = vtkTransform::New();
+		vtkTransformPolyDataFilter *transformFilter = vtkTransformPolyDataFilter::New();
+
+		transformFilter->SetInput(filter->GetOutput());
+		transform->Scale(scale,scale,scale);
+		transformFilter->SetTransform(transform);
+
+		writer->SetInput(transformFilter->GetOutput());
+		writer->Write();
+
+		transform->Delete();
+		transformFilter->Delete();
+	}
+
+	writer->Delete();
+}
+
+void VTKPrimitives::WritePolyData2PLY(const char* filename, double scale)
+{
+	cout << "VTKPrimitives::WritePolyData2PLY: Dump to ply file: " << filename << " -- Using scale: " << scale << endl;
+
+	vtkTriangleFilter* filter = vtkTriangleFilter::New();
+
+	filter->SetInput(m_PolyDataCollection->GetOutput());
+
+	vtkPLYWriter* writer  = vtkPLYWriter::New();
 	writer->SetFileName(filename);
 
 	if (scale==1.0)

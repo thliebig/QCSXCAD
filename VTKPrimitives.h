@@ -100,6 +100,8 @@ public:
 	//! Write the collected poly-data into a stl file (should be a *.stl)
 	void WritePolyData2STL(const char* filename, double scale=1.0);
 
+	//! Write the collected poly-data into a ply file (should be a *.ply)
+	void WritePolyData2PLY(const char* filename, double scale=1.0);
 protected:
 	/// unusable constructor, only for inheritance 
 	VTKPrimitives();

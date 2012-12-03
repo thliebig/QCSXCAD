@@ -611,6 +611,18 @@ void QVTKStructure::ExportProperty2STL(unsigned int uiID, QString filename, doub
 	}
 }
 
+void QVTKStructure::ExportProperty2PLY(unsigned int uiID, QString filename, double scale)
+{
+	for (int i=0;i<LayerPrimitives.size();++i)
+	{
+		if (LayerPrimitives.at(i).uID==uiID)
+		{
+			if (LayerPrimitives.at(i).VTKProp!=NULL)
+				LayerPrimitives.at(i).VTKProp->WritePolyData2PLY(filename.toStdString().c_str(), scale);
+		}
+	}
+}
+
 void QVTKStructure::KeyPress(vtkObject *caller, unsigned long eid, void *clientdata, void *calldata)
 {
 	UNUSED(caller);
