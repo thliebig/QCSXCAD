@@ -31,6 +31,7 @@ class vtkRenderer;
 class vtkPolyData;
 class vtkActorCollection;
 class vtkAppendPolyData;
+class vtkActor;
 
 #define PI 3.141592654
 
@@ -93,7 +94,8 @@ public:
 	/*! \param *Filename Set filename of STL object \param *dCenter Set point of origin for STL object \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness)*/
 	void AddSTLObject(const char *Filename, double *dCenter, double *dRGB, double dOpacity, const double* tf_matrix=0);//complete
 
-	void AddPolyData(vtkPolyData* polydata, double *dRGB, double dOpacity, const double* tf_matrix=0);
+	//! Add the given polydata to the scene
+	vtkActor* AddPolyData(vtkPolyData* polydata, double *dRGB, double dOpacity, const double* tf_matrix=0);
 	
 	void SetOpacity2All(double opacity);
 

@@ -557,6 +557,9 @@ void QVTKStructure::RenderGeometry()
 					polydata->SetPoints(points);
 					polydata->SetPolys(poly);
 					vtkPrims->AddPolyData(polydata,rgb,(double)col.a/255.0,transform_matrix);
+					poly->Delete();
+					points->Delete();
+					polydata->Delete();
 					break;
 				}
 //				case CSPrimitives::POLYHEDRONREADER:
