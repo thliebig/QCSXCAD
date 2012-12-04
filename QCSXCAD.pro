@@ -10,6 +10,9 @@ DEFINES += GIT_VERSION=\\\"$$GITREV\\\"
 # vtk includes deprecated header files; silence the corresponding warning
 QMAKE_CXXFLAGS += -Wno-deprecated
 
+exists(localPathes.pri) {
+    include(localPathes.pri)
+}
 
 MOC_DIR = moc
 OBJECTS_DIR = obj
