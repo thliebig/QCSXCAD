@@ -18,6 +18,20 @@
 #include "QGeometryPlot.h"
 #include "QCSXCAD.h"
 
+#include "CSPrimPoint.h"
+#include "CSPrimBox.h"
+#include "CSPrimMultiBox.h"
+#include "CSPrimSphere.h"
+#include "CSPrimSphericalShell.h"
+#include "CSPrimCylinder.h"
+#include "CSPrimCylindricalShell.h"
+#include "CSPrimPolygon.h"
+#include "CSPrimLinPoly.h"
+#include "CSPrimRotPoly.h"
+#include "CSPrimCurve.h"
+#include "CSPrimWire.h"
+#include "CSPrimUserDefined.h"
+
 QGeometryPlot::QGeometryPlot(QCSXCAD* CS) : QWidget()
 {
 	setBackgroundRole(QPalette::Base);
