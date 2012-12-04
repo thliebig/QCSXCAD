@@ -10,6 +10,9 @@ DEFINES += GIT_VERSION=\\\"$$GITREV\\\"
 # vtk includes deprecated header files; silence the corresponding warning
 QMAKE_CXXFLAGS += -Wno-deprecated
 
+# remove unnecessary webkit define
+DEFINES -= QT_WEBKIT
+
 exists(localPathes.pri) {
     include(localPathes.pri)
 }
@@ -51,10 +54,10 @@ win32 {
     isEmpty(WIN32_LIB_ROOT) {
         WIN32_LIB_ROOT = ..
     }
+    # CSXCAD path
     isEmpty(CSXCAD_ROOT) {
      CSXCAD_ROOT = $$WIN32_LIB_ROOT/CSXCAD
     }
-
     # CSXCAD
     INCLUDEPATH += $$CSXCAD_ROOT/include/CSXCAD
     LIBS += -L$$CSXCAD_ROOT/lib -lCSXCAD0
@@ -67,13 +70,21 @@ win32 {
     # vtk
     INCLUDEPATH +=   $$WIN32_LIB_ROOT/vtk/include/vtk-5.10
     LIBS += -L$$WIN32_LIB_ROOT/vtk/bin -lvtkCommon -lQVTK -lvtkRendering -lvtkGraphics -lvtkFiltering -lvtkIO -lvtkHybrid -lvtkWidgets
+
+    #boost, needed by cgal
+    INCLUDEPATH += $$WIN32_LIB_ROOT/boost/include
+    LIBS += -L$$WIN32_LIB_ROOT/boost/lib -lboost_thread -lboost_system -lboost_date_time -lboost_serialization
+    #cgal
+    INCLUDEPATH += $$WIN32_LIB_ROOT/cgal/include
+    LIBS += -L$$WIN32_LIB_ROOT/cgal/bin -lCGAL
 }
 
 unix { 
-    # CSXCAD
+    # CSXCAD path
     isEmpty(CSXCAD_ROOT) {
      CSXCAD_ROOT = /usr
     }
+    # CSXCAD
     INCLUDEPATH += $$CSXCAD_ROOT/include/CSXCAD
     LIBS += -L$$CSXCAD_ROOT/lib -lCSXCAD
 
@@ -101,6 +112,7 @@ unix {
         -lvtksys \
         -lQVTK
 }
+
 FORMS += 
 RESOURCES += resources.qrc
 DEFINES += BUILD_QCSXCAD_LIB
