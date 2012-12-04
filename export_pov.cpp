@@ -25,6 +25,12 @@
 #include <vector>
 #include <ContinuousStructure.h>
 
+#include "CSPrimBox.h"
+#include "CSPrimCylinder.h"
+#include "CSPrimPolygon.h"
+#include "CSPrimCurve.h"
+#include "CSPrimWire.h"
+
 #include "QVTKStructure.h"
 #include "QCSXCAD.h"
 #include "export_pov.h"

@@ -18,6 +18,20 @@
 #include "QCSPrimEditor.h"
 #include "QCSXCAD_Global.h"
 
+#include "CSPrimPoint.h"
+#include "CSPrimBox.h"
+#include "CSPrimMultiBox.h"
+#include "CSPrimSphere.h"
+#include "CSPrimSphericalShell.h"
+#include "CSPrimCylinder.h"
+#include "CSPrimCylindricalShell.h"
+#include "CSPrimPolygon.h"
+#include "CSPrimLinPoly.h"
+#include "CSPrimRotPoly.h"
+#include "CSPrimCurve.h"
+#include "CSPrimWire.h"
+#include "CSPrimUserDefined.h"
+
 QCSPrimEditor::QCSPrimEditor(ContinuousStructure *CS, CSPrimitives* prim, QWidget* parent) : QDialog(parent)
 {
 	clCS=CS;

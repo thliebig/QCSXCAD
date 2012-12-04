@@ -24,6 +24,8 @@
 #include <QtXml>
 #include <vector>
 #include <ContinuousStructure.h>
+#include "CSPrimBox.h"
+#include "CSPrimPolygon.h"
 
 #include "QVTKStructure.h"
 #include "QCSXCAD.h"

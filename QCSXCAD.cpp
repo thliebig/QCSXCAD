@@ -29,6 +29,33 @@
 #endif
 #include <iostream>
 
+#include "CSPropUnknown.h"
+#include "CSPropMaterial.h"
+#include "CSPropDispersiveMaterial.h"
+#include "CSPropLorentzMaterial.h"
+#include "CSPropDiscMaterial.h"
+#include "CSPropLumpedElement.h"
+#include "CSPropMetal.h"
+#include "CSPropConductingSheet.h"
+#include "CSPropExcitation.h"
+#include "CSPropProbeBox.h"
+#include "CSPropDumpBox.h"
+#include "CSPropResBox.h"
+
+#include "CSPrimPoint.h"
+#include "CSPrimBox.h"
+#include "CSPrimMultiBox.h"
+#include "CSPrimSphere.h"
+#include "CSPrimSphericalShell.h"
+#include "CSPrimCylinder.h"
+#include "CSPrimCylindricalShell.h"
+#include "CSPrimPolygon.h"
+#include "CSPrimLinPoly.h"
+#include "CSPrimRotPoly.h"
+#include "CSPrimCurve.h"
+#include "CSPrimWire.h"
+#include "CSPrimUserDefined.h"
+
 #include <QVTKWidget.h>
 #include <vtkRendererCollection.h>
 #include <vtkRenderWindow.h>
