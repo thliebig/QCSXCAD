@@ -72,6 +72,7 @@ public slots:
 
 	void ExportProperty2PolyDataVTK(unsigned int uiID, QString filename, double scale = 1.0);
 	void ExportProperty2STL(unsigned int uiID, QString filename, double scale = 1.0);
+	void ExportProperty2PLY(unsigned int uiID, QString filename, double scale = 1.0);
 
 protected slots:
 	void RenderGridDir(int dir, unsigned int plane_pos);

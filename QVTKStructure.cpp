@@ -27,6 +27,7 @@
 #include "QVTKStructure.h"
 #include "vtkCubeSource.h"
 #include "vtkPolyDataMapper.h"
+#include "vtkCellArray.h"
 #include "vtkActor.h"
 #include "vtkFollower.h"
 #include "vtkAxes.h"
@@ -543,6 +544,41 @@ void QVTKStructure::RenderGeometry()
 					}
 					break;
 				}
+				case CSPrimitives::POLYHEDRONREADER:
+				case CSPrimitives::POLYHEDRON:
+				{
+					CSPrimPolyhedron* polyhedron = dynamic_cast<CSPrimPolyhedron*>(prim);
+					vtkCellArray *poly = vtkCellArray::New();
+					vtkPolyData* polydata=vtkPolyData::New();
+					vtkPoints *points = vtkPoints::New();
+					for (unsigned int i=0; i<polyhedron->GetNumVertices();i++)
+						points->InsertPoint(i,polyhedron->GetVertex(i));
+					unsigned int numVertex;
+					int* vertices;
+					for (unsigned int i=0; i<polyhedron->GetNumFaces();++i)
+					{
+						if (polyhedron->GetFaceValid(i)==false)
+							continue;
+						vertices=polyhedron->GetFace(i,numVertex);
+						poly->InsertNextCell(numVertex);
+						for (unsigned int p=0; p<numVertex;++p)
+							poly->InsertCellPoint(vertices[p]);
+					}
+					polydata->SetPoints(points);
+					polydata->SetPolys(poly);
+					vtkPrims->AddPolyData(polydata,rgb,(double)col.a/255.0,transform_matrix);
+					poly->Delete();
+					points->Delete();
+					polydata->Delete();
+					break;
+				}
+//				case CSPrimitives::POLYHEDRONREADER:
+//				{
+//					CSPrimPolyhedronReader* reader = prim->ToPolyhedronReader();
+//					double center[]={0,0,0};
+//					vtkPrims->AddSTLObject(reader->GetFilename().c_str(),center,rgb,(double)col.a/255.0,transform_matrix);
+//					break;
+//				}
 				case CSPrimitives::CURVE:
 				case CSPrimitives::WIRE:
 				{
@@ -617,6 +653,18 @@ void QVTKStructure::ExportProperty2STL(unsigned int uiID, QString filename, doub
 		{
 			if (LayerPrimitives.at(i).VTKProp!=NULL)
 				LayerPrimitives.at(i).VTKProp->WritePolyData2STL(filename.toStdString().c_str(), scale);
+		}
+	}
+}
+
+void QVTKStructure::ExportProperty2PLY(unsigned int uiID, QString filename, double scale)
+{
+	for (int i=0;i<LayerPrimitives.size();++i)
+	{
+		if (LayerPrimitives.at(i).uID==uiID)
+		{
+			if (LayerPrimitives.at(i).VTKProp!=NULL)
+				LayerPrimitives.at(i).VTKProp->WritePolyData2PLY(filename.toStdString().c_str(), scale);
 		}
 	}
 }
