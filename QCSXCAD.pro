@@ -45,11 +45,16 @@ SOURCES += QCSXCAD.cpp \
 win32 { 
     DEFINES += BUILD_QCSXCAD_LIB
 
-    WIN32_LIB_ROOT = ..
+    isEmpty(WIN32_LIB_ROOT) {
+        WIN32_LIB_ROOT = ..
+    }
+    isEmpty(CSXCAD_ROOT) {
+     CSXCAD_ROOT = $$WIN32_LIB_ROOT/CSXCAD
+    }
 
     # CSXCAD
-    INCLUDEPATH += $$WIN32_LIB_ROOT/CSXCAD
-    LIBS += -L$$WIN32_LIB_ROOT/CSXCAD/release -lCSXCAD0
+    INCLUDEPATH += $$CSXCAD_ROOT/include/CSXCAD
+    LIBS += -L$$CSXCAD_ROOT/lib -lCSXCAD0
 
     # #3rd party libraries#
     # tinyxml
@@ -62,16 +67,20 @@ win32 {
 }
 
 unix { 
-    INCLUDEPATH += ../CSXCAD
-    LIBS += -L../CSXCAD \
-        -lCSXCAD
+    # CSXCAD
+    isEmpty(CSXCAD_ROOT) {
+     CSXCAD_ROOT = /usr
+    }
+    INCLUDEPATH += $$CSXCAD_ROOT/include/CSXCAD
+    LIBS += -L$$CSXCAD_ROOT/lib -lCSXCAD
+
+    # #3rd party libraries#
     INCLUDEPATH += /usr/include/vtk-5.2 \
         /usr/include/vtk-5.4 \
         /usr/include/vtk-5.6 \
         /usr/include/vtk-5.8 \
         /usr/include/vtk-5.10 \
         /usr/include/vtk
-    INCLUDEPATH += /usr/include/CSXCAD
     LIBS += -lvtkCommon \
         -lvtkDICOMParser \
         -lvtkFiltering \
@@ -95,8 +104,6 @@ DEFINES += BUILD_QCSXCAD_LIB
 QMAKE_CXXFLAGS_DEBUG = -O0 -g
 
 
-
-
 #
 # create tar file
 #
@@ -109,11 +116,15 @@ QMAKE_EXTRA_TARGETS += tarball
 #
 # INSTALL
 #
+isEmpty(PREFIX) {
+ PREFIX = /usr/local
+}
 install.target = install
-install.commands = mkdir -p \"$(INSTALL_ROOT)/usr/lib$$LIB_SUFFIX\"
-install.commands += && mkdir -p \"$(INSTALL_ROOT)/usr/include/QCSXCAD\"
-install.commands += && cp -at \"$(INSTALL_ROOT)/usr/include/QCSXCAD/\" $$HEADERS
-install.commands += && cp -at \"$(INSTALL_ROOT)/usr/lib$$LIB_SUFFIX/\" libQCSXCAD.so*
+install.commands = mkdir -p \"$$PREFIX/lib$$LIB_SUFFIX\"
+install.commands += && mkdir -p \"$$PREFIX/include/QCSXCAD\"
+install.commands += && cp -at \"$$PREFIX/include/QCSXCAD/\" $$HEADERS
+unix:install.commands += && cp -at \"$$PREFIX/lib$$LIB_SUFFIX/\" libQCSXCAD.so*
+win32:install.commands += && cp -at \"$$PREFIX/lib$$LIB_SUFFIX/\" release/QCSXCAD0.dll
 
 QMAKE_EXTRA_TARGETS += install
 
