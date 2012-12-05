@@ -10,6 +10,9 @@ DEFINES += GIT_VERSION=\\\"$$GITREV\\\"
 # vtk includes deprecated header files; silence the corresponding warning
 QMAKE_CXXFLAGS += -Wno-deprecated
 
+#cgal needs
+QMAKE_CXXFLAGS += -frounding-math
+
 # remove unnecessary webkit define
 DEFINES -= QT_WEBKIT
 
