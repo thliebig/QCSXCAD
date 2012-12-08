@@ -5,6 +5,7 @@ VERSION = 0.3.1
 
 # add git revision
 GITREV = $$system(git describe --tags)
+isEmpty(GITREV):GITREV=$$VERSION
 DEFINES += GIT_VERSION=\\\"$$GITREV\\\"
 
 # vtk includes deprecated header files; silence the corresponding warning
@@ -135,7 +136,7 @@ QMAKE_EXTRA_TARGETS += tarball
 # INSTALL
 #
 isEmpty(PREFIX) {
- PREFIX = /usr/local
+    PREFIX = /usr/local
 }
 install.target = install
 install.commands = mkdir -p \"$$PREFIX/lib$$LIB_SUFFIX\"
