@@ -517,7 +517,7 @@ void QVTKStructure::RenderGeometry()
 					const double* stop  = cylinder->GetAxisStopCoord()->GetCartesianCoords();
 					const double radius = cylinder->GetRadius();
 					const double shellWidth = cylinder->GetShellWidth();
-					vtkPrims->AddCylindricalShell( start, stop, radius, shellWidth, rgb, (double)col.a/255.0, iResolution, transform_matrix );
+					vtkPrims->AddCylindricalShell( start, stop, radius-shellWidth/2, radius+shellWidth/2, rgb, (double)col.a/255.0, iResolution, transform_matrix );
 					break;
 				}
 				case CSPrimitives::POLYGON:

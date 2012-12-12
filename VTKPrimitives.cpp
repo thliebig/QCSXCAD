@@ -399,15 +399,15 @@ void VTKPrimitives::AddCylinder(const double *dCenter, const double *dExtrusionV
 	transformFilter->Delete();
 }
 
-void VTKPrimitives::AddCylindricalShell(const double *dAxisStart, const double* dAxisStop, double radius, double shellWidth, double *dRGB, double dOpacity, int iResolution, const double* tf_matrix)
+void VTKPrimitives::AddCylindricalShell(const double *dAxisStart, const double* dAxisStop, double r_i, double r_o, double *dRGB, double dOpacity, int iResolution, const double* tf_matrix)
 {
 	const double dExtrusionVector[3] = {dAxisStop[0]-dAxisStart[0], dAxisStop[1]-dAxisStart[1], dAxisStop[2]-dAxisStart[2]};
 	double length = sqrt( dExtrusionVector[0]*dExtrusionVector[0] + dExtrusionVector[1]*dExtrusionVector[1] + dExtrusionVector[2]*dExtrusionVector[2] ) ;
 
 	// create a disk in xy plane
 	vtkDiskSource *diskSource = vtkDiskSource::New();
-	diskSource->SetInnerRadius( radius - shellWidth/2.0 );
-	diskSource->SetOuterRadius( radius + shellWidth/2.0 );
+	diskSource->SetInnerRadius( r_i );
+	diskSource->SetOuterRadius( r_o );
 	diskSource->SetCircumferentialResolution(iResolution);
 
 	// extrude in +z
