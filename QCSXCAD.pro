@@ -93,12 +93,20 @@ unix {
     LIBS += -L$$CSXCAD_ROOT/lib -lCSXCAD
 
     # #3rd party libraries#
+    isEmpty(VTK_INCLUDEPATH) {
     INCLUDEPATH += /usr/include/vtk-5.2 \
         /usr/include/vtk-5.4 \
         /usr/include/vtk-5.6 \
         /usr/include/vtk-5.8 \
         /usr/include/vtk-5.10 \
         /usr/include/vtk
+    } else {
+    INCLUDEPATH += $$VTK_INCLUDEPATH
+    }
+    isEmpty(VTK_LIBRARYPATH){
+    } else {
+    LIBS +=-L$$VTK_LIBRARYPATH
+    }
     LIBS += -lvtkCommon \
         -lvtkDICOMParser \
         -lvtkFiltering \
