@@ -504,6 +504,15 @@ void QVTKStructure::RenderGeometry()
 					vtkPrims->AddSphere(sphere->GetCenter()->GetCartesianCoords(),sphere->GetRadius(),rgb,(double)col.a/255.0,iResolution,transform_matrix);
 					break;
 				}
+				case CSPrimitives::SPHERICALSHELL:
+				{
+					CSPrimSphericalShell* sphereshell = prim->ToSphericalShell();
+					const double* center = sphereshell->GetCenter()->GetCartesianCoords();
+					const double radius = sphereshell->GetRadius();
+					const double shellWidth = sphereshell->GetShellWidth();
+					vtkPrims->AddSphericalShell(center, radius-shellWidth/2, radius+shellWidth/2, rgb, (double)col.a/255.0, iResolution, transform_matrix);
+					break;
+				}
 				case CSPrimitives::CYLINDER:
 				{
 					CSPrimCylinder* cylinder = prim->ToCylinder();

@@ -52,6 +52,10 @@
 #include "vtkDiskSource.h"
 #include "vtkPLYWriter.h"
 
+#if VTK_MAJOR_VERSION==5 && VTK_MINOR_VERSION>=10
+#include "vtkBooleanOperationPolyDataFilter.h"
+#endif
+
 VTKPrimitives::VTKPrimitives(vtkRenderer *Renderer)
 {
 	ren = Renderer;
@@ -445,7 +449,7 @@ void VTKPrimitives::AddCylindricalShell(const double *dAxisStart, const double* 
 	ren->AddActor(actor);
 }
 
-void VTKPrimitives::AddSphere(const double *dCenter, float fRadius, double *dRGB, double dOpacity, int iResolution, const double* tf_matrix)
+void VTKPrimitives::AddSphere(const double *dCenter, double fRadius, double *dRGB, double dOpacity, int iResolution, const double* tf_matrix)
 {//complete
 	vtkSphereSource *Source = vtkSphereSource::New();
 	double center[3]={dCenter[0],dCenter[1],dCenter[2]};
@@ -458,6 +462,39 @@ void VTKPrimitives::AddSphere(const double *dCenter, float fRadius, double *dRGB
 
 	Source->Delete();
 }
+
+void VTKPrimitives::AddSphericalShell(const double *dCenter, double r_i, double r_o, double *dRGB, double dOpacity, int iResolution, const double* tf_matrix)
+{//complete
+#if VTK_MAJOR_VERSION==5 && VTK_MINOR_VERSION>=10
+	vtkSphereSource *Source_o = vtkSphereSource::New();
+	double center[3]={dCenter[0],dCenter[1],dCenter[2]};
+	Source_o->SetCenter(center);
+	Source_o->SetRadius(r_o);
+	Source_o->SetPhiResolution(iResolution);
+	Source_o->SetThetaResolution(iResolution);
+
+	vtkSphereSource *Source_i = vtkSphereSource::New();
+	Source_i->SetCenter(center);
+	Source_i->SetRadius(r_i);
+	Source_i->SetPhiResolution(iResolution);
+	Source_i->SetThetaResolution(iResolution);
+
+	vtkBooleanOperationPolyDataFilter* boolFilter = vtkBooleanOperationPolyDataFilter::New();
+	boolFilter->SetOperationToDifference();
+	boolFilter->SetInputConnection( 0, Source_o->GetOutput()->GetProducerPort() );
+	boolFilter->SetInputConnection( 1, Source_i->GetOutput()->GetProducerPort() );
+
+	//todo, we should remove the unnecessary scalar data produced by the filter...
+	AddPolyData(boolFilter->GetOutput(), dRGB, dOpacity, tf_matrix);
+
+	boolFilter->Delete();
+	Source_o->Delete();
+	Source_i->Delete();
+#else
+	cerr << "VTKPrimitives::AddSphericalShell: Error, spherical shell not supported by this vkt version, you require vtk 5.10 or higher." << endl;
+#endif
+}
+
 
 void VTKPrimitives::AddArrow(double *dStart, double *dEnd, double *dRGB, double dOpacity, int iResolution, const double* tf_matrix)
 {
@@ -705,8 +742,10 @@ vtkActor* VTKPrimitives::AddPolyData(vtkPolyData* polydata, double *dRGB, double
 
 	vtkPolyDataMapper *Mapper = vtkPolyDataMapper::New();
 	Mapper->SetInput(filter->GetOutput());
+	Mapper->ScalarVisibilityOff();
 	vtkActor *Actor = vtkActor::New();
 	Actor->SetMapper(Mapper);
+	Actor->GetProperty()->RemoveAllTextures();
 	Actor->GetProperty()->SetColor(dRGB);
 	Actor->GetProperty()->SetOpacity(dOpacity);
 

@@ -76,7 +76,10 @@ public:
 	void AddCylindricalShell(const double *dAxisStart, const double* dAxisStop, double r_i, double r_o, double *dRGB, double dOpacity, int iResolution, const double *tf_matrix=0);
 	/// Add a Sphere to scene
 	/*! \param *dCenter Set Center Point in 3D space \param fRadius Set Radius \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness) \param iResolution Set resolution of discretisation*/
-	void AddSphere(const double *dCenter, float fRadius, double *dRGB, double dOpacity, int iResolution, const double* tf_matrix=0);	//complete
+	void AddSphere(const double *dCenter, double fRadius, double *dRGB, double dOpacity, int iResolution, const double* tf_matrix=0);	//complete
+	/// Add a Spherical shell to scene
+	/*! \param *dCenter Set Center Point in 3D space \param r_i Set inner radius \param r_o Set outer radius \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness) \param iResolution Set resolution of discretisation*/
+	void AddSphericalShell(const double *dCenter, double r_i, double r_o, double *dRGB, double dOpacity, int iResolution, const double* tf_matrix=0);	//complete
 	/// Add an arrow to scene
 	/*! \param *dStart Set start point \param *dEnd Set end point \param *dRGB Set RGB Colors (range 0 to 1 for red, green, blue) \param dOpacity Set opacity (0 complete transparency to 1 complete opaqueness) \param iResolution Set resolution of discretisation*/
 	void AddArrow(double *dStart, double *dEnd, double *dRGB, double dOpacity, int iResolution=6, const double* tf_matrix=0);
