@@ -1,0 +1,19 @@
+Install instructions for the QCSXCAD library:
+---------------------------------------------
+
+1) Prerequirements:
+  QCSXCAD relies on a number of libraries:
+  - CSXCAD (http://openEMS.de)
+  - Qt (http://qt-project.org/)
+
+2) Build:
+  - change directory to QCSXCAD
+  - build:
+    qmake PREFIX=<path/to/install/> CSXCAD_ROOT=<path/to/CSXCAD> QCSXCAD.pro
+    make
+    make install (may require root)
+
+    Note:
+      - all path informations may be stored in a localPathes.pri
+      - the default "prefix" is /usr/local
+
