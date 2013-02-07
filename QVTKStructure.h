@@ -49,7 +49,7 @@ public:
 	void SetBackgroundColor(int r, int g, int b);
 
 	//! Set the update mode to false if this widget should not be rendered e.g. because it is hidden
-	void SetUpdateMode(bool mode) {AllowUpdate=mode;};
+	void SetUpdateMode(bool mode) {AllowUpdate=mode;}
 
 	//Callback
 	void SetCallback(vtkRenderWindowInteractor *iren);
