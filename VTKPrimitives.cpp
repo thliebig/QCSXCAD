@@ -438,7 +438,7 @@ void VTKPrimitives::AddCylindricalShell(const double *dAxisStart, const double* 
 	vtkPolyDataMapper *mapper = vtkPolyDataMapper::New();
 	mapper->SetInputConnection( transformFilter->GetOutputPort() );
 	mapper->ScalarVisibilityOff();
-	vtkActor *actor = vtkActor::New();
+	vtkActor *actor = vtkLODActor::New();
 	actor->SetMapper( mapper );
 
 	m_PolyDataCollection->AddInput( transformFilter->GetOutput());
@@ -743,7 +743,7 @@ vtkActor* VTKPrimitives::AddPolyData(vtkPolyData* polydata, double *dRGB, double
 	vtkPolyDataMapper *Mapper = vtkPolyDataMapper::New();
 	Mapper->SetInput(filter->GetOutput());
 	Mapper->ScalarVisibilityOff();
-	vtkActor *Actor = vtkActor::New();
+	vtkLODActor *Actor = vtkLODActor::New();
 	Actor->SetMapper(Mapper);
 	Actor->GetProperty()->RemoveAllTextures();
 	Actor->GetProperty()->SetColor(dRGB);

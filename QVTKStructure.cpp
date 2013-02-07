@@ -29,6 +29,7 @@
 #include "vtkPolyDataMapper.h"
 #include "vtkCellArray.h"
 #include "vtkActor.h"
+#include "vtkLODActor.h"
 #include "vtkFollower.h"
 #include "vtkAxes.h"
 #include "vtkVectorText.h"
@@ -268,7 +269,7 @@ void QVTKStructure::RenderGridDir(int dir, unsigned int plane_pos)
 		ActorGridPlane[dir]->Delete();
 	}
 
-	ActorGridPlane[dir] = vtkActor::New();
+	ActorGridPlane[dir] = vtkLODActor::New();
 	vtkPolyDataMapper *gridMapper = vtkPolyDataMapper::New();
 	vtkPolyDataAlgorithm *plane = NULL;
 
