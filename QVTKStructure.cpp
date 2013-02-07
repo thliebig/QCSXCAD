@@ -87,6 +87,7 @@ QVTKStructure::QVTKStructure()
 	m_CamData = NULL;
 
 	iResolution=32;
+	AllowUpdate=true;
 
 	VTKWidget= new QVTKWidget();
 
