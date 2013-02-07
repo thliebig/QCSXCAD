@@ -67,6 +67,8 @@ public slots:
 	void RenderGridZ(int plane_pos);
 	void RenderGeometry();
 
+	void RenderDiscMaterialModel();
+
 	//! Export the current view to an image file (currently only png)
 	void ExportView2Image();
 
@@ -102,6 +104,13 @@ protected:
 	int GridOpacity; //remember the grid opacity
 
 	int iResolution;
+
+	typedef struct
+	{
+		VTKPrimitives* vtk_model;
+		unsigned int uID;
+	} VTKDiscModel;
+	QVector<VTKDiscModel> m_DiscMatModels;
 
 	struct KeyPressData
 	{

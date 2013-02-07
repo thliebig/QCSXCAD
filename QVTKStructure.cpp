@@ -69,6 +69,8 @@
 #include "CSPrimWire.h"
 #include "CSPrimUserDefined.h"
 
+#include "CSPropDiscMaterial.h"
+
 #include "CSTransform.h"
 
 QVTKStructure::QVTKStructure()
@@ -149,6 +151,12 @@ void QVTKStructure::clear()
 		delete LayerPrimitives.at(i).VTKProp;
 	}
 	LayerPrimitives.clear();
+
+	for (int i=0;i<m_DiscMatModels.size();++i)
+	{
+		delete m_DiscMatModels.at(i).vtk_model;
+	}
+	m_DiscMatModels.clear();
 
 	for (int i=0; i<3; i++)
 	{
@@ -640,6 +648,43 @@ void QVTKStructure::RenderGeometry()
 	VTKWidget->GetRenderWindow()->GetInteractor()->Render();
 }
 
+void QVTKStructure::RenderDiscMaterialModel()
+{
+	for (int i=0;i<m_DiscMatModels.size();++i)
+	{
+		delete m_DiscMatModels.at(i).vtk_model;
+	}
+	m_DiscMatModels.clear();
+
+	if (clCS==NULL) return;
+
+	for (unsigned int i=0;i<clCS->GetQtyProperties();++i)
+	{
+		CSProperties* prop = clCS->GetProperty(i);
+		CSPropDiscMaterial* dm_prop = prop->ToDiscMaterial();
+		if (dm_prop)
+		{
+			VTKDiscModel model;
+			VTKPrimitives* vtkPrims= new VTKPrimitives(ren);
+			model.vtk_model = vtkPrims;
+			model.uID = dm_prop->GetUniqueID();
+			m_DiscMatModels.append(model);
+			vtkPolyData* polydata = dm_prop->CreatePolyDataModel();
+
+			double rgb[3] = {1,1,1};
+			CSTransform* transform = new CSTransform(dm_prop->GetTransform());
+			transform->SetPreMultiply();
+			transform->Scale(dm_prop->GetScale());
+			double* transform_matrix = NULL;
+			if (transform)
+				transform_matrix = transform->GetMatrix();
+			vtkPrims->AddPolyData(polydata,rgb,1.0,transform_matrix);
+			delete transform;
+		}
+	}
+	VTKWidget->GetRenderWindow()->GetInteractor()->Render();
+}
+
 void QVTKStructure::ExportView2Image()
 {
 	QString filename = QFileDialog::getSaveFileName(VTKWidget, tr("Choose file to save image"), QString(), tr("Images (*.png)"));
@@ -665,7 +710,22 @@ void QVTKStructure::ExportProperty2PolyDataVTK(unsigned int uiID, QString filena
 		if (LayerPrimitives.at(i).uID==uiID)
 		{
 			if (LayerPrimitives.at(i).VTKProp!=NULL)
-				LayerPrimitives.at(i).VTKProp->WritePolyData2File(filename.toStdString().c_str(), scale);
+			{
+				QString name = filename + ".vtp";
+				LayerPrimitives.at(i).VTKProp->WritePolyData2File(name.toStdString().c_str(), scale);
+			}
+		}
+	}
+
+	for (int i=0;i<m_DiscMatModels.size();++i)
+	{
+		if (m_DiscMatModels.at(i).uID==uiID)
+		{
+			if (m_DiscMatModels.at(i).vtk_model!=NULL)
+			{
+				QString name = filename + "_DiscMaterial" + ".vtp";
+				m_DiscMatModels.at(i).vtk_model->WritePolyData2File(name.toStdString().c_str(), scale);
+			}
 		}
 	}
 }
@@ -677,7 +737,10 @@ void QVTKStructure::ExportProperty2STL(unsigned int uiID, QString filename, doub
 		if (LayerPrimitives.at(i).uID==uiID)
 		{
 			if (LayerPrimitives.at(i).VTKProp!=NULL)
-				LayerPrimitives.at(i).VTKProp->WritePolyData2STL(filename.toStdString().c_str(), scale);
+			{
+				QString name = filename + ".stl";
+				LayerPrimitives.at(i).VTKProp->WritePolyData2STL(name.toStdString().c_str(), scale);
+			}
 		}
 	}
 }
@@ -689,7 +752,10 @@ void QVTKStructure::ExportProperty2PLY(unsigned int uiID, QString filename, doub
 		if (LayerPrimitives.at(i).uID==uiID)
 		{
 			if (LayerPrimitives.at(i).VTKProp!=NULL)
-				LayerPrimitives.at(i).VTKProp->WritePolyData2PLY(filename.toStdString().c_str(), scale);
+			{
+				QString name = filename + ".ply";
+				LayerPrimitives.at(i).VTKProp->WritePolyData2PLY(name.toStdString().c_str(), scale);
+			}
 		}
 	}
 }

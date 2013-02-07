@@ -45,8 +45,12 @@ public:
 	void SetEdit(bool val) {m_EnableEdit=val;}
 	bool GetEdit() {return m_EnableEdit;}
 
+	void SetRenderDiscMaterial(bool val) {m_EnableEdit=val;}
+	bool GetRenderDiscMaterial() {return m_EnableEdit;}
+
 protected:
 	bool m_EnableEdit;
+	bool m_RenderDiscMat;
 };
 
 extern QCSXCAD_EXPORT QCSXCAD_Global QCSX_Settings;

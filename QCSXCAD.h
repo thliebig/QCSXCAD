@@ -93,6 +93,8 @@ public slots:
 
 	void ExportView2Image();
 
+	void EnableDiscModelRendering(bool val=true);
+
 	virtual void clear();
 	void New();
 
@@ -148,6 +150,8 @@ protected:
 	TiXmlNode* FindRootNode(TiXmlNode* node);
 
 	void SetVisibility2All(bool value);
+
+	bool m_RenderDiscModels;
 
 	QCSTreeWidget *CSTree;
 	QCSGridEditor* GridEditor;

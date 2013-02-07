@@ -94,6 +94,8 @@ QCSXCAD::QCSXCAD(QWidget *parent) : QMainWindow(parent)
 
 	ViewLevel=VIEW_2D;
 
+	m_RenderDiscModels = QCSX_Settings.GetRenderDiscMaterial();
+
 	StructureVTK = new QVTKStructure();
 	StructureVTK->SetGeometry(this);
 
@@ -695,7 +697,11 @@ void QCSXCAD::setModified()
 	bModified=true;
 	emit modified(true);
 	DrawWidget->update();
-	if (StackWidget->currentIndex()==1) StructureVTK->RenderGeometry();
+	if (StackWidget->currentIndex()==1)
+	{
+		StructureVTK->RenderGeometry();
+		StructureVTK->RenderDiscMaterialModel();
+	}
 }
 
 void QCSXCAD::DetectEdges(int nu)
@@ -874,15 +880,12 @@ void QCSXCAD::ExportGeometry(QString dirname, int type)
 			switch (type)
 			{
 			case 0:
-				filename.append(".vtp");
 				StructureVTK->ExportProperty2PolyDataVTK(uID,filename,clGrid.GetDeltaUnit());
 				break;
 			case 1:
-				filename.append(".stl");
 				StructureVTK->ExportProperty2STL(uID,filename,clGrid.GetDeltaUnit());
 				break;
 			case 2:
-				filename.append(".ply");
 				StructureVTK->ExportProperty2PLY(uID,filename,clGrid.GetDeltaUnit());
 				break;
 			default:
@@ -915,6 +918,11 @@ void QCSXCAD::ExportView2Image()
 		StructureVTK->ExportView2Image();
 	else
 		QMessageBox::warning(this,tr("PNG export"),tr("Not Yet Implemented for 2D view, use 3D instead."),QMessageBox::Ok,QMessageBox::NoButton);
+}
+
+void QCSXCAD::EnableDiscModelRendering(bool val)
+{
+	m_RenderDiscModels = val;
 }
 
 void QCSXCAD::GUIUpdate()
@@ -1042,6 +1050,8 @@ void QCSXCAD::View3D()
 	StructureVTK->SetUpdateMode(true);
 	StructureVTK->RenderGrid();
 	StructureVTK->RenderGeometry();
+	if (m_RenderDiscModels)
+		StructureVTK->RenderDiscMaterialModel();
 }
 
 void QCSXCAD::keyPressEvent(QKeyEvent * event)

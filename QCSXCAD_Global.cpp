@@ -28,11 +28,13 @@ QCSXCAD_Global QCSX_Settings;
 QCSXCAD_Global::QCSXCAD_Global()
 {
 	m_EnableEdit = true;
+	m_RenderDiscMat = false;
 }
 
 void QCSXCAD_Global::ShowArguments(ostream& ostr, string front)
 {
 	ostr << front << "--disableEdit\tDisable Edit" << endl;
+	ostr << front << "--RenderDiscMaterial\tRender discrete material" << endl;
 }
 
 bool QCSXCAD_Global::parseCommandLineArgument( QString argv )
@@ -44,6 +46,12 @@ bool QCSXCAD_Global::parseCommandLineArgument( QString argv )
 	{
 		cout << "QCSXCAD - disabling editing" << endl;
 		SetEdit(false);
+		return true;
+	}
+	if (argv.compare("--RenderDiscMaterial")==0)
+	{
+		cout << "QCSXCAD - Render discrete material" << endl;
+		SetRenderDiscMaterial(true);
 		return true;
 	}
 //	cerr << "QCSXCAD_Global::parseCommandLineArgument: Warning, unknown argument: " << argv.toStdString() << endl;
