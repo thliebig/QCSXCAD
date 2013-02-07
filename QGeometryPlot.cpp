@@ -379,7 +379,7 @@ void QGeometryPlot::paintEvent(QPaintEvent * /* event */)
 					int nPP = (direct+2)%3;
 					for (unsigned int n=0;n<nrPts;++n)
 					{
-						curve->GetPoint(n,xyz);
+						curve->GetPoint(n,xyz, CARTESIAN);
 						points[n].setX((xyz[nP]-offsetX)/factor);
 						points[n].setY(height()-(xyz[nPP]-offsetY)/factor);
 					}

@@ -121,7 +121,7 @@ void export_pov::export_properties( QTextStream &stream, vector<CSProperties*> p
 				size_t count  = primitive->GetNumberOfPoints();
 				double *array = new double[count*3];
 				for (unsigned int i=0; i<count; i++)
-					primitive->GetPoint(i,array+i*3);
+					primitive->GetPoint(i,array+i*3, CARTESIAN);
 				export_wire( stream, count, array, radius, default_obj_modifier );
 				delete[] array;
 			}
@@ -132,7 +132,7 @@ void export_pov::export_properties( QTextStream &stream, vector<CSProperties*> p
 				size_t count  = primitive->GetNumberOfPoints();
 				double *array = new double[count*3];
 				for (unsigned int i=0; i<count; i++)
-					primitive->GetPoint(i,array+i*3);
+					primitive->GetPoint(i,array+i*3, CARTESIAN);
 				export_wire( stream, count, array, radius, default_obj_modifier );
 				delete[] array;
 			}
