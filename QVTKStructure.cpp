@@ -79,7 +79,7 @@ QVTKStructure::QVTKStructure()
 	m_Rect_Grid = NULL;
 	m_Struct_Grid = NULL;
 
-	iResolution=16;
+	iResolution=32;
 
 	ren = vtkRenderer::New();
 
