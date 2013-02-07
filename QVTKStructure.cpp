@@ -691,7 +691,6 @@ void QVTKStructure::ExportView2Image()
 
 	if (filename.isEmpty())
 		return;
-	filename += ".png";
 
 	vtkWindowToImageFilter* filter = vtkWindowToImageFilter::New();
 	filter->SetInput(VTKWidget->GetRenderWindow());
