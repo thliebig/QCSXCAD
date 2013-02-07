@@ -67,6 +67,15 @@ public slots:
 	void RenderGridZ(int plane_pos);
 	void RenderGeometry();
 
+	//! Enable/Disable 3D parallel projection
+	void SetParallelProjection(bool val, bool render=true);
+
+	//! Enable/Disable 2D interaction style
+	void Set2DInteractionStyle(bool val, bool render=true);
+
+	void SaveCamData();
+	void RestoreCamData(bool render);
+
 	void RenderDiscMaterialModel();
 
 	//! Export the current view to an image file (currently only png)
@@ -111,6 +120,15 @@ protected:
 		unsigned int uID;
 	} VTKDiscModel;
 	QVector<VTKDiscModel> m_DiscMatModels;
+
+	typedef struct
+	{
+		double pos[3];
+		double focalPoint[3];
+		double viewUp[3];
+		double viewAngle;
+	} CamData;
+	CamData* m_CamData;
 
 	struct KeyPressData
 	{

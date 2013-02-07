@@ -53,6 +53,9 @@
 #include "vtkPNGWriter.h"
 #include <vtkStructuredGrid.h>
 #include <vtkStructuredGridGeometryFilter.h>
+#include <vtkCamera.h>
+#include <vtkInteractorStyleTrackballCamera.h>
+#include <vtkInteractorStyleRubberBand2D.h>
 
 #include "CSPrimPoint.h"
 #include "CSPrimBox.h"
@@ -81,15 +84,14 @@ QVTKStructure::QVTKStructure()
 	ActorGridPlane[2]=NULL;
 	m_Rect_Grid = NULL;
 	m_Struct_Grid = NULL;
+	m_CamData = NULL;
 
 	iResolution=32;
 
-	ren = vtkRenderer::New();
-
 	VTKWidget= new QVTKWidget();
 
-  	ren = vtkRenderer::New();
-  	VTKWidget->GetRenderWindow()->AddRenderer(ren);
+	ren = vtkRenderer::New();
+	VTKWidget->GetRenderWindow()->AddRenderer(ren);
 
 	AddAxes();
 	SetBackgroundColor(255,255,255);
@@ -381,7 +383,7 @@ void QVTKStructure::SetGridOpacity(int val)
 	{
 		if (ActorGridPlane[i]!=NULL) ActorGridPlane[i]->GetProperty()->SetOpacity((double)val/255.0);
 	}
-    VTKWidget->GetRenderWindow()->GetInteractor()->Render();
+	VTKWidget->GetRenderWindow()->GetInteractor()->Render();
 }
 
 void QVTKStructure::ResetView()
@@ -684,6 +686,56 @@ void QVTKStructure::RenderDiscMaterialModel()
 	}
 	VTKWidget->GetRenderWindow()->GetInteractor()->Render();
 }
+
+void QVTKStructure::SetParallelProjection(bool val, bool render)
+{
+	vtkCamera* cam = ren->GetActiveCamera();
+	cam->SetParallelProjection(val);
+
+	if (render)
+		VTKWidget->GetRenderWindow()->GetInteractor()->Render();
+}
+
+void QVTKStructure::Set2DInteractionStyle(bool val, bool render)
+{
+	if (val)
+		VTKWidget->GetRenderWindow()->GetInteractor()->SetInteractorStyle(vtkInteractorStyleRubberBand2D::New());
+	else
+		VTKWidget->GetRenderWindow()->GetInteractor()->SetInteractorStyle(vtkInteractorStyleTrackballCamera::New());
+
+	if (render)
+		VTKWidget->GetRenderWindow()->GetInteractor()->Render();
+}
+
+void QVTKStructure::SaveCamData()
+{
+	if (m_CamData==NULL)
+		m_CamData = new CamData;
+
+	vtkCamera *Camera = ren->GetActiveCamera();
+
+	Camera->GetPosition(m_CamData->pos);
+	Camera->GetFocalPoint(m_CamData->focalPoint);
+	Camera->GetViewUp(m_CamData->viewUp);
+	m_CamData->viewAngle = Camera->GetViewAngle();
+}
+
+void QVTKStructure::RestoreCamData(bool render)
+{
+	if (m_CamData==NULL)
+		return;
+
+	vtkCamera *Camera = ren->GetActiveCamera();
+	Camera->SetPosition( m_CamData->pos );
+	Camera->SetFocalPoint( m_CamData->focalPoint );
+	Camera->SetViewUp( m_CamData->viewUp );
+	Camera->SetViewAngle( m_CamData->viewAngle );
+	Camera->Modified();
+
+	if (render)
+		VTKWidget->GetRenderWindow()->GetInteractor()->Render();
+}
+
 
 void QVTKStructure::ExportView2Image()
 {
