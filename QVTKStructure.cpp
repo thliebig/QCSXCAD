@@ -618,7 +618,7 @@ void QVTKStructure::RenderGeometry()
 					bool isCurve = (prim->GetType()==CSPrimitives::CURVE);
 					for (unsigned int n=0;n<nrP;++n)
 					{
-						curve->GetPoint(n,xyz,isCurve);
+						curve->GetPoint(n,xyz,CARTESIAN,isCurve);
 						dCoords[0*nrP+n] = xyz[0];
 						dCoords[1*nrP+n] = xyz[1];
 						dCoords[2*nrP+n] = xyz[2];
