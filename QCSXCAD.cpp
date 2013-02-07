@@ -69,22 +69,6 @@
 
 QCSXCAD::QCSXCAD(QWidget *parent) : QMainWindow(parent)
 {
-//	QFilename.clear();
-//	relPath.clear();
-
-//	QPushButton* GeometryBrowse = new QPushButton(tr("Browse Geometry"));
-//	//GeometryLine->setFixedWidth(LineWidth);
-//	QObject::connect(GeometryBrowse,SIGNAL(clicked()),this,SLOT(browseGeometryFile()));
-
-
-//	QGridLayout* Layout = new QGridLayout();
-//	File_Lbl = new QLabel("None");
-//	Layout->addWidget(File_Lbl,1,1,1,2);
-//	Layout->addWidget(GeometryBrowse,2,1);
-//	//Layout->addWidget(qTree,3,1);
-//	Layout->setColumnStretch(3,1);
-//	Layout->setRowStretch(4,1);
-
 	QStringList argList=qApp->arguments();
 	for (int i=1;i<argList.size();++i)
 	{
@@ -92,26 +76,16 @@ QCSXCAD::QCSXCAD(QWidget *parent) : QMainWindow(parent)
 			QCSX_Settings.parseCommandLineArgument(argList.at(i));
 	}
 
-	ViewLevel=VIEW_2D;
+	m_ViewDir = 2;
 
 	m_RenderDiscModels = QCSX_Settings.GetRenderDiscMaterial();
 
 	StructureVTK = new QVTKStructure();
 	StructureVTK->SetGeometry(this);
 
-	StackWidget = new QStackedWidget();
-
-	DrawWidget = new QGeometryPlot(this);
-	StackWidget->addWidget(DrawWidget);
-	StackWidget->addWidget(StructureVTK->GetVTKWidget());
-
-	setCentralWidget(StackWidget);
-	DrawWidget->SetStatusBar(statusBar());
-//	centralWidget()->setLayout(Layout);
+	setCentralWidget(StructureVTK->GetVTKWidget());
 
 	CSTree = new QCSTreeWidget(this);
-	QObject::connect(CSTree,SIGNAL(itemSelectionChanged()),DrawWidget,SLOT(update()));
-
 	QObject::connect(CSTree,SIGNAL(Edit()),this,SLOT(Edit()));
 	QObject::connect(CSTree,SIGNAL(Copy()),this,SLOT(Copy()));
 	QObject::connect(CSTree,SIGNAL(ShowHide()),this,SLOT(ShowHide()));
@@ -138,7 +112,6 @@ QCSXCAD::QCSXCAD(QWidget *parent) : QMainWindow(parent)
 	addDockWidget(Qt::LeftDockWidgetArea,dock);
 
 	GridEditor = new QCSGridEditor(&clGrid);
-	QObject::connect(GridEditor,SIGNAL(OpacityChange(int)),DrawWidget,SLOT(setGridOpacity(int)));
 	QObject::connect(GridEditor,SIGNAL(OpacityChange(int)),StructureVTK,SLOT(SetGridOpacity(int)));
 	QObject::connect(GridEditor,SIGNAL(signalDetectEdges(int)),this,SLOT(DetectEdges(int)));
 	QObject::connect(GridEditor,SIGNAL(GridChanged()),StructureVTK,SLOT(RenderGrid()));
@@ -176,6 +149,7 @@ QCSXCAD::QCSXCAD(QWidget *parent) : QMainWindow(parent)
 
 	bModified=true;
 	GridEditor->SetOpacity(30);
+	Render();
 }
 
 QCSXCAD::~QCSXCAD()
@@ -539,12 +513,8 @@ void QCSXCAD::SetVisibility2All(bool value)
 		CSProperties* prop = vProperties.at(n);
 		prop->SetVisibility(value);
 		CSTree->RefreshItem(GetIndex(prop));
-		if (ViewLevel==VIEW_2D) DrawWidget->update();
-		if (ViewLevel==VIEW_3D)
-		{
-			if (value) StructureVTK->SetPropOpacity(prop->GetUniqueID(),prop->GetFillColor().a);
-			else StructureVTK->SetPropOpacity(prop->GetUniqueID(),0);
-		}
+		if (value) StructureVTK->SetPropOpacity(prop->GetUniqueID(),prop->GetFillColor().a);
+		else StructureVTK->SetPropOpacity(prop->GetUniqueID(),0);
 	}
 }
 
@@ -558,6 +528,10 @@ void QCSXCAD::ShowAll()
 	SetVisibility2All(true);
 }
 
+void QCSXCAD::SetParallelProjection(bool val)
+{
+	StructureVTK->SetParallelProjection(val);
+}
 
 void QCSXCAD::ShowHide()
 {
@@ -566,12 +540,8 @@ void QCSXCAD::ShowHide()
 	{
 		prop->SetVisibility(!prop->GetVisibility());
 		CSTree->RefreshItem(GetIndex(prop));
-		if (ViewLevel==VIEW_2D) DrawWidget->update();
-		if (ViewLevel==VIEW_3D)
-		{
-			if (prop->GetVisibility()) StructureVTK->SetPropOpacity(prop->GetUniqueID(),prop->GetFillColor().a);
-			else StructureVTK->SetPropOpacity(prop->GetUniqueID(),0);
-		}
+		if (prop->GetVisibility()) StructureVTK->SetPropOpacity(prop->GetUniqueID(),prop->GetFillColor().a);
+		else StructureVTK->SetPropOpacity(prop->GetUniqueID(),0);
 	}
 }
 
@@ -656,7 +626,6 @@ void QCSXCAD::NewPrimitive(CSPrimitives* newPrim)
 	{
 		AddPrimitive(newPrim);
 		setModified();
-		//CSTree->UpdateTree();
 		CSTree->AddPrimItem(newPrim);
 	}
 	else delete newPrim;
@@ -696,12 +665,7 @@ void QCSXCAD::setModified()
 {
 	bModified=true;
 	emit modified(true);
-	DrawWidget->update();
-	if (StackWidget->currentIndex()==1)
-	{
-		StructureVTK->RenderGeometry();
-		StructureVTK->RenderDiscMaterialModel();
-	}
+	Render();
 }
 
 void QCSXCAD::DetectEdges(int nu)
@@ -711,41 +675,42 @@ void QCSXCAD::DetectEdges(int nu)
 
 void QCSXCAD::BestView()
 {
-	if (ViewLevel==VIEW_2D)
+	StructureVTK->ResetView();
+}
+
+void QCSXCAD::setViewDir(int dir)
+{
+	switch (dir)
 	{
-		double area[6];
-		double* SimArea=clGrid.GetSimArea();
-		double* ObjArea=GetObjectArea();
-		for (int i=0;i<3;++i)
-		{
-			area[2*i]=SimArea[2*i];
-	//		if (area[2*i]>clGrid.GetLine(i,0)) area[2*i]=clGrid.GetLine(i,0);
-			if (ObjArea[2*i]<area[2*i]) area[2*i]=ObjArea[2*i];
-			area[2*i+1]=SimArea[2*i+1];
-	//		if (area[2*i+1]<clGrid.GetLine(i,clGrid.GetQtyLines(i)-1)) area[2*i+1]=clGrid.GetLine(i,clGrid.GetQtyLines(i)-1);
-			if (ObjArea[2*1+1]>area[2*i+1]) area[2*i+1]=ObjArea[2*i+1];
-		}
-		DrawWidget->setDrawArea(area);
+	default:
+	case 0:
+		setYZ();
+		return;
+	case 1:
+		setZX();
+		return;
+	case 2:
+		setXY();
+		return;
 	}
-	else StructureVTK->ResetView();
 }
 
 void QCSXCAD::setXY()
 {
-	if (ViewLevel==VIEW_3D) StructureVTK->setXY();
-	else DrawWidget->setXY();
+	m_ViewDir = 2;
+	StructureVTK->setXY();
 }
 
 void QCSXCAD::setYZ()
 {
-	if (ViewLevel==VIEW_3D) StructureVTK->setYZ();
-	else DrawWidget->setYZ();
+	m_ViewDir = 0;
+	StructureVTK->setYZ();
 }
 
 void QCSXCAD::setZX()
 {
-	if (ViewLevel==VIEW_3D) StructureVTK->setZX();
-	else DrawWidget->setZX();
+	m_ViewDir = 1;
+	StructureVTK->setZX();
 }
 
 void QCSXCAD::SetSimMode(int mode)
@@ -1014,54 +979,69 @@ void QCSXCAD::BuildToolBar()
 	newObjct->setObjectName("Zoom_ToolBar");
 
 	newAct = newObjct->addAction(QIcon(":/images/viewmagfit.png"),tr("Zoom fit"),this,SLOT(BestView()));
+	newAct->setToolTip("Zoom to best fit all objects");
 
-	viewPlane[2] = newObjct->addAction(GridEditor->GetNormName(2),this,SLOT(setXY()));
 	viewPlane[0] = newObjct->addAction(GridEditor->GetNormName(0),this,SLOT(setYZ()));
+	viewPlane[0]->setToolTip(tr("Switch to y-z-plane view (x-normal)"));
 	viewPlane[1] = newObjct->addAction(GridEditor->GetNormName(1),this,SLOT(setZX()));
+	viewPlane[1]->setToolTip(tr("Switch to z-x-plane view (y-normal)"));
+	viewPlane[2] = newObjct->addAction(GridEditor->GetNormName(2),this,SLOT(setXY()));
+	viewPlane[2]->setToolTip(tr("Switch to x-y-plane view (z-normal)"));
 
 	addToolBarBreak();
 
 	QActionGroup* ActViewGrp = new QActionGroup(this);
 	newAct = newObjct->addAction(tr("2D"),this,SLOT(View2D()));
+	newAct->setToolTip(tr("Switch to 2D view mode"));
 	ActViewGrp->addAction(newAct);
 	newAct->setCheckable(true);
 	newAct = newObjct->addAction(tr("3D"),this,SLOT(View3D()));
-	newAct->setCheckable(true);
+	newAct->setToolTip(tr("Switch to 3D view mode"));
 	ActViewGrp->addAction(newAct);
+	newAct->setCheckable(true);
+	m_PPview = newObjct->addAction(tr("PP"));
+	m_PPview->setToolTip(tr("Toggle parallel projection view mode"));
+	QObject::connect(m_PPview,SIGNAL(toggled(bool)),this,SLOT(SetParallelProjection(bool)));
+	m_PPview->setCheckable(true);
 
 	if (QCSX_Settings.GetEdit())
 		addToolBar(GridEditor->BuildToolbar());
 }
 
+void QCSXCAD::Render()
+{
+	StructureVTK->RenderGrid();
+	StructureVTK->RenderGeometry();
+	if (m_RenderDiscModels)
+		StructureVTK->RenderDiscMaterialModel();
+
+}
+
 void QCSXCAD::View2D()
 {
-	if (clGrid.GetMeshType()==CYLINDRICAL)
-		QMessageBox::warning(this, tr("2D View Mode Warning"),tr("The 2D view mode is not yet adepted to handle a cylindrical mesh and some primitives defined with cylindrical coordinates."));
 	ViewLevel=VIEW_2D;
-	StackWidget->setCurrentIndex(ViewLevel);
-	StructureVTK->SetUpdateMode(false);
+	StructureVTK->SaveCamData();
+	setViewDir(m_ViewDir);
+	StructureVTK->SetParallelProjection(true, false);
+	StructureVTK->Set2DInteractionStyle(true);
+	m_PPview->setDisabled(true);
 }
 
 void QCSXCAD::View3D()
 {
 	ViewLevel=VIEW_3D;
 
-	StackWidget->setCurrentIndex(ViewLevel);
-	StructureVTK->SetUpdateMode(true);
-	StructureVTK->RenderGrid();
-	StructureVTK->RenderGeometry();
-	if (m_RenderDiscModels)
-		StructureVTK->RenderDiscMaterialModel();
+	m_PPview->setDisabled(false);
+	StructureVTK->SetParallelProjection(m_PPview->isChecked(), false);
+	StructureVTK->Set2DInteractionStyle(false, false);
+	StructureVTK->RestoreCamData(true);
 }
 
 void QCSXCAD::keyPressEvent(QKeyEvent * event)
 {
 	if (event->key()==Qt::Key_Delete) Delete();
 	if (event->key()==Qt::Key_Escape)
-	{
 		CSTree->setCurrentItem(NULL);
-		DrawWidget->Reset();
-	}
 	QMainWindow::keyPressEvent(event);
 }
 

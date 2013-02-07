@@ -19,7 +19,6 @@
 #define _QCSXCAD_H_
 
 #include <QtGui>
-#include "QGeometryPlot.h"
 #include "QCSXCAD_Global.h"
 #include "ContinuousStructure.h"
 using namespace std;
@@ -95,13 +94,18 @@ public slots:
 
 	void EnableDiscModelRendering(bool val=true);
 
+	void Render();
 	virtual void clear();
 	void New();
 
 	void HideAll();
 	void ShowAll();
 
+	//! Enable/Disable 3D parallel projection for the 3D vtk viewer
+	void SetParallelProjection(bool val);
+
 	void BestView();
+	void setViewDir(int dir);
 	void setXY();
 	void setYZ();
 	void setZX();
@@ -155,17 +159,17 @@ protected:
 
 	QCSTreeWidget *CSTree;
 	QCSGridEditor* GridEditor;
-	QGeometryPlot* DrawWidget;
 	QParameterSet* QParaSet;
 
 	QVTKStructure* StructureVTK;
-	QStackedWidget* StackWidget;
 
 	QAction* viewPlane[3];
 	void BuildToolBar();
 
 	bool bModified;
 	ViewMode ViewLevel;
+	QAction* m_PPview;
+	int m_ViewDir;
 	int m_SimMode;
 
 	virtual void keyPressEvent(QKeyEvent * event);
