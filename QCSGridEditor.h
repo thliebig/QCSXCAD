@@ -35,6 +35,8 @@ public:
 	QString GetDirName(int ny);
 	QString GetNormName(int ny);
 
+	int GetOpacity();
+
 signals:
 	void OpacityChange(int);
 	void signalDetectEdges(int);

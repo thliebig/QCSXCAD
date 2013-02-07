@@ -567,6 +567,11 @@ void QCSGridEditor::SetOpacity(int val)
 	OpacitySlider->setValue(val);
 }
 
+int QCSGridEditor::GetOpacity()
+{
+	return OpacitySlider->value();
+}
+
 QString QCSGridEditor::GetDirName(int ny)
 {
 	if (clGrid->GetMeshType()==0)
