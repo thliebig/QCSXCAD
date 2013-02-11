@@ -55,6 +55,7 @@
 #include <vtkStructuredGridGeometryFilter.h>
 #include <vtkCamera.h>
 #include <vtkInteractorStyleTrackballCamera.h>
+#include "vtkInteractorStyleRubberBand2DPlane.h"
 #include <vtkInteractorStyleRubberBand2D.h>
 
 #include "CSPrimPoint.h"
@@ -700,7 +701,7 @@ void QVTKStructure::SetParallelProjection(bool val, bool render)
 void QVTKStructure::Set2DInteractionStyle(bool val, bool render)
 {
 	if (val)
-		VTKWidget->GetRenderWindow()->GetInteractor()->SetInteractorStyle(vtkInteractorStyleRubberBand2D::New());
+		VTKWidget->GetRenderWindow()->GetInteractor()->SetInteractorStyle(vtkInteractorStyleRubberBand2DPlane::New());
 	else
 		VTKWidget->GetRenderWindow()->GetInteractor()->SetInteractorStyle(vtkInteractorStyleTrackballCamera::New());
 
