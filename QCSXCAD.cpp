@@ -829,6 +829,8 @@ void QCSXCAD::ExportGeometry(QString dirname, int type)
 {
 	if (dirname.isEmpty())
 		dirname = QFileDialog::getExistingDirectory(this, tr("Choose directory to save data"));
+	if (dirname.isEmpty())
+		return;
 	int QtyProp = GetQtyProperties();
 	for (int i=0;i<QtyProp;++i)
 	{
