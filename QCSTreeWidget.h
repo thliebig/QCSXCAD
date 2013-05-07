@@ -81,6 +81,8 @@ protected:
 //	void BuildContextMenu();
 	ContinuousStructure* clCS;
 	
+	QTreeWidgetItem* GetTreeItemByPrimID(int primID);
+	int GetTreeItemIndexByPrimID(int primID);
 	QVector<QTreeWidgetItem*> vPrimItems;
 	
 };

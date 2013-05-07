@@ -56,11 +56,14 @@ CSPrimitives* QCSTreeWidget::GetCurrentPrimitive()
 
 void QCSTreeWidget::AddPrimItem(CSPrimitives* prim)
 {
-	if (prim==NULL) return;
+	if (prim==NULL)
+		return;
 	int propID=clCS->GetIndex(prim->GetProperty());
-	if (propID<0) return;
+	if (propID<0)
+		return;
 	QTreeWidgetItem* parent = topLevelItem(propID);
-	if (parent==NULL) return;
+	if (parent==NULL)
+		return;
 	QString str = QString(prim->GetTypeName().c_str());
 
 	str+=QString(" - ID: %1").arg(prim->GetID());
@@ -82,15 +85,31 @@ void QCSTreeWidget::AddPropItem(CSProperties* prop)
 	else newItem->setIcon(1,QIcon(":/images/bulb_off.png"));
 }
 	
+
+QTreeWidgetItem* QCSTreeWidget::GetTreeItemByPrimID(int primID)
+{
+	for (int n=0;n<vPrimItems.size();++n)
+		if (vPrimItems.at(n)->data(0,1).toInt()==primID)
+			return vPrimItems.at(n);
+	return NULL;
+}
+
+int QCSTreeWidget::GetTreeItemIndexByPrimID(int primID)
+{
+	for (int n=0;n<vPrimItems.size();++n)
+		if (vPrimItems.at(n)->data(0,1).toInt()==primID)
+			return n;
+	return -1;
+}
+
 void QCSTreeWidget::DeletePrimItem(CSPrimitives* prim)
 {
-	int index=clCS->GetIndex(prim);
-	QTreeWidgetItem *item=NULL;
-	if ((index>=0) && (index<vPrimItems.size())) item=vPrimItems.at(index);
+	int index=GetTreeItemIndexByPrimID(prim->GetID());
+	QTreeWidgetItem* item;
+	if ((index>=0) && (index<vPrimItems.size()))
+		item=vPrimItems.at(index);
 	else return;
-	//QTreeWidgetItem *parent=item->parent();
 	vPrimItems.remove(index);
-	//if (parent==NULL) return;
 	delete item;
 }
 
@@ -162,13 +181,10 @@ void QCSTreeWidget::UpdateTree()
 		if (prop==NULL) break;
 		AddPropItem(prop);
 	}
-	for (size_t i=0;i<clCS->GetQtyPrimitives();++i)
-	{
-		QString str;
-		CSPrimitives* prim=clCS->GetPrimitive(i);
-		if (prim==NULL) break;
-		AddPrimItem(prim);
-	}
+
+	vector<CSPrimitives*> vPrims = clCS->GetAllPrimitives();
+	for (size_t i=0;i<vPrims.size();++i)
+		AddPrimItem(vPrims.at(i));
 }
 
 void QCSTreeWidget::ClearTree()
@@ -179,19 +195,22 @@ void QCSTreeWidget::ClearTree()
 
 void QCSTreeWidget::SwitchProperty(CSPrimitives* prim, CSProperties* newProp)
 {
-	int index=clCS->GetIndex(prim);
+	int index=GetTreeItemIndexByPrimID(prim->GetID());
 	QTreeWidgetItem *item=NULL;
-	if ((index>=0) && (index<vPrimItems.size())) item=vPrimItems.at(index);	
-	else return;
+	if ((index>=0) && (index<vPrimItems.size()))
+		item=vPrimItems.at(index);
+	else
+		return;
 
 	QTreeWidgetItem *parent=item->parent();
-	if (parent==NULL) return;
+	if (parent==NULL)
+		return;
 	QTreeWidgetItem *newParent = topLevelItem(clCS->GetIndex(newProp));
-	if (newParent==NULL) return;
+	if (newParent==NULL)
+		return;
 
 	parent->takeChild(parent->indexOfChild(item));
 	newParent->addChild(item);
-	
 }
 
 void QCSTreeWidget::collapseAll()

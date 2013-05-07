@@ -63,7 +63,6 @@ public:
 	virtual bool ReadFile(QString filename);
 	bool ReadNode(TiXmlNode* root);
 
-	int GetCurrentPrimitive();
 	int GetCurrentProperty();
 
 	ParameterSet* GetParaSet();

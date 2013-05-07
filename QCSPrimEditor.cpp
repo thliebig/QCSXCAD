@@ -108,7 +108,14 @@ void QCSPrimEditor::Reset()
 void QCSPrimEditor::Save()
 {
 	CSPrim->SetPriority(PrioSpinBox->value());
-	CSPrim->SetProperty(clCS->GetProperty((unsigned int)PropertiesComboBox->currentIndex()));
+	CSProperties* prop = clCS->GetProperty((unsigned int)PropertiesComboBox->currentIndex());
+	if (prop==NULL)
+	{
+		cerr << __func__ << ": Error, property invalid!" << endl;
+		reject();
+		return;
+	}
+	prop->AddPrimitive(CSPrim);
 	CSPrimEdit->SetValues();
 	accept();
 }

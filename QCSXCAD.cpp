@@ -367,11 +367,6 @@ TiXmlNode* QCSXCAD::ReadOpenEMS(TiXmlNode* openEMS)
 	return openEMS;
 }
 
-int QCSXCAD::GetCurrentPrimitive()
-{
-	return GetIndex(CSTree->GetCurrentPrimitive());
-}
-
 int QCSXCAD::GetCurrentProperty()
 {
 	return GetIndex(CSTree->GetCurrentProperty());
@@ -478,32 +473,18 @@ void QCSXCAD::Copy()
 	CSPrimitives* prim = CSTree->GetCurrentPrimitive();
 	if (prim!=NULL)
 	{
-//		CSProperties* oldProp=prim->GetProperty();
 		CSPrimitives* newPrim=prim->GetCopy();
-		if (newPrim==NULL) return;
+		if (newPrim==NULL)
+			return;
 		QCSPrimEditor* newEdit = new QCSPrimEditor(this,newPrim);
 		if (newEdit->exec()==QDialog::Accepted)
 		{
-//			CSProperties* newProp=newPrim->GetProperty();
-//			if (newProp!=oldProp) CSTree->SwitchProperty(newPrim,newProp);
-			AddPrimitive(newPrim);
 			setModified();
 			CSTree->AddPrimItem(newPrim);
 		}
-		return;
+		else
+			delete newPrim;
 	}
-//	CSProperties* prop = CSTree->GetCurrentProperty();
-//	if (prop!=NULL)
-//	{
-//		CSProperties* newProp = prop->
-//		int index=GetIndex(prop);
-//		QCSPropEditor* newEdit = new QCSPropEditor(this,prop);
-//		if (newEdit->exec()==QDialog::Accepted)
-//		{
-//			CSTree->RefreshItem(index);
-//			setModified();
-//		}
-//	}
 }
 
 void QCSXCAD::SetVisibility2All(bool value)
@@ -624,11 +605,11 @@ void QCSXCAD::NewPrimitive(CSPrimitives* newPrim)
 
 	if (newEdit->exec()==QDialog::Accepted)
 	{
-		AddPrimitive(newPrim);
 		setModified();
 		CSTree->AddPrimItem(newPrim);
 	}
-	else delete newPrim;
+	else
+		delete newPrim;
 }
 
 void QCSXCAD::NewMaterial()
