@@ -545,17 +545,11 @@ void QCSXCAD::Delete()
 		size_t qtyPrim=prop->GetQtyPrimitives();
 		if (qtyPrim>0)
 		{
-			if (QMessageBox::question(this,tr("Delete Property"),tr("\"%1\" contains Primitive(s)!!\n Delete anyway?").arg(prop->GetName().c_str()),QMessageBox::Yes,QMessageBox::No)==QMessageBox::Yes)
-			{
-				for (size_t i=0;i<qtyPrim;++i)
-				{
-					CSTree->DeletePrimItem(prop->GetPrimitive(0));
-					DeletePrimitive(prop->GetPrimitive(0));
-				}
-			}
-			else return;
+			if (QMessageBox::question(this,tr("Delete Property"),tr("\"%1\" contains Primitive(s)!!\n Delete anyway?").arg(prop->GetName().c_str()),QMessageBox::Yes,QMessageBox::No)!=QMessageBox::Yes)
+				return;
 		}
-		else if (QMessageBox::question(this,tr("Delete Property"),tr("Delete current Property?"),QMessageBox::Yes,QMessageBox::No)!=QMessageBox::Yes) return;
+		else if (QMessageBox::question(this,tr("Delete Property"),tr("Delete current Property?"),QMessageBox::Yes,QMessageBox::No)!=QMessageBox::Yes)
+			return;
 		CSTree->DeletePropItem(prop);
 		DeleteProperty(prop);
 		setModified();
