@@ -39,7 +39,6 @@ QCSPrimEditor::QCSPrimEditor(ContinuousStructure *CS, CSPrimitives* prim, QWidge
 
 	MainLayout = new QVBoxLayout();
 
-	
 	switch (CSPrim->GetType())
 	{
 		case CSPrimitives::BOX:
@@ -72,14 +71,14 @@ QCSPrimEditor::QCSPrimEditor(ContinuousStructure *CS, CSPrimitives* prim, QWidge
 			break;
 		default:
 			setWindowTitle(tr("default Editor"));
-			CSPrimEdit = NULL;
+			CSPrimEdit = new QCSPrimitiveLayout(CSPrim);
 			break;	
 	};
 		
 	MainLayout->addWidget(BuildGeneral()); 
 	
 	QGroupBox* gb = new QGroupBox(tr("Geometrical Properties"));
-	if (CSPrimEdit!=NULL) gb->setLayout(CSPrimEdit);
+	gb->setLayout(CSPrimEdit);
 
 	MainLayout->addWidget(gb);
 
@@ -115,7 +114,8 @@ void QCSPrimEditor::Save()
 		reject();
 		return;
 	}
-	prop->AddPrimitive(CSPrim);
+	if (prop!=CSPrim->GetProperty())
+		prop->AddPrimitive(CSPrim);
 	CSPrimEdit->SetValues();
 	accept();
 }
@@ -213,8 +213,9 @@ void QCSPrimEditor::UpdatePropertyCB()
 	else  PropertiesComboBox->setCurrentIndex(prop->GetID());
 }
 
-QCSPrimitiveLayout::QCSPrimitiveLayout(QWidget *parent) : QGridLayout(parent)
+QCSPrimitiveLayout::QCSPrimitiveLayout(CSPrimitives *prim, QWidget *parent) : QGridLayout(parent)
 {
+	clPrim = prim;
 }
 
 QCSPrimitiveLayout::~QCSPrimitiveLayout()
@@ -230,7 +231,7 @@ void QCSPrimitiveLayout::GetValues()
 }
 
 
-QCSPrimBoxLayout::QCSPrimBoxLayout(CSPrimBox* prim, QWidget *parent) : QCSPrimitiveLayout(parent)
+QCSPrimBoxLayout::QCSPrimBoxLayout(CSPrimBox* prim, QWidget *parent) : QCSPrimitiveLayout(prim, parent)
 {
 	clBox=prim;
 	
@@ -288,7 +289,7 @@ void QCSPrimBoxLayout::GetValues()
 	}
 }
 
-QCSPrimSphereLayout::QCSPrimSphereLayout(CSPrimSphere* prim, QWidget *parent) : QCSPrimitiveLayout(parent)
+QCSPrimSphereLayout::QCSPrimSphereLayout(CSPrimSphere* prim, QWidget *parent) : QCSPrimitiveLayout(prim, parent)
 {
 	clSphere=prim;
 	
@@ -350,7 +351,7 @@ void QCSPrimSphereLayout::GetValues()
 }
 
 //****Cylinder
-QCSPrimCylinderLayout::QCSPrimCylinderLayout(CSPrimCylinder* prim, QWidget *parent) : QCSPrimitiveLayout(parent)
+QCSPrimCylinderLayout::QCSPrimCylinderLayout(CSPrimCylinder* prim, QWidget *parent) : QCSPrimitiveLayout(prim, parent)
 {
 	clCylinder=prim;
 
@@ -465,7 +466,7 @@ void QCSPrimCylindricalShellLayout::GetValues()
 }
 
 /*****************MultiBox*****/
-QCSPrimMultiBoxLayout::QCSPrimMultiBoxLayout(CSPrimMultiBox* prim, QWidget *parent) : QCSPrimitiveLayout(parent)
+QCSPrimMultiBoxLayout::QCSPrimMultiBoxLayout(CSPrimMultiBox* prim, QWidget *parent) : QCSPrimitiveLayout(prim, parent)
 {
 	clMultiBox=prim;
 	
@@ -531,7 +532,7 @@ void QCSPrimMultiBoxLayout::EditBox(QListWidgetItem* item)
 }
 
 //***********************************************************************************//
-QCSPrimPolygonLayout::QCSPrimPolygonLayout(CSPrimPolygon* prim, QWidget *parent) : QCSPrimitiveLayout(parent)
+QCSPrimPolygonLayout::QCSPrimPolygonLayout(CSPrimPolygon* prim, QWidget *parent) : QCSPrimitiveLayout(prim, parent)
 {
 	clPoly=prim;
 	
@@ -659,7 +660,7 @@ void QCSPrimPolygonLayout::NormVecChanged()
 }
 
 //***********************************************************************************//
-QCSPrimUserDefinedLayout::QCSPrimUserDefinedLayout(CSPrimUserDefined* prim, QWidget *parent) : QCSPrimitiveLayout(parent)
+QCSPrimUserDefinedLayout::QCSPrimUserDefinedLayout(CSPrimUserDefined* prim, QWidget *parent) : QCSPrimitiveLayout(prim, parent)
 {
 	clUserDef=prim;
 	

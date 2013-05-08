@@ -449,7 +449,8 @@ void QCSXCAD::Edit()
 		if (newEdit->exec()==QDialog::Accepted)
 		{
 			CSProperties* newProp=prim->GetProperty();
-			if (newProp!=oldProp) CSTree->SwitchProperty(prim,newProp);
+			if (newProp!=oldProp)
+				CSTree->SwitchProperty(prim,newProp);
 			setModified();
 			//CSTree->UpdateTree();
 		}

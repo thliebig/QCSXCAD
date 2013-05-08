@@ -61,8 +61,8 @@ protected:
 class QCSPrimitiveLayout : public QGridLayout
 {
 	Q_OBJECT
-protected:
-	QCSPrimitiveLayout(QWidget *parent=NULL);
+public:
+	QCSPrimitiveLayout(CSPrimitives* prim, QWidget *parent=NULL);
 	virtual ~QCSPrimitiveLayout();
 	
 public slots:
@@ -71,6 +71,9 @@ public slots:
 	
 signals:
 	void modified();
+
+protected:
+	CSPrimitives* clPrim;
 	
 };
 
