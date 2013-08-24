@@ -58,11 +58,11 @@ win32 {
     isEmpty(WIN32_LIB_ROOT) {
         WIN32_LIB_ROOT = ..
     }
-    # CSXCAD path
+
+    # CSXCAD
     isEmpty(CSXCAD_ROOT) {
      CSXCAD_ROOT = $$WIN32_LIB_ROOT/CSXCAD
     }
-    # CSXCAD
     INCLUDEPATH += $$CSXCAD_ROOT/include/CSXCAD
     LIBS += -L$$CSXCAD_ROOT/lib -lCSXCAD0
 
@@ -84,11 +84,10 @@ win32 {
 }
 
 unix { 
-    # CSXCAD path
+    # CSXCAD
     isEmpty(CSXCAD_ROOT) {
      CSXCAD_ROOT = /usr
     }
-    # CSXCAD
     INCLUDEPATH += $$CSXCAD_ROOT/include/CSXCAD
     LIBS += -L$$CSXCAD_ROOT/lib -lCSXCAD
 
