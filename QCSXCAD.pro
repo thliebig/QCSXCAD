@@ -17,8 +17,8 @@ QMAKE_CXXFLAGS += -frounding-math
 # remove unnecessary webkit define
 DEFINES -= QT_WEBKIT
 
-exists(localPathes.pri) {
-    include(localPathes.pri)
+exists(localPaths.pri) {
+    include(localPaths.pri)
 }
 
 MOC_DIR = moc

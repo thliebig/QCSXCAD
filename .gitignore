@@ -16,4 +16,4 @@ Thumbs.db
 object_script.*
 *.pro.user*
 qrc_resources.cpp
-localPathes.pri
+localPaths.pri
