@@ -1,0 +1,6 @@
+Changes in v0.5.0
+-------------------------------
+- use a level of detail actor for faster rendering
+- new and rewritten 2D view mode, now based on vtk as well
+- render discrete material models
+- code cleanup
