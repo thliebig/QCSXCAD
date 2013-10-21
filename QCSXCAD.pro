@@ -92,6 +92,10 @@ unix {
     LIBS += -L$$CSXCAD_ROOT/lib -lCSXCAD
 
     # #3rd party libraries#
+    # tinyxml
+    DEFINES += TIXML_USE_STL
+
+    # vtk
     isEmpty(VTK_INCLUDEPATH) {
     INCLUDEPATH += /usr/include/vtk-5.2 \
         /usr/include/vtk-5.4 \
@@ -107,20 +111,12 @@ unix {
     LIBS +=-L$$VTK_LIBRARYPATH
     }
     LIBS += -lvtkCommon \
-        -lvtkDICOMParser \
         -lvtkFiltering \
-        -lvtkGenericFiltering \
         -lvtkGraphics \
         -lvtkHybrid \
         -lvtkIO \
-        -lvtkImaging \
-        -lvtkParallel \
         -lvtkRendering \
-        -lvtkVolumeRendering \
         -lvtkWidgets \
-        -lvtkexoIIc \
-        -lvtkftgl \
-        -lvtksys \
         -lQVTK
 }
 
