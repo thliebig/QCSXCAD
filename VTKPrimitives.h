@@ -32,9 +32,9 @@ class vtkPolyData;
 class vtkActorCollection;
 class vtkAppendPolyData;
 class vtkActor;
+class vtkAlgorithmOutput;
 
 #define PI 3.141592654
-
 
 class VTKPrimitives
 {
@@ -100,8 +100,10 @@ public:
 	void AddSTLObject(const char *Filename, double *dCenter, double *dRGB, double dOpacity, const double* tf_matrix=0);//complete
 
 	//! Add the given polydata to the scene
+	vtkActor* AddPolyData(vtkAlgorithmOutput* polydata_port, double *dRGB, double dOpacity, const double* tf_matrix=0);
+	//! Add the given polydata to the scene
 	vtkActor* AddPolyData(vtkPolyData* polydata, double *dRGB, double dOpacity, const double* tf_matrix=0);
-	
+
 	void SetOpacity2All(double opacity);
 
 	//! Write the collected poly-data into a vtk xml file (should be a *.vtp)

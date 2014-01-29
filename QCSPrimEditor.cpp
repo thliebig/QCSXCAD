@@ -15,6 +15,12 @@
 *	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <QLabel>
+#include <QPushButton>
+#include <QHBoxLayout>
+#include <QLineEdit>
+#include <QFormLayout>
+
 #include "QCSPrimEditor.h"
 #include "QCSXCAD_Global.h"
 

@@ -15,6 +15,13 @@
 *	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <QPushButton>
+#include <QDialog>
+#include <QMessageBox>
+#include <QScrollArea>
+#include <QButtonGroup>
+#include <QRadioButton>
+
 #include "QParameterGui.h"
 #include "QCSXCAD_Global.h"
 

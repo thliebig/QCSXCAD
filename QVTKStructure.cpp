@@ -15,6 +15,13 @@
 *	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define vtkRenderingCore_AUTOINIT 4(vtkInteractionStyle,vtkRenderingFreeType,vtkRenderingFreeTypeOpenGL,vtkRenderingOpenGL)
+#define vtkRenderingVolume_AUTOINIT 1(vtkRenderingVolumeOpenGL)
+
+#include <QFileDialog>
+
+#include "QVTKStructure.h"
+
 #include "QVTKWidget.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
@@ -24,7 +31,6 @@
 #include "ContinuousStructure.h"
 #include "ParameterCoord.h"
 #include "VTKPrimitives.h"
-#include "QVTKStructure.h"
 #include "vtkCubeSource.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkCellArray.h"
@@ -308,7 +314,11 @@ void QVTKStructure::RenderGridDir(int dir, unsigned int plane_pos)
 		}
 		vtkRectilinearGridGeometryFilter *grid_plane = vtkRectilinearGridGeometryFilter::New();
 		plane = grid_plane;
+#if VTK_MAJOR_VERSION==6
+		grid_plane->SetInputData(m_Rect_Grid);
+#else
 		grid_plane->SetInput(m_Rect_Grid);
+#endif
 		switch (dir)
 		{
 		case 2:
@@ -341,7 +351,11 @@ void QVTKStructure::RenderGridDir(int dir, unsigned int plane_pos)
 
 		vtkStructuredGridGeometryFilter *grid_plane = vtkStructuredGridGeometryFilter::New();
 		plane = grid_plane;
+#if VTK_MAJOR_VERSION==6
+		grid_plane->SetInputData(m_Struct_Grid);
+#else
 		grid_plane->SetInput(m_Struct_Grid);
+#endif
 		switch (dir)
 		{
 		case 2:
@@ -364,7 +378,7 @@ void QVTKStructure::RenderGridDir(int dir, unsigned int plane_pos)
 	else
 		cerr << "QVTKStructure::RenderGrid(): Error, unknown grid type!" << endl;
 
-	gridMapper->SetInput(plane->GetOutput());
+	gridMapper->SetInputConnection(plane->GetOutputPort());
 	ActorGridPlane[dir]->SetMapper(gridMapper);
 	ActorGridPlane[dir]->GetProperty()->SetColor(0,0,0);
 	ActorGridPlane[dir]->GetProperty()->SetDiffuse(0);
@@ -750,7 +764,7 @@ void QVTKStructure::ExportView2Image()
 	filter->SetInput(VTKWidget->GetRenderWindow());
 
 	vtkPNGWriter* png_writer= vtkPNGWriter::New();
-	png_writer->SetInput(filter->GetOutput());
+	png_writer->SetInputConnection(filter->GetOutputPort());
 	//png_writer->SetQuality(100);
 	png_writer->SetFileName(filename.toStdString().c_str());
 	png_writer->Write();

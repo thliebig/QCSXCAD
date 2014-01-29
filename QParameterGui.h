@@ -18,7 +18,13 @@
 #ifndef _QPARAMETERGUI_H_
 #define _QPARAMETERGUI_H_
 
-#include <QtGui>
+#include <QCheckBox>
+#include <QGroupBox>
+#include <QLabel>
+#include <QLineEdit>
+#include <QGridLayout>
+#include <QSlider>
+
 #include "ParameterObjects.h"
 
 class QParameter : public QGroupBox

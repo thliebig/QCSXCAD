@@ -18,7 +18,16 @@
 #ifndef _QCSPROPEDITOR_H_
 #define _QCSPROPEDITOR_H_
 
-#include <QtGui>
+#include <QPushButton>
+#include <QDialog>
+#include <QWidget>
+#include <QComboBox>
+#include <QGroupBox>
+#include <QLayout>
+#include <QLabel>
+#include <QSpinBox>
+#include <QLineEdit>
+
 #include "ContinuousStructure.h"
 
 class QColorPushButton : public QPushButton

@@ -18,7 +18,9 @@
 #ifndef _QCSTREEWIDGET_H_
 #define _QCSTREEWIDGET_H_
 
-#include <QtGui>
+#include <QTreeWidget>
+#include <QTreeWidgetItem>
+
 #include "ContinuousStructure.h"
 
 #define PROPTYPE 0

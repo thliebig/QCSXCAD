@@ -18,7 +18,9 @@
 #ifndef _QCSXCAD_H_
 #define _QCSXCAD_H_
 
-#include <QtGui>
+#include <QMainWindow>
+#include <QHash>
+#include <QString>
 #include "QCSXCAD_Global.h"
 #include "ContinuousStructure.h"
 using namespace std;

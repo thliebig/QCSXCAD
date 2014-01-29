@@ -15,6 +15,15 @@
 *	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <QGridLayout>
+#include <QPushButton>
+#include <QDialog>
+#include <QHBoxLayout>
+#include <QCheckBox>
+#include <QSpinBox>
+#include <QMessageBox>
+#include <QTextEdit>
+
 #include "QCSGridEditor.h"
 #include "CSRectGrid.h"
 #include "QCSXCAD_Global.h"

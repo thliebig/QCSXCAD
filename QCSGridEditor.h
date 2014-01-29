@@ -18,7 +18,13 @@
 #ifndef _QCSGRIDEDITOR_H_
 #define _QCSGRIDEDITOR_H_
 
-#include <QtGui>
+#include <QWidget>
+#include <QToolBar>
+#include <QString>
+#include <QVector>
+#include <QSlider>
+#include <QLabel>
+#include <QLineEdit>
 
 class CSRectGrid;
 

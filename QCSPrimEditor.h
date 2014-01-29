@@ -18,7 +18,15 @@
 #ifndef _QCSPRIMEDITOR_H_
 #define _QCSPRIMEDITOR_H_
 
-#include <QtGui>
+#include <QDialog>
+#include <QWidget>
+#include <QLayout>
+#include <QGroupBox>
+#include <QVBoxLayout>
+#include <QSpinBox>
+#include <QComboBox>
+#include <QListWidgetItem>
+
 #include "ContinuousStructure.h"
 
 class QCSPrimitiveLayout;

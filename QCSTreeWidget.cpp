@@ -15,6 +15,9 @@
 *	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <QMenu>
+#include <QContextMenuEvent>
+
 #include "QCSTreeWidget.h"
 #include "QCSXCAD_Global.h"
 

@@ -15,6 +15,9 @@
 *	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define vtkRenderingCore_AUTOINIT 4(vtkInteractionStyle,vtkRenderingFreeType,vtkRenderingFreeTypeOpenGL,vtkRenderingOpenGL)
+#define vtkRenderingVolume_AUTOINIT 1(vtkRenderingVolumeOpenGL)
+
 #include "VTKPrimitives.h"
 #include "vtkRenderer.h"
 #include "vtkActorCollection.h"
@@ -52,7 +55,7 @@
 #include "vtkDiskSource.h"
 #include "vtkPLYWriter.h"
 
-#if VTK_MAJOR_VERSION==5 && VTK_MINOR_VERSION>=10
+#if (VTK_MAJOR_VERSION==5 && VTK_MINOR_VERSION>=10) || (VTK_MAJOR_VERSION==6)
 #include "vtkBooleanOperationPolyDataFilter.h"
 #endif
 
@@ -120,7 +123,7 @@ void VTKPrimitives::AddCube(double *dCoords, double *dRGB, double dOpacity, cons
 	vtkCubeSource *Source = vtkCubeSource::New();
 	Source->SetBounds(dCoords);
 
-	AddPolyData(Source->GetOutput(), dRGB, dOpacity, tf_matrix);
+	AddPolyData(Source->GetOutputPort(), dRGB, dOpacity, tf_matrix);
 	Source->Delete();
 }
 
@@ -192,7 +195,11 @@ void VTKPrimitives::AddCylindricalCube(double *dCoords, double *dRGB, double dOp
 			return;
 
 		vtkRotationalExtrusionFilter *extrude = vtkRotationalExtrusionFilter::New();
+#if VTK_MAJOR_VERSION==6
+		extrude->SetInputData(PDSource->GetOutput());
+#else
 		extrude->SetInput(PDSource->GetOutput());
+#endif
 		int nrSteps = ceil(fabs(dCoords[3]-dCoords[2])/m_ArcDelta);
 		extrude->SetResolution(nrSteps);
 		extrude->SetAngle( (dCoords[3]-dCoords[2])*180/PI );
@@ -226,7 +233,7 @@ void VTKPrimitives::AddCylindricalCube(double *dCoords, double *dRGB, double dOp
 	if (PDFilter==NULL)
 		return;
 
-	AddPolyData(PDFilter->GetOutput(), dRGB, dOpacity, tf_matrix);
+	AddPolyData(PDFilter->GetOutputPort(), dRGB, dOpacity, tf_matrix);
 	if (PDSource)
 		PDSource->Delete();
 	PDFilter->Delete();
@@ -293,14 +300,17 @@ void VTKPrimitives::AddClosedPoly(double *dCoords, unsigned int uiQtyCoords, dou
 	profile->SetPoints(points);
 	profile->SetPolys(poly);
 	vtkTriangleFilter *tf = vtkTriangleFilter::New();
+#if VTK_MAJOR_VERSION==6
+	tf->SetInputData(profile);
+#else
 	tf->SetInput(profile);
-
-	extrude->SetInput(tf->GetOutput());
+#endif
+	extrude->SetInputConnection(tf->GetOutputPort());
 	extrude->SetExtrusionTypeToVectorExtrusion();
 	extrude->SetVector(dExtrusionVector);
 	extrude->CappingOn();
 
-	AddPolyData(extrude->GetOutput(), dRGB, dOpacity, tf_matrix);
+	AddPolyData(extrude->GetOutputPort(), dRGB, dOpacity, tf_matrix);
 
 	points->Delete();
 	poly->Delete();
@@ -353,10 +363,14 @@ void VTKPrimitives::AddTubePoly(const double *dCoords, unsigned int uiQtyCoords,
 
 	vtkTubeFilter* m_profileTubes = vtkTubeFilter::New();
 	m_profileTubes->SetNumberOfSides(iResolution);
+#if VTK_MAJOR_VERSION==6
+	m_profileTubes->SetInputData(profile);
+#else
 	m_profileTubes->SetInput(profile);
+#endif
 	m_profileTubes->SetRadius(TubeRadius);
 
-	AddPolyData(m_profileTubes->GetOutput(), dRGB, dOpacity, tf_matrix);
+	AddPolyData(m_profileTubes->GetOutputPort(), dRGB, dOpacity, tf_matrix);
 
 	points->Delete();
 	poly->Delete();
@@ -393,10 +407,14 @@ void VTKPrimitives::AddCylinder(const double *dCenter, const double *dExtrusionV
 
 	transform->PostMultiply();
 
+#if VTK_MAJOR_VERSION==6
+	transformFilter->SetInputData(Source->GetOutput());
+#else
 	transformFilter->SetInput(Source->GetOutput());
+#endif
 	transformFilter->SetTransform(transform);
 
-	AddPolyData(transformFilter->GetOutput(), dRGB, dOpacity, tf_matrix);
+	AddPolyData(transformFilter->GetOutputPort(), dRGB, dOpacity, tf_matrix);
 
 	Source->Delete();
 	transform->Delete();
@@ -416,7 +434,11 @@ void VTKPrimitives::AddCylindricalShell(const double *dAxisStart, const double* 
 
 	// extrude in +z
 	vtkLinearExtrusionFilter *linearExtrusionFilter = vtkLinearExtrusionFilter::New();
-	linearExtrusionFilter->SetInputConnection( diskSource->GetOutputPort() );
+#if VTK_MAJOR_VERSION==6
+	linearExtrusionFilter->SetInputData( diskSource->GetOutput() );
+#else
+	linearExtrusionFilter->SetInput( diskSource->GetOutput() );
+#endif
 	linearExtrusionFilter->SetExtrusionTypeToNormalExtrusion();
 	linearExtrusionFilter->SetVector(0,0,length);
 
@@ -441,7 +463,7 @@ void VTKPrimitives::AddCylindricalShell(const double *dAxisStart, const double* 
 	vtkActor *actor = vtkLODActor::New();
 	actor->SetMapper( mapper );
 
-	m_PolyDataCollection->AddInput( transformFilter->GetOutput());
+	m_PolyDataCollection->AddInputConnection( transformFilter->GetOutputPort());
 	actor->GetProperty()->SetColor(dRGB);
 	actor->GetProperty()->SetOpacity(dOpacity);
 
@@ -465,7 +487,7 @@ void VTKPrimitives::AddSphere(const double *dCenter, double fRadius, double *dRG
 
 void VTKPrimitives::AddSphericalShell(const double *dCenter, double r_i, double r_o, double *dRGB, double dOpacity, int iResolution, const double* tf_matrix)
 {//complete
-#if VTK_MAJOR_VERSION==5 && VTK_MINOR_VERSION>=10
+#if (VTK_MAJOR_VERSION==5 && VTK_MINOR_VERSION>=10) || (VTK_MAJOR_VERSION==6)
 	vtkSphereSource *Source_o = vtkSphereSource::New();
 	double center[3]={dCenter[0],dCenter[1],dCenter[2]};
 	Source_o->SetCenter(center);
@@ -481,8 +503,8 @@ void VTKPrimitives::AddSphericalShell(const double *dCenter, double r_i, double 
 
 	vtkBooleanOperationPolyDataFilter* boolFilter = vtkBooleanOperationPolyDataFilter::New();
 	boolFilter->SetOperationToDifference();
-	boolFilter->SetInputConnection( 0, Source_o->GetOutput()->GetProducerPort() );
-	boolFilter->SetInputConnection( 1, Source_i->GetOutput()->GetProducerPort() );
+	boolFilter->SetInputConnection(0, Source_o->GetOutputPort());
+	boolFilter->SetInputConnection(1, Source_i->GetOutputPort());
 
 	//todo, we should remove the unnecessary scalar data produced by the filter...
 	AddPolyData(boolFilter->GetOutput(), dRGB, dOpacity, tf_matrix);
@@ -521,10 +543,14 @@ void VTKPrimitives::AddArrow(double *dStart, double *dEnd, double *dRGB, double 
 
 	transform->PostMultiply();
 
+#if VTK_MAJOR_VERSION==6
+	transformFilter->SetInputData(Source->GetOutput());
+#else
 	transformFilter->SetInput(Source->GetOutput());
+#endif
 	transformFilter->SetTransform(transform);
 
-	AddPolyData(transformFilter->GetOutput(), dRGB, dOpacity, tf_matrix);
+	AddPolyData(transformFilter->GetOutputPort(), dRGB, dOpacity, tf_matrix);
 
 	Source->Delete();
 	transform->Delete();
@@ -540,14 +566,18 @@ void VTKPrimitives::AddLabel(char *cText, double *dCoords, double *dRGB, double 
 
 	vtkTransformPolyDataFilter* filter = vtkTransformPolyDataFilter::New();
 	vtkTransform* vtrans = vtkTransform::New();
+#if VTK_MAJOR_VERSION==6
+	filter->SetInputData(text->GetOutput());
+#else
 	filter->SetInput(text->GetOutput());
+#endif
 
 	if (tf_matrix)
 		vtrans->SetMatrix(tf_matrix);
 	filter->SetTransform(vtrans);
 
-	m_PolyDataCollection->AddInput(filter->GetOutput());
-	Mapper->SetInput(filter->GetOutput());
+	m_PolyDataCollection->AddInputConnection(filter->GetOutputPort());
+	Mapper->SetInputConnection(filter->GetOutputPort());
 	Actor->SetMapper(Mapper);
 	Actor->SetScale(dscale);
 	Actor->SetCamera(ren->GetActiveCamera());
@@ -599,16 +629,20 @@ void VTKPrimitives::AddRotationalPoly(const double *dCoords, unsigned int uiQtyC
 	profile->SetPoints(points);
 	profile->SetPolys(poly);
 	vtkTriangleFilter *tf = vtkTriangleFilter::New();
+#if VTK_MAJOR_VERSION==6
+	tf->SetInputData(profile);
+#else
 	tf->SetInput(profile);
+#endif
 
 	InvTransform->Translate(-start[0],-start[1],-start[2]);
 	InvTransform->RotateX(alpha);
 	InvTransform->RotateY(beta);
 
-	InvTransformFilter->SetInput(tf->GetOutput());
+	InvTransformFilter->SetInputConnection(tf->GetOutputPort());
 	InvTransformFilter->SetTransform(InvTransform);
 
-	extrude->SetInput(InvTransformFilter->GetOutput());
+	extrude->SetInputConnection(InvTransformFilter->GetOutputPort());
 	extrude->SetResolution(iResolution);
 	extrude->SetAngle(StartStopAngle[1]-StartStopAngle[0]);
 
@@ -621,7 +655,7 @@ void VTKPrimitives::AddRotationalPoly(const double *dCoords, unsigned int uiQtyC
 
 	transform->PostMultiply();
 
-	transformFilter->SetInput(extrude->GetOutput());
+	transformFilter->SetInputConnection(extrude->GetOutputPort());
 	transformFilter->SetTransform(transform);
 
 	AddPolyData(transformFilter->GetOutput(), dRGB, dOpacity, tf_matrix);
@@ -664,7 +698,11 @@ void VTKPrimitives::AddRotationalSolid(const double *dPoint, double fRadius, con
 	profile->SetPoints(points);
 	profile->SetLines(poly);
 
+#if VTK_MAJOR_VERSION==6
+	extrude->SetInputData(profile);
+#else
 	extrude->SetInput(profile);
+#endif
 	extrude->SetResolution(iResolution);
 	extrude->SetAngle(360.0);
 
@@ -679,10 +717,10 @@ void VTKPrimitives::AddRotationalSolid(const double *dPoint, double fRadius, con
 
 	transform->PostMultiply();
 
-	transformFilter->SetInput(extrude->GetOutput());
+	transformFilter->SetInputConnection(extrude->GetOutputPort());
 	transformFilter->SetTransform(transform);
 
-	AddPolyData(transformFilter->GetOutput(), dRGB, dOpacity, tf_matrix);
+	AddPolyData(transformFilter->GetOutputPort(), dRGB, dOpacity, tf_matrix);
 
 	points->Delete();
 	poly->Delete();
@@ -722,7 +760,7 @@ void VTKPrimitives::AddSTLObject(const char *Filename, double *dCenter, double *
 	part->SetFileName(Filename);
 	vtkPolyDataMapper *partMapper = vtkPolyDataMapper::New();
 
-	vtkActor* actor = AddPolyData(part->GetOutput(), dRGB, dOpacity, tf_matrix);
+	vtkActor* actor = AddPolyData(part->GetOutputPort(), dRGB, dOpacity, tf_matrix);
 	actor->SetPosition(dCenter);
 
 	part->Delete();
@@ -733,15 +771,57 @@ vtkActor* VTKPrimitives::AddPolyData(vtkPolyData* polydata, double *dRGB, double
 {
 	vtkTransformPolyDataFilter* filter = vtkTransformPolyDataFilter::New();
 	vtkTransform* vtrans = vtkTransform::New();
+#if VTK_MAJOR_VERSION==6
+	filter->SetInputData(polydata);
+#else
 	filter->SetInput(polydata);
+#endif
 	if (tf_matrix)
 		vtrans->SetMatrix(tf_matrix);
 	filter->SetTransform(vtrans);
 
+#if VTK_MAJOR_VERSION==6
+	m_PolyDataCollection->AddInputData(filter->GetOutput());
+#else
 	m_PolyDataCollection->AddInput(filter->GetOutput());
+#endif
 
 	vtkPolyDataMapper *Mapper = vtkPolyDataMapper::New();
-	Mapper->SetInput(filter->GetOutput());
+	Mapper->SetInputConnection(filter->GetOutputPort());
+	Mapper->ScalarVisibilityOff();
+	vtkLODActor *Actor = vtkLODActor::New();
+	Actor->SetMapper(Mapper);
+	Actor->GetProperty()->RemoveAllTextures();
+	Actor->GetProperty()->SetColor(dRGB);
+	Actor->GetProperty()->SetOpacity(dOpacity);
+
+	ActorColl->AddItem(Actor);
+	ren->AddActor(Actor);
+
+	filter->Delete();
+	vtrans->Delete();
+	Mapper->Delete();
+
+	return Actor;
+}
+
+vtkActor* VTKPrimitives::AddPolyData(vtkAlgorithmOutput* polydata_port, double *dRGB, double dOpacity, const double* tf_matrix)
+{
+	vtkTransformPolyDataFilter* filter = vtkTransformPolyDataFilter::New();
+	vtkTransform* vtrans = vtkTransform::New();
+	filter->SetInputConnection(polydata_port);
+	if (tf_matrix)
+		vtrans->SetMatrix(tf_matrix);
+	filter->SetTransform(vtrans);
+
+#if VTK_MAJOR_VERSION==6
+	m_PolyDataCollection->AddInputData(filter->GetOutput());
+#else
+	m_PolyDataCollection->AddInput(filter->GetOutput());
+#endif
+
+	vtkPolyDataMapper *Mapper = vtkPolyDataMapper::New();
+	Mapper->SetInputConnection(filter->GetOutputPort());
 	Mapper->ScalarVisibilityOff();
 	vtkLODActor *Actor = vtkLODActor::New();
 	Actor->SetMapper(Mapper);
@@ -777,7 +857,11 @@ void VTKPrimitives::WritePolyData2File(const char* filename, double scale)
 
 	if (scale==1.0)
 	{
+#if VTK_MAJOR_VERSION==6
+		writer->SetInputData(m_PolyDataCollection->GetOutput());
+#else
 		writer->SetInput(m_PolyDataCollection->GetOutput());
+#endif
 		writer->Write();
 	}
 	else
@@ -785,11 +869,19 @@ void VTKPrimitives::WritePolyData2File(const char* filename, double scale)
 		vtkTransform *transform = vtkTransform::New();
 		vtkTransformPolyDataFilter *transformFilter = vtkTransformPolyDataFilter::New();
 
+#if VTK_MAJOR_VERSION==6
+		transformFilter->SetInputData(m_PolyDataCollection->GetOutput());
+#else
 		transformFilter->SetInput(m_PolyDataCollection->GetOutput());
+#endif
 		transform->Scale(scale,scale,scale);
 		transformFilter->SetTransform(transform);
 
+#if VTK_MAJOR_VERSION==6
+		writer->SetInputData(transformFilter->GetOutput());
+#else
 		writer->SetInput(transformFilter->GetOutput());
+#endif
 		writer->Write();
 
 		transform->Delete();
@@ -805,14 +897,17 @@ void VTKPrimitives::WritePolyData2STL(const char* filename, double scale)
 
 	vtkTriangleFilter* filter = vtkTriangleFilter::New();
 
+#if VTK_MAJOR_VERSION==6
+	filter->SetInputData(m_PolyDataCollection->GetOutput());
+#else
 	filter->SetInput(m_PolyDataCollection->GetOutput());
-
+#endif
 	vtkSTLWriter* writer  = vtkSTLWriter::New();
 	writer->SetFileName(filename);
 
 	if (scale==1.0)
 	{
-		writer->SetInput(filter->GetOutput());
+		writer->SetInputConnection(filter->GetOutputPort());
 		writer->Write();
 	}
 	else
@@ -820,11 +915,15 @@ void VTKPrimitives::WritePolyData2STL(const char* filename, double scale)
 		vtkTransform *transform = vtkTransform::New();
 		vtkTransformPolyDataFilter *transformFilter = vtkTransformPolyDataFilter::New();
 
-		transformFilter->SetInput(filter->GetOutput());
+		transformFilter->SetInputConnection(filter->GetOutputPort());
 		transform->Scale(scale,scale,scale);
 		transformFilter->SetTransform(transform);
 
+#if VTK_MAJOR_VERSION==6
+		writer->SetInputData(transformFilter->GetOutput());
+#else
 		writer->SetInput(transformFilter->GetOutput());
+#endif
 		writer->Write();
 
 		transform->Delete();
@@ -840,14 +939,18 @@ void VTKPrimitives::WritePolyData2PLY(const char* filename, double scale)
 
 	vtkTriangleFilter* filter = vtkTriangleFilter::New();
 
+#if VTK_MAJOR_VERSION==6
+	filter->SetInputData(m_PolyDataCollection->GetOutput());
+#else
 	filter->SetInput(m_PolyDataCollection->GetOutput());
-
+#endif
+	
 	vtkPLYWriter* writer  = vtkPLYWriter::New();
 	writer->SetFileName(filename);
 
 	if (scale==1.0)
 	{
-		writer->SetInput(filter->GetOutput());
+		writer->SetInputConnection(filter->GetOutputPort());
 		writer->Write();
 	}
 	else
@@ -855,11 +958,15 @@ void VTKPrimitives::WritePolyData2PLY(const char* filename, double scale)
 		vtkTransform *transform = vtkTransform::New();
 		vtkTransformPolyDataFilter *transformFilter = vtkTransformPolyDataFilter::New();
 
-		transformFilter->SetInput(filter->GetOutput());
+		transformFilter->SetInputConnection(filter->GetOutputPort());
 		transform->Scale(scale,scale,scale);
 		transformFilter->SetTransform(transform);
 
+#if VTK_MAJOR_VERSION==6
+		writer->SetInputData(transformFilter->GetOutput());
+#else
 		writer->SetInput(transformFilter->GetOutput());
+#endif
 		writer->Write();
 
 		transform->Delete();

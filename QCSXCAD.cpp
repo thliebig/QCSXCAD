@@ -15,6 +15,14 @@
 *	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define vtkRenderingCore_AUTOINIT 4(vtkInteractionStyle,vtkRenderingFreeType,vtkRenderingFreeTypeOpenGL,vtkRenderingOpenGL)
+#define vtkRenderingVolume_AUTOINIT 1(vtkRenderingVolumeOpenGL)
+
+#include <QDockWidget>
+#include <QMessageBox>
+#include <QFileDialog>
+#include <QAction>
+
 #include "QCSXCAD.h"
 #include "QVTKStructure.h"
 #include "QCSPrimEditor.h"
@@ -24,9 +32,6 @@
 #include "QParameterGui.h"
 #include "vtkConfigure.h"
 #include "tinyxml.h"
-#ifdef __GYM2XML__
-#include "Gym2XML.h"
-#endif
 #include <iostream>
 
 #include "CSPropUnknown.h"
@@ -400,43 +405,11 @@ bool QCSXCAD::isGeometryValid()
 
 void QCSXCAD::ImportGeometry()
 {
-//	QString filter;
-//	QString filename=QFileDialog::getOpenFileName(0,tr("Choose geometry file"),NULL,"*.xml *.gym",&filter);
-//	cerr << filter.toStdString();
-//	if (filename!=NULL) ReadFile(filename);
-//	CSTree->UpdateTree();
-
-	QFileDialog FD(this,tr("Choose geometry file"));
-	QStringList NameFiler;
-	QString xmlFile("XML-File (*.xml)");
-	QString gymFile("Gym-File (*.gym)");
-	NameFiler << xmlFile << gymFile;
-	FD.setFilters(NameFiler);
-	FD.setFileMode(QFileDialog::ExistingFile);
-
-	if (FD.exec()==QDialog::Accepted)
-	{
-		QStringList selectedFiles = FD.selectedFiles();
-		if (selectedFiles.isEmpty()) return;
-		if (FD.selectedNameFilter()==xmlFile)
-		{
-			ReadFile(selectedFiles.at(0));
-		}
-		else if  (FD.selectedNameFilter()==gymFile)
-		{
-#ifdef __GYM2XML__
-			if (QMessageBox::warning(this,tr("Import gym-file"),tr("Import of gym-files is highly experimental. This may cause a crash of this application!\nContinue?"),QMessageBox::Ok,QMessageBox::Cancel)==QMessageBox::Ok)
-			{
-				Gym2XML converter(this);
-				converter.ReadGymFile(selectedFiles.at(0).toStdString().c_str());
-				GUIUpdate();
-			}
-#else
-			QMessageBox::warning(this,tr("Import gym-file"),tr("Import of gym-files is not supported in this version!!"),QMessageBox::Ok);
-#endif
-		}
-		else return;
-	}
+	QString filter;
+	QString filename=QFileDialog::getOpenFileName(0,tr("Choose geometry file"),NULL,tr("XML-File (*.xml)"),&filter);
+	if (filename.isEmpty())
+		return;
+	ReadFile(filename);
 }
 
 void QCSXCAD::Edit()

@@ -26,6 +26,9 @@ OBJECTS_DIR = obj
 QT += core \
     gui \
     xml
+greaterThan(QT_MAJOR_VERSION, 4) {
+    QT += widgets
+}
 
 HEADERS += QCSXCAD.h \
     QCSGridEditor.h \
@@ -97,20 +100,23 @@ unix {
 
     # vtk
     isEmpty(VTK_INCLUDEPATH) {
-    INCLUDEPATH += /usr/include/vtk-5.2 \
+        INCLUDEPATH += /usr/include/vtk-5.2 \
         /usr/include/vtk-5.4 \
         /usr/include/vtk-5.6 \
         /usr/include/vtk-5.8 \
         /usr/include/vtk-5.10 \
+        /usr/include/vtk-6.0 \
+        /usr/include/vtk-6.1 \
         /usr/include/vtk
     } else {
-    INCLUDEPATH += $$VTK_INCLUDEPATH
+        INCLUDEPATH += $$VTK_INCLUDEPATH
     }
     isEmpty(VTK_LIBRARYPATH){
     } else {
-    LIBS +=-L$$VTK_LIBRARYPATH
+        LIBS +=-L$$VTK_LIBRARYPATH
     }
-    LIBS += -lvtkCommon \
+    isEmpty(VTK_6_VERSION){
+        LIBS += -lvtkCommon \
         -lvtkFiltering \
         -lvtkGraphics \
         -lvtkHybrid \
@@ -118,6 +124,28 @@ unix {
         -lvtkRendering \
         -lvtkWidgets \
         -lQVTK
+    } else {
+        LIBS += -lvtkCommonCore-$$VTK_6_VERSION \
+        -lvtkCommonDataModel-$$VTK_6_VERSION \
+        -lvtkIOLegacy-$$VTK_6_VERSION \
+        -lvtkIOXML-$$VTK_6_VERSION \
+        -lvtkIOGeometry-$$VTK_6_VERSION \
+        -lvtkIOPLY-$$VTK_6_VERSION \
+        -lvtkIOImage-$$VTK_6_VERSION \
+        -lvtksys-$$VTK_6_VERSION \
+        -lvtkIOCore-$$VTK_6_VERSION \
+        -lvtkInteractionStyle-$$VTK_6_VERSION \
+        -lvtkInteractionWidgets-$$VTK_6_VERSION \
+        -lvtkFiltersModeling-$$VTK_6_VERSION \
+        -lvtkGUISupportQt-$$VTK_6_VERSION \
+        -lvtkRenderingCore-$$VTK_6_VERSION \
+        -lvtkRenderingVolumeOpenGL-$$VTK_6_VERSION \
+        -lvtkRenderingOpenGL-$$VTK_6_VERSION \
+        -lvtkRenderingFreeTypeOpenGL-$$VTK_6_VERSION \
+        -lvtkRenderingFreeType-$$VTK_6_VERSION \
+        -lvtkRenderingAnnotation-$$VTK_6_VERSION \
+        -lvtkRenderingLOD-$$VTK_6_VERSION
+    }
 }
 
 FORMS += 

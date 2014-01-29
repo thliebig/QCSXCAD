@@ -15,6 +15,11 @@
 *	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define vtkRenderingCore_AUTOINIT 4(vtkInteractionStyle,vtkRenderingFreeType,vtkRenderingFreeTypeOpenGL,vtkRenderingOpenGL)
+#define vtkRenderingVolume_AUTOINIT 1(vtkRenderingVolumeOpenGL)
+
+#include <QMessageBox>
+
 #include <QVTKWidget.h>
 #include <vtkRendererCollection.h>
 #include <vtkRenderWindow.h>
