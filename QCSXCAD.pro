@@ -115,7 +115,7 @@ unix {
     } else {
         LIBS +=-L$$VTK_LIBRARYPATH
     }
-    isEmpty(VTK_6_VERSION){
+    !contains(VTK_6, 1) {
         LIBS += -lvtkCommon \
         -lvtkFiltering \
         -lvtkGraphics \
@@ -125,26 +125,26 @@ unix {
         -lvtkWidgets \
         -lQVTK
     } else {
-        LIBS += -lvtkCommonCore-$$VTK_6_VERSION \
-        -lvtkCommonDataModel-$$VTK_6_VERSION \
-        -lvtkIOLegacy-$$VTK_6_VERSION \
-        -lvtkIOXML-$$VTK_6_VERSION \
-        -lvtkIOGeometry-$$VTK_6_VERSION \
-        -lvtkIOPLY-$$VTK_6_VERSION \
-        -lvtkIOImage-$$VTK_6_VERSION \
-        -lvtksys-$$VTK_6_VERSION \
-        -lvtkIOCore-$$VTK_6_VERSION \
-        -lvtkInteractionStyle-$$VTK_6_VERSION \
-        -lvtkInteractionWidgets-$$VTK_6_VERSION \
-        -lvtkFiltersModeling-$$VTK_6_VERSION \
-        -lvtkGUISupportQt-$$VTK_6_VERSION \
-        -lvtkRenderingCore-$$VTK_6_VERSION \
-        -lvtkRenderingVolumeOpenGL-$$VTK_6_VERSION \
-        -lvtkRenderingOpenGL-$$VTK_6_VERSION \
-        -lvtkRenderingFreeTypeOpenGL-$$VTK_6_VERSION \
-        -lvtkRenderingFreeType-$$VTK_6_VERSION \
-        -lvtkRenderingAnnotation-$$VTK_6_VERSION \
-        -lvtkRenderingLOD-$$VTK_6_VERSION
+        LIBS += -lvtkCommonCore$$VTK_6_LIBSUFFIX \
+        -lvtkCommonDataModel$$VTK_6_LIBSUFFIX \
+        -lvtkIOLegacy$$VTK_6_LIBSUFFIX \
+        -lvtkIOXML$$VTK_6_LIBSUFFIX \
+        -lvtkIOGeometry$$VTK_6_LIBSUFFIX \
+        -lvtkIOPLY$$VTK_6_LIBSUFFIX \
+        -lvtkIOImage$$VTK_6_LIBSUFFIX \
+        -lvtksys$$VTK_6_LIBSUFFIX \
+        -lvtkIOCore$$VTK_6_LIBSUFFIX \
+        -lvtkInteractionStyle$$VTK_6_LIBSUFFIX \
+        -lvtkInteractionWidgets$$VTK_6_LIBSUFFIX \
+        -lvtkFiltersModeling$$VTK_6_LIBSUFFIX \
+        -lvtkGUISupportQt$$VTK_6_LIBSUFFIX \
+        -lvtkRenderingCore$$VTK_6_LIBSUFFIX \
+        -lvtkRenderingVolumeOpenGL$$VTK_6_LIBSUFFIX \
+        -lvtkRenderingOpenGL$$VTK_6_LIBSUFFIX \
+        -lvtkRenderingFreeTypeOpenGL$$VTK_6_LIBSUFFIX \
+        -lvtkRenderingFreeType$$VTK_6_LIBSUFFIX \
+        -lvtkRenderingAnnotation$$VTK_6_LIBSUFFIX \
+        -lvtkRenderingLOD$$VTK_6_LIBSUFFIX
     }
 }
 
