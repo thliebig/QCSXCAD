@@ -861,6 +861,8 @@ void QCSXCAD::BuildToolBar()
 {
 	QToolBar *mainTB = addToolBar(tr("General"));
 	mainTB->setObjectName("General_ToolBar");
+	QSize TBIconSize(16,16);
+	mainTB->setIconSize(TBIconSize);
 
 	if (QCSX_Settings.GetEdit())
 		mainTB->addAction(QIcon(":/images/filenew.png"),tr("New"),this,SLOT(New()));
@@ -870,6 +872,7 @@ void QCSXCAD::BuildToolBar()
 
 
 	QToolBar *ItemTB = addToolBar(tr("Item View"));
+	ItemTB->setIconSize(TBIconSize);
 	ItemTB->setObjectName("Item_View_ToolBar");
 
 	ItemTB->addAction(tr("CollapseAll"),CSTree,SLOT(collapseAll()));
@@ -927,6 +930,7 @@ void QCSXCAD::BuildToolBar()
 	}
 
 	newObjct = addToolBar(tr("Zoom"));
+	newObjct->setIconSize(TBIconSize);
 	newObjct->setObjectName("Zoom_ToolBar");
 
 	newAct = newObjct->addAction(QIcon(":/images/viewmagfit.png"),tr("Zoom fit"),this,SLOT(BestView()));
