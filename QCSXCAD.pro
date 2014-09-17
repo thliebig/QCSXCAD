@@ -86,7 +86,7 @@ win32 {
     LIBS += -L$$WIN32_LIB_ROOT/cgal/bin -lCGAL
 }
 
-unix { 
+unix:!macx { 
     # CSXCAD
     isEmpty(CSXCAD_ROOT) {
      CSXCAD_ROOT = /usr
@@ -148,6 +148,42 @@ unix {
     }
 }
 
+macx { 
+    # CSXCAD
+    isEmpty(CSXCAD_ROOT) {
+     CSXCAD_ROOT = /usr
+    }
+    INCLUDEPATH += $$CSXCAD_ROOT/include/CSXCAD
+    LIBS += -L$$CSXCAD_ROOT/lib -lCSXCAD
+
+    # #3rd party libraries#
+    # tinyxml
+    DEFINES += TIXML_USE_STL
+
+    # vtk
+    isEmpty(VTK_INCLUDEPATH) {
+        INCLUDEPATH += \
+        /usr/local/opt/vtk5/include  \
+        /usr/local/opt/vtk5/include/vtk-5.10
+
+    } else {
+        INCLUDEPATH += $$VTK_INCLUDEPATH
+    }
+
+    LIBS += -L/usr/local/opt/vtk5/lib/vtk-5.10  -lvtkCommon \
+        -lvtkFiltering \
+        -lvtkGraphics \
+        -lvtkHybrid \
+        -lvtkIO \
+        -lvtkRendering \
+        -lvtkWidgets \
+        -lQVTK
+
+    LIBS += -ltinyxml
+
+}
+
+
 FORMS += 
 RESOURCES += resources.qrc
 DEFINES += BUILD_QCSXCAD_LIB
@@ -172,9 +208,10 @@ isEmpty(PREFIX) {
 install.target = install
 install.commands = mkdir -p \"$$PREFIX/lib$$LIB_SUFFIX\"
 install.commands += && mkdir -p \"$$PREFIX/include/QCSXCAD\"
-install.commands += && cp -at \"$$PREFIX/include/QCSXCAD/\" $$HEADERS
-unix:install.commands += && cp -at \"$$PREFIX/lib$$LIB_SUFFIX/\" libQCSXCAD.so*
+install.commands += && cp $$HEADERS \"$$PREFIX/include/QCSXCAD/\"
+unix:!macx:install.commands += && cp -at \"$$PREFIX/lib$$LIB_SUFFIX/\" libQCSXCAD.so*
 win32:install.commands += && cp -at \"$$PREFIX/lib$$LIB_SUFFIX/\" release/QCSXCAD0.dll
+macx:install.commands += && cp libQCSXCAD*.dylib \"$$PREFIX/lib$$LIB_SUFFIX/\"
 
 QMAKE_EXTRA_TARGETS += install
 
