@@ -3,6 +3,10 @@ PROJECT( QCSXCAD CXX)
 
 cmake_minimum_required(VERSION 2.8)
 
+IF(EXISTS ${PROJECT_SOURCE_DIR}/localConfig.cmake)
+   include(${PROJECT_SOURCE_DIR}/localConfig.cmake)
+ENDIF()
+
 # default
 set(VERSION "v0.5.2")
 
@@ -23,12 +27,47 @@ ENDIF()
 
 ADD_DEFINITIONS(-DGIT_VERSION=\"${VERSION}\")
 
+#####  RPATH settings, see: http://www.cmake.org/Wiki/CMake_RPATH_handling#Always_full_RPATH #######
+# use, i.e. don't skip the full RPATH for the build tree
+SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
+
+# when building, don't use the install RPATH already
+# (but later on when installing)
+SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
+
+SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+
+# add the automatically determined parts of the RPATH
+# which point to directories outside the build tree to the install RPATH
+SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
+# the RPATH to be used when installing, but only if it's not a system directory
+LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
+IF("${isSystemDir}" STREQUAL "-1")
+   SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+ENDIF("${isSystemDir}" STREQUAL "-1")
+####################################################################################################
+
+# Set locations of extra CMake modules
+SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${openEMS_SOURCE_DIR}/cmake/Modules/")
+
+# CSXCAD
+# $ cmake -D CSXCAD_ROOT_DIR=~/opt/openEMS .
+# SET(CSXCAD_ROOT_DIR ~/opt/openEMS)
+find_library(CSXCAD_LIBRARIES NAMES CSXCAD
+  HINTS
+  ${CSXCAD_ROOT_DIR}/lib
+)
+message(STATUS "CSXCAD: ${CSXCAD_LIBRARIES}" )
+#TODO test if CSXCADs was found
+INCLUDE_DIRECTORIES( ${CSXCAD_ROOT_DIR}/include/CSXCAD ) 
+
 # TODO handle Qt5
 FIND_PACKAGE( Qt4 4.6.3 REQUIRED QtCore QtGui QtXml)
 INCLUDE( ${QT_USE_FILE} )
 
 # Set locations of CMake modules
-SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${QCSXCAD_SOURCE_DIR}/cmake/modules/")
+SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${QCSXCAD_SOURCE_DIR}/cmake/Modules/")
 
 # TinyXML module from https://github.com/ros/cmake_modules
 find_package(TinyXML REQUIRED)
@@ -90,9 +129,6 @@ INCLUDE_DIRECTORIES (${VTK_INCLUDE_DIR})
 INCLUDE_DIRECTORIES (${VTK_INCLUDE_DIR})
 
 
-INCLUDE_DIRECTORIES( ${CSXCAD_SOURCE_DIR}/src ) #find ContinuousStructure.h
-
-
 ADD_DEFINITIONS( -DBUILD_QCSXCAD_LIB )
 
 set( SOURCES
@@ -126,6 +162,7 @@ SET(MOC_HDRS
 
 
 set(PUB_HEADERS
+  QCSXCAD.h
   QCSGridEditor.h
   QCSPrimEditor.h
   QCSPropEditor.h
@@ -159,7 +196,7 @@ add_library( QCSXCAD SHARED
 )
 
 TARGET_LINK_LIBRARIES( QCSXCAD
-  CSXCAD
+  ${CSXCAD_LIBRARIES}
   tinyxml
   #${vtk_LIBS}      # issue with subset and vtk 6
   ${VTK_LIBRARIES}  # give all found libs fo linker
