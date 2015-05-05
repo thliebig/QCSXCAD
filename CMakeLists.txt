@@ -64,10 +64,6 @@ message(STATUS "CSXCAD: ${CSXCAD_LIBRARIES}" )
 #TODO test if CSXCADs was found
 INCLUDE_DIRECTORIES( ${CSXCAD_ROOT_DIR}/include/CSXCAD ) 
 
-# TODO handle Qt5
-FIND_PACKAGE( Qt4 4.6.3 REQUIRED QtCore QtGui QtXml)
-INCLUDE( ${QT_USE_FILE} )
-
 # Set locations of CMake modules
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${QCSXCAD_SOURCE_DIR}/cmake/Modules/")
 
@@ -75,7 +71,7 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${QCSXCAD_SOURCE_DIR}/cmake/Modules/
 find_package(TinyXML REQUIRED)
 ADD_DEFINITIONS(  -DTIXML_USE_STL )
 
-
+# vtk
 find_package(VTK REQUIRED)
 
 if("${VTK_MAJOR_VERSION}" EQUAL 5)
@@ -83,7 +79,6 @@ if("${VTK_MAJOR_VERSION}" EQUAL 5)
     QVTK
   )
 endif()
-
 
 ## issue with vtk 6.1,
 ## * the vtkStructuredGridGeometryFilter only for vtk 5
@@ -116,20 +111,34 @@ if("${VTK_MAJOR_VERSION}" EQUAL 6)
   )
 endif()
 
-if(VTK_FOUND)
-	message(STATUS "Found package VTK. Using " ${VTK_USE_FILE})
-    include(${VTK_USE_FILE})
-else(VTK_FOUND)
-    message(FATAL_ERROR "VTK not found. Please set VTK_DIR.")
-endif(VTK_FOUND)
-
+message(STATUS "Found package VTK. Using version " ${VTK_VERSION})
+include(${VTK_USE_FILE})
 INCLUDE_DIRECTORIES (${VTK_INCLUDE_DIR})
 
-#message(status "VTK selected: ${vtk_LIBS}")
-#message(status "VTK all libs: ${VTK_LIBRARIES}")
 
-INCLUDE_DIRECTORIES (${VTK_INCLUDE_DIR})
+# Qt 
+# require Qt4 if vtk 5.x is used
+# require Qt5 if vtk 6.x is used
+set(CMAKE_AUTOMOC ON)
+#
+# generate rules for building source files from bitmap resources
+#
+SET(RESOURCES resources.qrc)
 
+if("${VTK_MAJOR_VERSION}" EQUAL 5)
+    FIND_PACKAGE(Qt4 REQUIRED QtCore QtGui QtXml)
+    INCLUDE( ${QT_USE_FILE} )
+    QT4_ADD_RESOURCES(RESOURCES_SRCS ${RESOURCES})
+    set(CMAKE_AUTOMOC ON)
+elseif("${VTK_MAJOR_VERSION}" EQUAL 6)
+    find_package(Qt5Widgets REQUIRED)
+    include_directories(${Qt5Widgets_INCLUDE_DIRS})
+    find_package(Qt5Xml REQUIRED)
+    include_directories(${Qt5Xml_INCLUDE_DIRS})
+    INCLUDE_DIRECTORIES(${Qt5_INCLUDE_DIRS})
+    set(CMAKE_CXX_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
+    QT5_ADD_RESOURCES(RESOURCES_SRCS ${RESOURCES})
+endif()
 
 ADD_DEFINITIONS( -DBUILD_QCSXCAD_LIB )
 
@@ -148,21 +157,6 @@ set( SOURCES
   vtkInteractorStyleRubberBand2DPlane.cpp
 )
 
-#
-# files that have Q_OBJECT need to be MOC'ed
-# TODO use newer automoc with Qt5
-#
-SET(MOC_HDRS
-  QCSGridEditor.h
-  QCSPropEditor.h
-  QCSPrimEditor.h
-  QCSTreeWidget.h
-  QCSXCAD.h
-  QParameterGui.h
-  QVTKStructure.h
-)
-
-
 set(PUB_HEADERS
   QCSXCAD.h
   QCSGridEditor.h
@@ -178,24 +172,16 @@ set(PUB_HEADERS
   vtkInteractorStyleRubberBand2DPlane.h
 )
 
-#
-# headers that need to be moc'ed
-#
-QT4_WRAP_CPP( MOC_SRCS ${MOC_HDRS} )
-
-#
-# generate rules for building source files from bitmap resources
-#
-SET(RESOURCES resources.qrc)
-QT4_ADD_RESOURCES(RESOURCES_SRCS ${RESOURCES})
-
-
 # CSXCAD library
 add_library( QCSXCAD SHARED
   ${SOURCES}
   ${MOC_SRCS}
   ${RESOURCES_SRCS}
 )
+
+if(Qt5Widgets_FOUND)
+    qt5_use_modules(QCSXCAD Widgets Xml)
+endif()
 
 TARGET_LINK_LIBRARIES( QCSXCAD
   ${CSXCAD_LIBRARIES}
