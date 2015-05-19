@@ -34,6 +34,11 @@ ENDIF()
 
 ADD_DEFINITIONS(-DGIT_VERSION=\"${VERSION}\")
 
+if (WIN32)
+    ADD_DEFINITIONS( -DBUILD_QCSXCAD_LIB )
+endif (WIN32)
+
+
 #
 # Set up RPATH for the project
 #
@@ -54,15 +59,21 @@ endif()
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${openEMS_SOURCE_DIR}/cmake/Modules/")
 
 # CSXCAD
-# $ cmake -D CSXCAD_ROOT_DIR=~/opt/openEMS .
+# $ cmake -DCSXCAD_ROOT_DIR=~/opt/openEMS .
 # SET(CSXCAD_ROOT_DIR ~/opt/openEMS)
-find_library(CSXCAD_LIBRARIES NAMES CSXCAD
-  HINTS
-  ${CSXCAD_ROOT_DIR}/lib
+find_library(CSXCAD_LIBRARIES 
+  NAMES CSXCAD
+  HINTS ${CSXCAD_ROOT_DIR}/lib
 )
-message(STATUS "CSXCAD: ${CSXCAD_LIBRARIES}" )
+message(STATUS "CSXCAD_LIBRARIES: ${CSXCAD_LIBRARIES}" )
 #TODO test if CSXCADs was found
-INCLUDE_DIRECTORIES( ${CSXCAD_ROOT_DIR}/include/CSXCAD ) 
+find_path(CSXCAD_INCLUDE_DIR 
+    NAMES ContinuousStructure.h 
+    HINTS ${CSXCAD_ROOT_DIR}/include
+    PATH_SUFFIXES "CSXCAD" ${CSXCAD_INCLUDE_DIR}
+)
+message(STATUS "CSXCAD_INCLUDE_DIR: ${CSXCAD_INCLUDE_DIR}" )
+INCLUDE_DIRECTORIES( ${CSXCAD_INCLUDE_DIR} ) 
 
 # Set locations of CMake modules
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${QCSXCAD_SOURCE_DIR}/cmake/Modules/")
@@ -72,49 +83,16 @@ find_package(TinyXML REQUIRED)
 ADD_DEFINITIONS(  -DTIXML_USE_STL )
 
 # vtk
-find_package(VTK REQUIRED)
-
-if("${VTK_MAJOR_VERSION}" EQUAL 5)
-  set( vtk_LIBS
-    QVTK
-  )
-endif()
-
-## issue with vtk 6.1,
-## * the vtkStructuredGridGeometryFilter only for vtk 5
-## using the whole set of libs does work... 
-if("${VTK_MAJOR_VERSION}" EQUAL 6)
-  set( vtk_LIBS
-        vtkCommonCore
-        vtkCommonDataModel
-        vtkIOLegacy
-        vtkIOXML
-        vtkIOGeometry
-        vtkIOPLY
-        vtkIOImage
-        vtksys
-        vtkIOCore
-        vtkInteractionStyle
-        vtkInteractionWidgets
-        vtkFiltersModeling
-        vtkGUISupportQt
-        vtkRenderingCore
-        vtkRenderingVolumeOpenGL
-        vtkRenderingOpenGL
-        vtkRenderingFreeTypeOpenGL
-        vtkRenderingFreeType
-        vtkRenderingAnnotation
-        vtkRenderingLOD
-        vtkRenderingMatplotlib
-        vtkRenderingFreeTypeFontConfig
-        vtkStructuredGridGeometry
-  )
+if (WIN32)
+    find_package(VTK 6.1 REQUIRED)
+else()
+    # prefer >=6.1, fallback to >=5.4
+    find_package(VTK REQUIRED)
 endif()
 
 message(STATUS "Found package VTK. Using version " ${VTK_VERSION})
 include(${VTK_USE_FILE})
 INCLUDE_DIRECTORIES (${VTK_INCLUDE_DIR})
-
 
 # Qt 
 # require Qt4 if vtk 5.x is used
@@ -129,18 +107,22 @@ if("${VTK_MAJOR_VERSION}" EQUAL 5)
     FIND_PACKAGE(Qt4 REQUIRED QtCore QtGui QtXml)
     INCLUDE( ${QT_USE_FILE} )
     QT4_ADD_RESOURCES(RESOURCES_SRCS ${RESOURCES})
-    set(CMAKE_AUTOMOC ON)
 elseif("${VTK_MAJOR_VERSION}" EQUAL 6)
-    find_package(Qt5Widgets REQUIRED)
-    include_directories(${Qt5Widgets_INCLUDE_DIRS})
-    find_package(Qt5Xml REQUIRED)
-    include_directories(${Qt5Xml_INCLUDE_DIRS})
-    INCLUDE_DIRECTORIES(${Qt5_INCLUDE_DIRS})
-    set(CMAKE_CXX_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
-    QT5_ADD_RESOURCES(RESOURCES_SRCS ${RESOURCES})
+    # prefer Qt5 for vtk 6.x        
+    find_package(Qt5Widgets)
+    if(Qt5Widgets_FOUND)
+        include_directories(${Qt5Widgets_INCLUDE_DIRS})
+        find_package(Qt5Xml REQUIRED)
+        include_directories(${Qt5Xml_INCLUDE_DIRS})
+        INCLUDE_DIRECTORIES(${Qt5_INCLUDE_DIRS})
+        set(CMAKE_CXX_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
+        QT5_ADD_RESOURCES(RESOURCES_SRCS ${RESOURCES})
+    else()
+        FIND_PACKAGE(Qt4 REQUIRED QtCore QtGui QtXml)
+        INCLUDE( ${QT_USE_FILE} )
+        QT4_ADD_RESOURCES(RESOURCES_SRCS ${RESOURCES})
+    endif()
 endif()
-
-ADD_DEFINITIONS( -DBUILD_QCSXCAD_LIB )
 
 set( SOURCES
   QCSXCAD.cpp
@@ -186,7 +168,6 @@ endif()
 TARGET_LINK_LIBRARIES( QCSXCAD
   ${CSXCAD_LIBRARIES}
   tinyxml
-  #${vtk_LIBS}      # issue with subset and vtk 6
   ${VTK_LIBRARIES}  # give all found libs fo linker
   ${QT_LIBRARIES}
 )
