@@ -31,7 +31,7 @@ public:
 	void save( QString filename );
 
 protected:
-	void export_properties( QDomElement Scene, vector<CSProperties*> properties, QDomElement Material = QDomElement() );
+	void export_properties( QDomElement Scene, std::vector<CSProperties*> properties, QDomElement Material = QDomElement() );
 	void export_box( QDomElement &elem, double start[3], double stop[3], QDomElement Material = QDomElement() );
 	void export_polygon( QDomElement &elem, size_t count, double *array, double elevation, int normDir, QDomElement Material = QDomElement() );
 

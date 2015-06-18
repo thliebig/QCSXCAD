@@ -64,7 +64,7 @@ void export_X3D::save( QString filename )
 	NavigationInfo.setAttribute( "type", "EXAMINE" );
 	Scene.appendChild( NavigationInfo );
 
-	vector<CSProperties*> properties = m_CSX->GetPropertyByType( CSProperties::MATERIAL );
+	std::vector<CSProperties*> properties = m_CSX->GetPropertyByType( CSProperties::MATERIAL );
 	export_properties( Scene, properties );
 
 	properties = m_CSX->GetPropertyByType( CSProperties::METAL );
@@ -104,7 +104,7 @@ void export_X3D::save( QString filename )
 	doc.save( stream, 4, QDomNode::EncodingFromTextStream );
 }
 
-void export_X3D::export_properties( QDomElement Scene, vector<CSProperties*> properties, QDomElement Material )
+void export_X3D::export_properties( QDomElement Scene, std::vector<CSProperties*> properties, QDomElement Material )
 {
 	foreach( CSProperties* prop, properties )
 	{

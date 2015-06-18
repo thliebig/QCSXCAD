@@ -185,7 +185,7 @@ void QCSTreeWidget::UpdateTree()
 		AddPropItem(prop);
 	}
 
-	vector<CSPrimitives*> vPrims = clCS->GetAllPrimitives();
+	std::vector<CSPrimitives*> vPrims = clCS->GetAllPrimitives();
 	for (size_t i=0;i<vPrims.size();++i)
 		AddPrimItem(vPrims.at(i));
 }

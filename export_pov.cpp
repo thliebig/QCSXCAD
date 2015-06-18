@@ -69,7 +69,7 @@ void export_pov::save( QString filename )
 	stream << "background { color rgb<1.000000,1.000000,1.000000> #if(TRANSPARENT) transmit 1.0 #end }" << endl;
 
 	// export material
-	vector<CSProperties*> properties = m_CSX->GetPropertyByType( CSProperties::MATERIAL );
+	std::vector<CSProperties*> properties = m_CSX->GetPropertyByType( CSProperties::MATERIAL );
 	export_properties( stream, properties, "pigment { color rgbt <0.000, 0.533, 0.800,0.0> } finish { diffuse 0.6 }" );
 
 	// export metal
@@ -86,7 +86,7 @@ void export_pov::save( QString filename )
 	file.close();
 }
 
-void export_pov::export_properties( QTextStream &stream, vector<CSProperties*> properties, QString default_obj_modifier )
+void export_pov::export_properties( QTextStream &stream, std::vector<CSProperties*> properties, QString default_obj_modifier )
 {
 	foreach( CSProperties* prop, properties )
 	{

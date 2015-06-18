@@ -23,7 +23,6 @@
 #include <QString>
 #include "QCSXCAD_Global.h"
 #include "ContinuousStructure.h"
-using namespace std;
 
 class QVTKStructure;
 class QCSPrimEditor;

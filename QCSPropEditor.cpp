@@ -491,7 +491,7 @@ void QCSPropExcitationGB::SetValues()
 
 void QCSPropExcitationGB::GetValues()
 {
-	string line;
+	std::string line;
 
 	for (unsigned int i=0;i<3;++i)
 	{

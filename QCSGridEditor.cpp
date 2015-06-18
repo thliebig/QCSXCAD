@@ -249,7 +249,7 @@ void QCSGridEditor::BuildInHomogenDisc()
 				double* dValue=new double[Nodes[i]->value()];
 				for (int n=0;n<Nodes[i]->value();++n)
 					dValue[n]=dSimBox[2*i]+n*dStep;
-				string error = clGrid->AddDiscLines(i,Nodes[i]->value(),dValue,function[i]->text().toStdString());
+				std::string error = clGrid->AddDiscLines(i,Nodes[i]->value(),dValue,function[i]->text().toStdString());
 				delete[] dValue;
 				if (error.empty()==false) QMessageBox::warning(HomogenDisc,tr("Error evaluation grid function!"),QString(error.c_str()));
 			}

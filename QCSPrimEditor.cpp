@@ -116,7 +116,7 @@ void QCSPrimEditor::Save()
 	CSProperties* prop = clCS->GetProperty((unsigned int)PropertiesComboBox->currentIndex());
 	if (prop==NULL)
 	{
-		cerr << __func__ << ": Error, property invalid!" << endl;
+		std::cerr << __func__ << ": Error, property invalid!" << std::endl;
 		reject();
 		return;
 	}

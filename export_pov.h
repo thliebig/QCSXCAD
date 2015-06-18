@@ -31,7 +31,7 @@ public:
 	void save( QString filename );
 
 protected:
-	void export_properties( QTextStream &stream, vector<CSProperties*> properties, QString default_obj_modifier = QString() );
+	void export_properties( QTextStream &stream, std::vector<CSProperties*> properties, QString default_obj_modifier = QString() );
 	void export_box( QTextStream &stream, double start[3], double stop[3], QString obj_modifier = QString() );
 	void export_polygon( QTextStream &stream, size_t count, double *array, double elevation, int normDir, QString obj_modifier = QString() );
 	void export_cylinder( QTextStream &stream, double start[3], double stop[3], double radius, QString object_modifier = QString() );

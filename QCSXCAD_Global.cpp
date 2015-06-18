@@ -20,8 +20,6 @@
 #include <QtCore>
 #include "QCSXCAD_Global.h"
 
-using namespace std;
-
 // create global object
 QCSXCAD_Global QCSX_Settings;
 
@@ -31,10 +29,10 @@ QCSXCAD_Global::QCSXCAD_Global()
 	m_RenderDiscMat = false;
 }
 
-void QCSXCAD_Global::ShowArguments(ostream& ostr, string front)
+void QCSXCAD_Global::ShowArguments(std::ostream& ostr, std::string front)
 {
-	ostr << front << "--disableEdit\tDisable Edit" << endl;
-	ostr << front << "--RenderDiscMaterial\tRender discrete material" << endl;
+	ostr << front << "--disableEdit\tDisable Edit" << std::endl;
+	ostr << front << "--RenderDiscMaterial\tRender discrete material" << std::endl;
 }
 
 bool QCSXCAD_Global::parseCommandLineArgument( QString argv )
@@ -44,17 +42,17 @@ bool QCSXCAD_Global::parseCommandLineArgument( QString argv )
 
 	if (argv.compare("--disableEdit")==0)
 	{
-		cout << "QCSXCAD - disabling editing" << endl;
+		std::cout << "QCSXCAD - disabling editing" << std::endl;
 		SetEdit(false);
 		return true;
 	}
 	if (argv.compare("--RenderDiscMaterial")==0)
 	{
-		cout << "QCSXCAD - Render discrete material" << endl;
+		std::cout << "QCSXCAD - Render discrete material" << std::endl;
 		SetRenderDiscMaterial(true);
 		return true;
 	}
-//	cerr << "QCSXCAD_Global::parseCommandLineArgument: Warning, unknown argument: " << argv.toStdString() << endl;
+//	std::cerr << "QCSXCAD_Global::parseCommandLineArgument: Warning, unknown argument: " << argv.toStdString() << std::endl;
 	return false;
 }
 
