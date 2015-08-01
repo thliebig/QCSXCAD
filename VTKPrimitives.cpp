@@ -196,7 +196,7 @@ void VTKPrimitives::AddCylindricalCube(double *dCoords, double *dRGB, double dOp
 
 		vtkRotationalExtrusionFilter *extrude = vtkRotationalExtrusionFilter::New();
 #if VTK_MAJOR_VERSION==6
-		extrude->SetInputData(PDSource->GetOutput());
+		extrude->SetInputConnection(PDSource->GetOutputPort());
 #else
 		extrude->SetInput(PDSource->GetOutput());
 #endif
@@ -408,7 +408,7 @@ void VTKPrimitives::AddCylinder(const double *dCenter, const double *dExtrusionV
 	transform->PostMultiply();
 
 #if VTK_MAJOR_VERSION==6
-	transformFilter->SetInputData(Source->GetOutput());
+	transformFilter->SetInputConnection(Source->GetOutputPort());
 #else
 	transformFilter->SetInput(Source->GetOutput());
 #endif
@@ -435,7 +435,7 @@ void VTKPrimitives::AddCylindricalShell(const double *dAxisStart, const double* 
 	// extrude in +z
 	vtkLinearExtrusionFilter *linearExtrusionFilter = vtkLinearExtrusionFilter::New();
 #if VTK_MAJOR_VERSION==6
-	linearExtrusionFilter->SetInputData( diskSource->GetOutput() );
+	linearExtrusionFilter->SetInputConnection( diskSource->GetOutputPort() );
 #else
 	linearExtrusionFilter->SetInput( diskSource->GetOutput() );
 #endif
@@ -544,7 +544,7 @@ void VTKPrimitives::AddArrow(double *dStart, double *dEnd, double *dRGB, double 
 	transform->PostMultiply();
 
 #if VTK_MAJOR_VERSION==6
-	transformFilter->SetInputData(Source->GetOutput());
+	transformFilter->SetInputConnection(Source->GetOutputPort());
 #else
 	transformFilter->SetInput(Source->GetOutput());
 #endif
@@ -567,7 +567,7 @@ void VTKPrimitives::AddLabel(char *cText, double *dCoords, double *dRGB, double 
 	vtkTransformPolyDataFilter* filter = vtkTransformPolyDataFilter::New();
 	vtkTransform* vtrans = vtkTransform::New();
 #if VTK_MAJOR_VERSION==6
-	filter->SetInputData(text->GetOutput());
+	filter->SetInputConnection(text->GetOutputPort());
 #else
 	filter->SetInput(text->GetOutput());
 #endif
