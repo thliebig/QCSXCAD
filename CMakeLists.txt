@@ -68,15 +68,16 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${openEMS_SOURCE_DIR}/cmake/Modules/
 # SET(CSXCAD_ROOT_DIR ~/opt/openEMS)
 find_library(CSXCAD_LIBRARIES 
   NAMES CSXCAD
-  PATH_SUFFIXES "libCSXCAD" ${CSXCAD_ROOT_DIR}/lib${LIB_SUFFIX}
+  HINTS ${CSXCAD_ROOT_DIR}/lib${LIB_SUFFIX}
   NO_CMAKE_FIND_ROOT_PATH
 )
 message(STATUS "CSXCAD_LIBRARIES: ${CSXCAD_LIBRARIES}" )
 #TODO test if CSXCADs was found
 find_path(CSXCAD_INCLUDE_DIR 
-  NAMES ContinuousStructure.h 
-  PATH_SUFFIXES "CSXCAD" ${CSXCAD_ROOT_DIR}/include
-  NO_CMAKE_FIND_ROOT_PATH
+    NAMES ContinuousStructure.h 
+    HINTS ${CSXCAD_ROOT_DIR}/include
+    PATH_SUFFIXES "CSXCAD" ${CSXCAD_INCLUDE_DIR}
+    NO_CMAKE_FIND_ROOT_PATH
 )
 message(STATUS "CSXCAD_INCLUDE_DIR: ${CSXCAD_INCLUDE_DIR}" )
 INCLUDE_DIRECTORIES( ${CSXCAD_INCLUDE_DIR} ) 
@@ -93,7 +94,10 @@ if (WIN32)
     find_package(VTK 6.1 REQUIRED)
 else()
     # prefer >=6.1, fallback to >=5.4
-    find_package(VTK REQUIRED)
+    find_package(VTK 6.1 COMPONENTS vtkGUISupportQt vtkRenderingLOD vtkRenderingOpenGL vtkIOXML vtkIOPLY vtkIOImage vtkInteractionWidgets NO_MODULE)
+    IF (NOT ${VTK_FOUND})
+        find_package(VTK REQUIRED)
+    endif()
 endif()
 
 message(STATUS "Found package VTK. Using version " ${VTK_VERSION})
@@ -130,6 +134,22 @@ elseif("${VTK_MAJOR_VERSION}" EQUAL 6)
     endif()
 endif()
 
+if("${VTK_MAJOR_VERSION}" EQUAL 6)
+    set( vtk_LIBS ${VTK_LIBRARIES} )
+else()
+    set( vtk_LIBS
+        vtkCommon
+        vtkFiltering
+        vtkGraphics
+        vtkHybrid
+        vtkIO
+        vtkRendering
+        vtkWidgets
+        QVTK
+        )
+endif()
+message(STATUS "vtk libraries " ${vtk_LIBS})
+    
 set( SOURCES
   QCSXCAD.cpp
   QCSGridEditor.cpp
@@ -174,7 +194,7 @@ endif()
 TARGET_LINK_LIBRARIES( QCSXCAD
   ${CSXCAD_LIBRARIES}
   tinyxml
-  ${VTK_LIBRARIES}  # give all found libs fo linker
+  ${vtk_LIBS}
   ${QT_LIBRARIES}
 )
 
