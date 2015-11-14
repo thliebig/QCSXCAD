@@ -10,6 +10,11 @@ PROJECT( QCSXCAD CXX)
 
 cmake_minimum_required(VERSION 2.8)
 
+# https://cmake.org/cmake/help/v3.0/policy/CMP0020.html
+if(POLICY CMP0020)
+  cmake_policy(SET CMP0020 OLD)
+endif()
+
 IF(EXISTS ${PROJECT_SOURCE_DIR}/localConfig.cmake)
    include(${PROJECT_SOURCE_DIR}/localConfig.cmake)
 ENDIF()
