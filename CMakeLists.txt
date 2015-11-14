@@ -105,33 +105,20 @@ include(${VTK_USE_FILE})
 INCLUDE_DIRECTORIES (${VTK_INCLUDE_DIR})
 
 # Qt 
-# require Qt4 if vtk 5.x is used
-# require Qt5 if vtk 6.x is used
-set(CMAKE_AUTOMOC ON)
-#
-# generate rules for building source files from bitmap resources
-#
 SET(RESOURCES resources.qrc)
-
-if("${VTK_MAJOR_VERSION}" EQUAL 5)
+set(CMAKE_AUTOMOC ON)
+if(${VTK_VERSION} VERSION_GREATER "6" AND VTK_QT_VERSION VERSION_GREATER "4")
+    find_package(Qt5Widgets REQUIRED)
+    include_directories(${Qt5Widgets_INCLUDE_DIRS})
+    find_package(Qt5Xml REQUIRED)
+    include_directories(${Qt5Xml_INCLUDE_DIRS})
+    INCLUDE_DIRECTORIES(${Qt5_INCLUDE_DIRS})
+    set(CMAKE_CXX_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
+    QT5_ADD_RESOURCES(RESOURCES_SRCS ${RESOURCES})
+else()
     FIND_PACKAGE(Qt4 REQUIRED QtCore QtGui QtXml)
     INCLUDE( ${QT_USE_FILE} )
     QT4_ADD_RESOURCES(RESOURCES_SRCS ${RESOURCES})
-elseif("${VTK_MAJOR_VERSION}" EQUAL 6)
-    # prefer Qt5 for vtk 6.x        
-    find_package(Qt5Widgets)
-    if(Qt5Widgets_FOUND)
-        include_directories(${Qt5Widgets_INCLUDE_DIRS})
-        find_package(Qt5Xml REQUIRED)
-        include_directories(${Qt5Xml_INCLUDE_DIRS})
-        INCLUDE_DIRECTORIES(${Qt5_INCLUDE_DIRS})
-        set(CMAKE_CXX_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
-        QT5_ADD_RESOURCES(RESOURCES_SRCS ${RESOURCES})
-    else()
-        FIND_PACKAGE(Qt4 REQUIRED QtCore QtGui QtXml)
-        INCLUDE( ${QT_USE_FILE} )
-        QT4_ADD_RESOURCES(RESOURCES_SRCS ${RESOURCES})
-    endif()
 endif()
 
 if("${VTK_MAJOR_VERSION}" EQUAL 6)
