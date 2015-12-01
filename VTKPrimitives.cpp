@@ -655,7 +655,7 @@ void VTKPrimitives::AddRotationalPoly(const double *dCoords, unsigned int uiQtyC
 	transformFilter->SetInputConnection(extrude->GetOutputPort());
 	transformFilter->SetTransform(transform);
 
-	AddPolyData(transformFilter->GetOutput(), dRGB, dOpacity, tf_matrix);
+	AddPolyData(transformFilter->GetOutputPort(), dRGB, dOpacity, tf_matrix);
 
 	points->Delete();
 	poly->Delete();
