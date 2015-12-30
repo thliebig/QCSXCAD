@@ -263,7 +263,7 @@ void QCSXCAD::aboutQCSXCAD(QWidget* parent)
 
 bool QCSXCAD::CheckGeometry()
 {
-	QString msg = QString(Update());
+	QString msg = QString::fromStdString(Update());
 	if (msg.isEmpty())
 	{
 		return true;
