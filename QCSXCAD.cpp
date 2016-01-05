@@ -789,7 +789,7 @@ void QCSXCAD::ExportGeometry(QString dirname, int type)
 		 {
 			QString filename(dirname);
 			filename.append("/");
-			filename.append(prop->GetName().c_str());
+			filename.append(QString::fromUtf8(prop->GetName().c_str()));
 			switch (type)
 			{
 			case 0:

@@ -232,7 +232,7 @@ QGroupBox* QCSPropEditor::BuildGeneral()
 	QGroupBox* box= new QGroupBox("General");
 	QGridLayout* grid = new QGridLayout();
 
-	Name = new QLineEdit(QString(clProp->GetName().c_str()));
+	Name = new QLineEdit(QString::fromUtf8(clProp->GetName().c_str()));
 	Name->setEnabled(QCSX_Settings.GetEdit());
 	grid->addWidget(new QLabel(tr("Name: ")),0,0);
 	grid->addWidget(Name,0,1);
@@ -311,7 +311,7 @@ void QCSPropEditor::GetValues()
 
 	propGB = BuildPropGroupBox(clProp);
 
-	Name->setText(QString(clProp->GetName().c_str()));
+	Name->setText(QString::fromUtf8(clProp->GetName().c_str()));
 	TypeCB->setCurrentIndex(GetIndexOfType());
 	FCButton->SetColor(clProp->GetFillColor());
 	ECButton->SetColor(clProp->GetEdgeColor());

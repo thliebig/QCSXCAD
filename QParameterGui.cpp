@@ -85,7 +85,7 @@ bool QParameter::Edit()
 	QGridLayout* lay = new QGridLayout();
 	
 	lay->addWidget(new QLabel(tr("Name: ")),0,0);
-	QLineEdit* eName= new QLineEdit(clPara->GetName().c_str());
+	QLineEdit* eName= new QLineEdit(QString::fromUtf8(clPara->GetName().c_str()));
 	lay->addWidget(eName,0,1);
 	
 	lay->addWidget(new QLabel(tr("Value: ")),1,0);
@@ -126,7 +126,7 @@ bool QParameter::Edit()
 void QParameter::Update()
 {
 	//Name->setText(clPara->GetName());
-	setTitle(clPara->GetName().c_str());
+	setTitle(QString::fromUtf8(clPara->GetName().c_str()));
 	Value->setText(QString("%1").arg(clPara->GetValue()));
 	if (clPara->GetSweep()) SweepCB->setCheckState(Qt::Checked);
 	else SweepCB->setCheckState(Qt::Unchecked);
@@ -162,7 +162,7 @@ bool QLinearParameter::Edit()
 	QGridLayout* lay = new QGridLayout();
 	
 	lay->addWidget(new QLabel(tr("Name: ")),0,0);
-	QLineEdit* eName= new QLineEdit(LP->GetName().c_str());
+	QLineEdit* eName= new QLineEdit(QString::fromUtf8(LP->GetName().c_str()));
 	lay->addWidget(eName,0,1);
 	
 	lay->addWidget(new QLabel(tr("Value: ")),1,0);
