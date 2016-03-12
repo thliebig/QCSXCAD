@@ -244,7 +244,7 @@ void VTKPrimitives::AddPlane(double *dOrigin, double* dP1, double* dP2, double *
 	Source->SetPoint1(TransformCylindricalCoords(dP1,out));
 	Source->SetPoint2(TransformCylindricalCoords(dP2,out));
 
-	AddPolyData(Source->GetOutput(), dRGB, dOpacity, tf_matrix);
+	AddPolyData(Source->GetOutputPort(), dRGB, dOpacity, tf_matrix);
 	Source->Delete();
 }
 
@@ -477,7 +477,7 @@ void VTKPrimitives::AddSphere(const double *dCenter, double fRadius, double *dRG
 	Source->SetPhiResolution(iResolution);
 	Source->SetThetaResolution(iResolution);
 
-	AddPolyData(Source->GetOutput(), dRGB, dOpacity, tf_matrix);
+	AddPolyData(Source->GetOutputPort(), dRGB, dOpacity, tf_matrix);
 
 	Source->Delete();
 }
@@ -504,7 +504,7 @@ void VTKPrimitives::AddSphericalShell(const double *dCenter, double r_i, double 
 	boolFilter->SetInputConnection(1, Source_i->GetOutputPort());
 
 	//todo, we should remove the unnecessary scalar data produced by the filter...
-	AddPolyData(boolFilter->GetOutput(), dRGB, dOpacity, tf_matrix);
+	AddPolyData(boolFilter->GetOutputPort(), dRGB, dOpacity, tf_matrix);
 
 	boolFilter->Delete();
 	Source_o->Delete();
