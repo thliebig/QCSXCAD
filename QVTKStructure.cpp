@@ -311,7 +311,7 @@ void QVTKStructure::RenderGridDir(int dir, unsigned int plane_pos)
 		}
 		vtkRectilinearGridGeometryFilter *grid_plane = vtkRectilinearGridGeometryFilter::New();
 		plane = grid_plane;
-#if VTK_MAJOR_VERSION==6
+#if VTK_MAJOR_VERSION>=6
 		grid_plane->SetInputData(m_Rect_Grid);
 #else
 		grid_plane->SetInput(m_Rect_Grid);
@@ -348,7 +348,7 @@ void QVTKStructure::RenderGridDir(int dir, unsigned int plane_pos)
 
 		vtkStructuredGridGeometryFilter *grid_plane = vtkStructuredGridGeometryFilter::New();
 		plane = grid_plane;
-#if VTK_MAJOR_VERSION==6
+#if VTK_MAJOR_VERSION>=6
 		grid_plane->SetInputData(m_Struct_Grid);
 #else
 		grid_plane->SetInput(m_Struct_Grid);
