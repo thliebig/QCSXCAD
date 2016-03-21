@@ -126,7 +126,7 @@ else()
     QT4_ADD_RESOURCES(RESOURCES_SRCS ${RESOURCES})
 endif()
 
-if("${VTK_MAJOR_VERSION}" EQUAL 6)
+if("${VTK_MAJOR_VERSION}" GREATER 5)
     set( vtk_LIBS ${VTK_LIBRARIES} )
 else()
     set( vtk_LIBS
