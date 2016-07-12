@@ -778,7 +778,7 @@ vtkActor* VTKPrimitives::AddPolyData(vtkPolyData* polydata, double *dRGB, double
 	filter->SetTransform(vtrans);
 
 #if VTK_MAJOR_VERSION>=6
-	m_PolyDataCollection->AddInputData(filter->GetOutput());
+	m_PolyDataCollection->AddInputConnection(filter->GetOutputPort());
 #else
 	m_PolyDataCollection->AddInput(filter->GetOutput());
 #endif
@@ -812,7 +812,7 @@ vtkActor* VTKPrimitives::AddPolyData(vtkAlgorithmOutput* polydata_port, double *
 	filter->SetTransform(vtrans);
 
 #if VTK_MAJOR_VERSION>=6
-	m_PolyDataCollection->AddInputData(filter->GetOutput());
+	m_PolyDataCollection->AddInputConnection(filter->GetOutputPort());
 #else
 	m_PolyDataCollection->AddInput(filter->GetOutput());
 #endif
@@ -855,7 +855,7 @@ void VTKPrimitives::WritePolyData2File(const char* filename, double scale)
 	if (scale==1.0)
 	{
 #if VTK_MAJOR_VERSION>=6
-		writer->SetInputData(m_PolyDataCollection->GetOutput());
+		writer->SetInputConnection(m_PolyDataCollection->GetOutputPort());
 #else
 		writer->SetInput(m_PolyDataCollection->GetOutput());
 #endif
@@ -867,7 +867,7 @@ void VTKPrimitives::WritePolyData2File(const char* filename, double scale)
 		vtkTransformPolyDataFilter *transformFilter = vtkTransformPolyDataFilter::New();
 
 #if VTK_MAJOR_VERSION>=6
-		transformFilter->SetInputData(m_PolyDataCollection->GetOutput());
+		transformFilter->SetInputConnection(m_PolyDataCollection->GetOutputPort());
 #else
 		transformFilter->SetInput(m_PolyDataCollection->GetOutput());
 #endif
@@ -875,7 +875,7 @@ void VTKPrimitives::WritePolyData2File(const char* filename, double scale)
 		transformFilter->SetTransform(transform);
 
 #if VTK_MAJOR_VERSION>=6
-		writer->SetInputData(transformFilter->GetOutput());
+		writer->SetInputConnection(transformFilter->GetOutputPort());
 #else
 		writer->SetInput(transformFilter->GetOutput());
 #endif
@@ -895,7 +895,7 @@ void VTKPrimitives::WritePolyData2STL(const char* filename, double scale)
 	vtkTriangleFilter* filter = vtkTriangleFilter::New();
 
 #if VTK_MAJOR_VERSION>=6
-	filter->SetInputData(m_PolyDataCollection->GetOutput());
+	filter->SetInputConnection(m_PolyDataCollection->GetOutputPort());
 #else
 	filter->SetInput(m_PolyDataCollection->GetOutput());
 #endif
@@ -917,7 +917,7 @@ void VTKPrimitives::WritePolyData2STL(const char* filename, double scale)
 		transformFilter->SetTransform(transform);
 
 #if VTK_MAJOR_VERSION>=6
-		writer->SetInputData(transformFilter->GetOutput());
+		writer->SetInputConnection(transformFilter->GetOutputPort());
 #else
 		writer->SetInput(transformFilter->GetOutput());
 #endif
@@ -937,7 +937,7 @@ void VTKPrimitives::WritePolyData2PLY(const char* filename, double scale)
 	vtkTriangleFilter* filter = vtkTriangleFilter::New();
 
 #if VTK_MAJOR_VERSION>=6
-	filter->SetInputData(m_PolyDataCollection->GetOutput());
+	filter->SetInputConnection(m_PolyDataCollection->GetOutputPort());
 #else
 	filter->SetInput(m_PolyDataCollection->GetOutput());
 #endif
@@ -960,7 +960,7 @@ void VTKPrimitives::WritePolyData2PLY(const char* filename, double scale)
 		transformFilter->SetTransform(transform);
 
 #if VTK_MAJOR_VERSION>=6
-		writer->SetInputData(transformFilter->GetOutput());
+		writer->SetInputConnection(transformFilter->GetOutputPort());
 #else
 		writer->SetInput(transformFilter->GetOutput());
 #endif
