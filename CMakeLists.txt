@@ -107,7 +107,7 @@ endif()
 
 message(STATUS "Found package VTK. Using version " ${VTK_VERSION})
 include(${VTK_USE_FILE})
-INCLUDE_DIRECTORIES (${VTK_INCLUDE_DIR})
+INCLUDE_DIRECTORIES (${VTK_INCLUDE_DIRS})
 
 # Qt 
 SET(RESOURCES resources.qrc)
