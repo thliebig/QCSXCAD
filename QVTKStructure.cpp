@@ -19,7 +19,12 @@
 
 #include "QVTKStructure.h"
 
-#include "QVTKWidget.h"
+#if VTK_MAJOR_VERSION>=8
+  #include "QVTKOpenGLWidget.h"
+  #include "vtkGenericOpenGLRenderWindow.h"
+#else
+  #include "QVTKWidget.h"
+#endif
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
@@ -93,7 +98,13 @@ QVTKStructure::QVTKStructure()
 	iResolution=32;
 	AllowUpdate=true;
 
+#if VTK_MAJOR_VERSION>=8
+	VTKWidget= new QVTKOpenGLWidget();
+	vtkNew<vtkGenericOpenGLRenderWindow> renderWindow;
+	VTKWidget->SetRenderWindow(renderWindow);
+#else
 	VTKWidget= new QVTKWidget();
+#endif
 
 	ren = vtkRenderer::New();
 	VTKWidget->GetRenderWindow()->AddRenderer(ren);

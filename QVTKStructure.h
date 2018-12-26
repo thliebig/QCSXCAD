@@ -20,7 +20,11 @@
 
 #include <QtGui>
 
-class QVTKWidget;
+#if VTK_MAJOR_VERSION>=8
+  class QVTKOpenGLWidget;
+#else
+  class QVTKWidget;
+#endif
 class vtkRenderWindow;
 class vtkRenderWindowInteractor;
 class vtkRenderer;
@@ -95,7 +99,11 @@ protected:
 		unsigned int uID;
 	} VTKLayerStruct;
 
+#if VTK_MAJOR_VERSION>=8
+	QVTKOpenGLWidget *VTKWidget;
+#else
 	QVTKWidget *VTKWidget;
+#endif
 
 	//set to false if this widget is hidden
 	bool AllowUpdate;
