@@ -19,11 +19,13 @@
 
 #include "QVTKStructure.h"
 
+#include "vtkCommand.h"
 #if VTK_MAJOR_VERSION>=8
   #include "QVTKOpenGLWidget.h"
   #include "vtkGenericOpenGLRenderWindow.h"
 #else
-  #include "QVTKWidget.h"
+  #include "QVTKWidget.h"
+
 #endif
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
@@ -55,7 +57,6 @@
 #include "vtkDoubleArray.h"
 #include "vtkActorCollection.h"
 #include "vtkInteractorStyle.h"
-#include "vtkCommand.h"
 #include "vtkCallbackCommand.h"
 #include "vtkWindowToImageFilter.h"
 #include "vtkPNGWriter.h"
@@ -99,9 +100,8 @@ QVTKStructure::QVTKStructure()
 	AllowUpdate=true;
 
 #if VTK_MAJOR_VERSION>=8
-	VTKWidget= new QVTKOpenGLWidget();
-	vtkNew<vtkGenericOpenGLRenderWindow> renderWindow;
-	VTKWidget->SetRenderWindow(renderWindow);
+	VTKWidget = new QVTKOpenGLWidget();
+	VTKWidget->SetRenderWindow(vtkGenericOpenGLRenderWindow::New());
 #else
 	VTKWidget= new QVTKWidget();
 #endif

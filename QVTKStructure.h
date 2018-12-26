@@ -20,6 +20,7 @@
 
 #include <QtGui>
 
+#include "vtkCommand.h"
 #if VTK_MAJOR_VERSION>=8
   class QVTKOpenGLWidget;
 #else
