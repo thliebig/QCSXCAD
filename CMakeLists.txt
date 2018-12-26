@@ -95,15 +95,7 @@ find_package(TinyXML REQUIRED)
 ADD_DEFINITIONS(  -DTIXML_USE_STL )
 
 # vtk
-if (WIN32)
-    find_package(VTK 6.1 REQUIRED)
-else()
-    # prefer >=6.1, fallback to >=5.4
-    find_package(VTK 6.1 COMPONENTS vtkGUISupportQt vtkRenderingLOD vtkRenderingOpenGL vtkIOXML vtkIOPLY vtkIOImage vtkInteractionWidgets NO_MODULE)
-    IF (NOT ${VTK_FOUND})
-        find_package(VTK REQUIRED)
-    endif()
-endif()
+find_package(VTK REQUIRED)
 
 message(STATUS "Found package VTK. Using version " ${VTK_VERSION})
 include(${VTK_USE_FILE})
