@@ -580,7 +580,7 @@ void QVTKStructure::RenderGeometry()
 					int nP = (normDir+1)%3;
 					int nPP = (normDir+2)%3;
 					int nrPts = poly->GetQtyCoords();
-					double dCoords[3*nrPts];
+					double* dCoords = new double[3*nrPts];
 					for (int n=0;n<nrPts;++n)
 					{
 						dCoords[normDir*nrPts + n] = elev;
@@ -601,6 +601,7 @@ void QVTKStructure::RenderGeometry()
 						double angles[2] = {prim->ToRotPoly()->GetAngle(0)*180/PI,prim->ToRotPoly()->GetAngle(1)*180/PI};
 						vtkPrims->AddRotationalPoly(dCoords,nrPts,dVector,angles,rgb,(double)col.a/255.0,32,transform_matrix);
 					}
+					delete[] dCoords; dCoords=NULL;
 					break;
 				}
 				case CSPrimitives::POLYHEDRONREADER:
@@ -648,7 +649,7 @@ void QVTKStructure::RenderGeometry()
 						curve = prim->ToWire();
 
 					unsigned int nrP = (unsigned int)curve->GetNumberOfPoints();
-					double dCoords[3*nrP];
+					double* dCoords = new double[3*nrP];
 					double xyz[3];
 					bool isCurve = (prim->GetType()==CSPrimitives::CURVE);
 					for (unsigned int n=0;n<nrP;++n)
@@ -665,6 +666,7 @@ void QVTKStructure::RenderGeometry()
 						CSPrimWire* wire = prim->ToWire();
 						vtkPrims->AddTubePoly(dCoords,nrP,wire->GetWireRadius(),rgb,(double)col.a/255.0,8,transform_matrix);
 					}
+					delete[] dCoords; dCoords=NULL;
 					break;
 				}
 				}

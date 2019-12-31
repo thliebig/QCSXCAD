@@ -34,6 +34,8 @@ class vtkAppendPolyData;
 class vtkActor;
 class vtkAlgorithmOutput;
 
+#define _USE_MATH_DEFINES
+
 #define PI 3.141592654
 
 class VTKPrimitives

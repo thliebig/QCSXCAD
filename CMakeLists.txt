@@ -9,6 +9,7 @@ ENDIF()
 PROJECT( QCSXCAD CXX)
 
 cmake_minimum_required(VERSION 2.8)
+cmake_policy(SET CMP0074 NEW)
 
 # https://cmake.org/cmake/help/v3.0/policy/CMP0020.html
 if(POLICY CMP0020)
@@ -93,6 +94,7 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${QCSXCAD_SOURCE_DIR}/cmake/Modules/
 # TinyXML module from https://github.com/ros/cmake_modules
 find_package(TinyXML REQUIRED)
 ADD_DEFINITIONS(  -DTIXML_USE_STL )
+INCLUDE_DIRECTORIES( ${TinyXML_INCLUDE_DIR} )
 
 # vtk
 find_package(VTK REQUIRED)
@@ -110,7 +112,7 @@ if(${VTK_VERSION} VERSION_GREATER "6" AND VTK_QT_VERSION VERSION_GREATER "4")
     find_package(Qt5Xml REQUIRED)
     include_directories(${Qt5Xml_INCLUDE_DIRS})
     INCLUDE_DIRECTORIES(${Qt5_INCLUDE_DIRS})
-    set(CMAKE_CXX_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
     QT5_ADD_RESOURCES(RESOURCES_SRCS ${RESOURCES})
 else()
     FIND_PACKAGE(Qt4 REQUIRED QtCore QtGui QtXml)
@@ -177,7 +179,7 @@ endif()
 
 TARGET_LINK_LIBRARIES( QCSXCAD
   ${CSXCAD_LIBRARIES}
-  tinyxml
+  ${TinyXML_LIBRARY}
   ${vtk_LIBS}
   ${QT_LIBRARIES}
 )
