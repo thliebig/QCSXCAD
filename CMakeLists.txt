@@ -9,7 +9,6 @@ ENDIF()
 PROJECT( QCSXCAD CXX)
 
 cmake_minimum_required(VERSION 2.8)
-cmake_policy(SET CMP0074 NEW)
 
 # https://cmake.org/cmake/help/v3.0/policy/CMP0020.html
 if(POLICY CMP0020)
