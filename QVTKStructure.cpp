@@ -20,7 +20,10 @@
 #include "QVTKStructure.h"
 
 #include "vtkCommand.h"
-#if VTK_MAJOR_VERSION>=8
+#if VTK_MAJOR_VERSION>=9
+  #include "QVTKOpenGLStereoWidget.h"
+  #include "vtkGenericOpenGLRenderWindow.h"
+#elif VTK_MAJOR_VERSION==8
   #include "QVTKOpenGLWidget.h"
   #include "vtkGenericOpenGLRenderWindow.h"
 #else
@@ -99,7 +102,10 @@ QVTKStructure::QVTKStructure()
 	iResolution=32;
 	AllowUpdate=true;
 
-#if VTK_MAJOR_VERSION>=8
+#if VTK_MAJOR_VERSION>=9
+	VTKWidget = new QVTKOpenGLStereoWidget();
+	VTKWidget->setRenderWindow(vtkGenericOpenGLRenderWindow::New());
+#elif VTK_MAJOR_VERSION==8
 	VTKWidget = new QVTKOpenGLWidget();
 	VTKWidget->SetRenderWindow(vtkGenericOpenGLRenderWindow::New());
 #else

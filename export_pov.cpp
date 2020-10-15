@@ -18,7 +18,14 @@
 #include <QMessageBox>
 #include <QtXml>
 
-#include <QVTKWidget.h>
+#include "QVTKStructure.h"
+#if VTK_MAJOR_VERSION>=9
+  #include "QVTKOpenGLStereoWidget.h"
+#elif VTK_MAJOR_VERSION==8
+  #include "QVTKOpenGLWidget.h"
+#else
+  #include "QVTKWidget.h"
+#endif
 #include <vtkRendererCollection.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
@@ -33,7 +40,6 @@
 #include "CSPrimCurve.h"
 #include "CSPrimWire.h"
 
-#include "QVTKStructure.h"
 #include "QCSXCAD.h"
 #include "export_pov.h"
 
@@ -201,7 +207,13 @@ void export_pov::export_wire( QTextStream &stream, size_t count, double *array, 
 
 QString export_pov::get_camera()
 {
+#if VTK_MAJOR_VERSION>=9
+	vtkRendererCollection* collection = ((QVTKOpenGLStereoWidget*)(m_CSX->StructureVTK->GetVTKWidget()))->renderWindow()->GetRenderers();
+#elif VTK_MAJOR_VERSION==8
+	vtkRendererCollection* collection = ((QVTKOpenGLWidget*)(m_CSX->StructureVTK->GetVTKWidget()))->GetRenderWindow()->GetRenderers();
+#else
 	vtkRendererCollection* collection = ((QVTKWidget*)(m_CSX->StructureVTK->GetVTKWidget()))->GetRenderWindow()->GetRenderers();
+#endif
 	vtkRenderer *r = collection->GetFirstRenderer();
 	if (!r)
 		return QString();
@@ -231,7 +243,13 @@ QString export_pov::get_camera()
 
 QString export_pov::get_light()
 {
+#if VTK_MAJOR_VERSION>=9
+	vtkRendererCollection* collection = ((QVTKOpenGLStereoWidget*)(m_CSX->StructureVTK->GetVTKWidget()))->renderWindow()->GetRenderers();
+#elif VTK_MAJOR_VERSION==8
+	vtkRendererCollection* collection = ((QVTKOpenGLWidget*)(m_CSX->StructureVTK->GetVTKWidget()))->GetRenderWindow()->GetRenderers();
+#else
 	vtkRendererCollection* collection = ((QVTKWidget*)(m_CSX->StructureVTK->GetVTKWidget()))->GetRenderWindow()->GetRenderers();
+#endif
 	vtkRenderer *r = collection->GetFirstRenderer();
 	if (!r)
 		return QString();

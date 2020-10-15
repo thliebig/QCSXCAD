@@ -21,7 +21,9 @@
 #include <QtGui>
 
 #include "vtkCommand.h"
-#if VTK_MAJOR_VERSION>=8
+#if VTK_MAJOR_VERSION>=9
+  class QVTKOpenGLStereoWidget;
+#elif VTK_MAJOR_VERSION==8
   class QVTKOpenGLWidget;
 #else
   class QVTKWidget;
@@ -100,7 +102,9 @@ protected:
 		unsigned int uID;
 	} VTKLayerStruct;
 
-#if VTK_MAJOR_VERSION>=8
+#if VTK_MAJOR_VERSION>=9
+	QVTKOpenGLStereoWidget *VTKWidget;
+#elif VTK_MAJOR_VERSION==8
 	QVTKOpenGLWidget *VTKWidget;
 #else
 	QVTKWidget *VTKWidget;

@@ -58,7 +58,6 @@
 #include "CSPrimWire.h"
 #include "CSPrimUserDefined.h"
 
-#include <QVTKWidget.h>
 #include <vtkRendererCollection.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
