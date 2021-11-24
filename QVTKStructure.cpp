@@ -19,7 +19,6 @@
 
 #include "QVTKStructure.h"
 
-#include "vtkCommand.h"
 #if VTK_MAJOR_VERSION>=9
   #include "QVTKOpenGLStereoWidget.h"
   #include "vtkGenericOpenGLRenderWindow.h"
@@ -30,6 +29,7 @@
   #include "QVTKWidget.h"
 
 #endif
+#include "vtkCommand.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"

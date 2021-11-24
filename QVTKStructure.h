@@ -20,7 +20,7 @@
 
 #include <QtGui>
 
-#include "vtkCommand.h"
+#include "vtkVersion.h"
 #if VTK_MAJOR_VERSION>=9
   class QVTKOpenGLStereoWidget;
 #elif VTK_MAJOR_VERSION==8
