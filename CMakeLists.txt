@@ -96,7 +96,7 @@ ADD_DEFINITIONS(  -DTIXML_USE_STL )
 INCLUDE_DIRECTORIES( ${TinyXML_INCLUDE_DIR} )
 
 # vtk
-find_package(VTK REQUIRED)
+find_package(VTK REQUIRED COMPONENTS CommonCore RenderingCore GUISupportQt RenderingLOD NO_MODULE)
 
 message(STATUS "Found package VTK. Using version " ${VTK_VERSION})
 include(${VTK_USE_FILE})

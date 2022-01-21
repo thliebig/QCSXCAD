@@ -27,7 +27,6 @@
 #include "QCSTreeWidget.h"
 #include "QCSGridEditor.h"
 #include "QParameterGui.h"
-#include "vtkConfigure.h"
 #include "tinyxml.h"
 #include <iostream>
 
