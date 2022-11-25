@@ -46,7 +46,8 @@ public:
 	QVTKStructure();
 	virtual ~QVTKStructure();
 
-	QWidget* GetVTKWidget() {return (QWidget *)VTKWidget;};
+	QWidget* GetVTKWidget() const;
+	vtkRenderWindow* GetRenderWindow() const;
 
 	void AddAxes();
 
