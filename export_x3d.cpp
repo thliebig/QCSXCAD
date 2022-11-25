@@ -18,13 +18,6 @@
 #include <QMessageBox>
 
 #include "QVTKStructure.h"
-#if VTK_MAJOR_VERSION>=9
-  #include "QVTKOpenGLStereoWidget.h"
-#elif VTK_MAJOR_VERSION==8
-  #include "QVTKOpenGLWidget.h"
-#else
-  #include "QVTKWidget.h"
-#endif
 #include <vtkRendererCollection.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
@@ -76,13 +69,7 @@ void export_X3D::save( QString filename )
 	export_properties( Scene, properties, Material );
 
 	// create camera
-#if VTK_MAJOR_VERSION>=9
-	vtkRendererCollection* collection = ((QVTKOpenGLStereoWidget*)(m_CSX->StructureVTK->GetVTKWidget()))->renderWindow()->GetRenderers();
-#elif VTK_MAJOR_VERSION==8
-	vtkRendererCollection* collection = ((QVTKOpenGLWidget*)(m_CSX->StructureVTK->GetVTKWidget()))->GetRenderWindow()->GetRenderers();
-#else
-	vtkRendererCollection* collection = ((QVTKWidget*)(m_CSX->StructureVTK->GetVTKWidget()))->GetRenderWindow()->GetRenderers();
-#endif
+	vtkRendererCollection* collection = m_CSX->StructureVTK->GetRenderWindow()->GetRenderers();
 	vtkRenderer *r = collection->GetFirstRenderer();
 	if (!r)
 		return;

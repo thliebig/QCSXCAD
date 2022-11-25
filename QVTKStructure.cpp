@@ -27,8 +27,8 @@
   #include "vtkGenericOpenGLRenderWindow.h"
 #else
   #include "QVTKWidget.h"
-
 #endif
+
 #include "vtkCommand.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
@@ -113,17 +113,30 @@ QVTKStructure::QVTKStructure()
 #endif
 
 	ren = vtkRenderer::New();
-	VTKWidget->GetRenderWindow()->AddRenderer(ren);
+	GetRenderWindow()->AddRenderer(ren);
 
 	AddAxes();
 	SetBackgroundColor(255,255,255);
 
-	SetCallback(VTKWidget->GetRenderWindow()->GetInteractor());
+	SetCallback(GetRenderWindow()->GetInteractor());
 }
 
 QVTKStructure::~QVTKStructure()
 {
 	clear();
+}
+
+QWidget* QVTKStructure::GetVTKWidget() const {
+	return VTKWidget;
+};
+
+vtkRenderWindow* QVTKStructure::GetRenderWindow() const
+{
+#if VTK_MAJOR_VERSION>=9
+	return VTKWidget->renderWindow();
+#else
+	return VTKWidget->GetRenderWindow();
+#endif
 }
 
 void QVTKStructure::AddAxes()
@@ -137,7 +150,7 @@ void QVTKStructure::AddAxes()
 	marker->SetOrientationMarker(assembly);
 	marker->SetViewport(0.0,0.0,0.25,0.25);
 
-	marker->SetInteractor(VTKWidget->GetRenderWindow()->GetInteractor());
+	marker->SetInteractor(GetRenderWindow()->GetInteractor());
 	marker->SetEnabled(1);
 	marker->InteractiveOff();
 
@@ -159,7 +172,7 @@ void QVTKStructure::SetBackgroundColor(int r, int g, int b)
 	{
 		if (ActorGridPlane[i]!=NULL) ActorGridPlane[i]->GetProperty()->SetColor(irgb);
 	}
-    VTKWidget->GetRenderWindow()->GetInteractor()->Render();
+	GetRenderWindow()->GetInteractor()->Render();
 }
 
 void QVTKStructure::SetGeometry(ContinuousStructure *CS)
@@ -277,20 +290,20 @@ void QVTKStructure::RenderGrid()
 void QVTKStructure::RenderGridX(int plane_pos)
 {
 	RenderGridDir(0,plane_pos);
-	VTKWidget->GetRenderWindow()->GetInteractor()->Render();
+	GetRenderWindow()->GetInteractor()->Render();
 }
 
 void QVTKStructure::RenderGridY(int plane_pos)
 {
 	RenderGridDir(1,plane_pos);
-	VTKWidget->GetRenderWindow()->GetInteractor()->Render();
+	GetRenderWindow()->GetInteractor()->Render();
 
 }
 
 void QVTKStructure::RenderGridZ(int plane_pos)
 {
 	RenderGridDir(2,plane_pos);
-	VTKWidget->GetRenderWindow()->GetInteractor()->Render();
+	GetRenderWindow()->GetInteractor()->Render();
 }
 
 void QVTKStructure::RenderGridDir(int dir, unsigned int plane_pos)
@@ -413,13 +426,13 @@ void QVTKStructure::SetGridOpacity(int val)
 	{
 		if (ActorGridPlane[i]!=NULL) ActorGridPlane[i]->GetProperty()->SetOpacity((double)val/255.0);
 	}
-	VTKWidget->GetRenderWindow()->GetInteractor()->Render();
+	GetRenderWindow()->GetInteractor()->Render();
 }
 
 void QVTKStructure::ResetView()
 {
 	ren->ResetCamera();
-    VTKWidget->GetRenderWindow()->GetInteractor()->Render();
+	GetRenderWindow()->GetInteractor()->Render();
 }
 
 void QVTKStructure::setXY()
@@ -472,7 +485,7 @@ void QVTKStructure::SetPropOpacity(unsigned int uiID, int val)
 			if (LayerPrimitives.at(i).VTKProp!=NULL) LayerPrimitives.at(i).VTKProp->SetOpacity2All((double)val/255.0);
 		}
 	}
-	VTKWidget->GetRenderWindow()->GetInteractor()->Render();
+	GetRenderWindow()->GetInteractor()->Render();
 }
 
 void QVTKStructure::RenderGeometry()
@@ -679,7 +692,7 @@ void QVTKStructure::RenderGeometry()
 			}
 		}
 	}
-	VTKWidget->GetRenderWindow()->GetInteractor()->Render();
+	GetRenderWindow()->GetInteractor()->Render();
 }
 
 void QVTKStructure::RenderDiscMaterialModel()
@@ -716,7 +729,7 @@ void QVTKStructure::RenderDiscMaterialModel()
 			delete transform;
 		}
 	}
-	VTKWidget->GetRenderWindow()->GetInteractor()->Render();
+	GetRenderWindow()->GetInteractor()->Render();
 }
 
 void QVTKStructure::SetParallelProjection(bool val, bool render)
@@ -725,18 +738,18 @@ void QVTKStructure::SetParallelProjection(bool val, bool render)
 	cam->SetParallelProjection(val);
 
 	if (render)
-		VTKWidget->GetRenderWindow()->GetInteractor()->Render();
+		GetRenderWindow()->GetInteractor()->Render();
 }
 
 void QVTKStructure::Set2DInteractionStyle(bool val, bool render)
 {
 	if (val)
-		VTKWidget->GetRenderWindow()->GetInteractor()->SetInteractorStyle(vtkInteractorStyleRubberBand2DPlane::New());
+		GetRenderWindow()->GetInteractor()->SetInteractorStyle(vtkInteractorStyleRubberBand2DPlane::New());
 	else
-		VTKWidget->GetRenderWindow()->GetInteractor()->SetInteractorStyle(vtkInteractorStyleTrackballCamera::New());
+		GetRenderWindow()->GetInteractor()->SetInteractorStyle(vtkInteractorStyleTrackballCamera::New());
 
 	if (render)
-		VTKWidget->GetRenderWindow()->GetInteractor()->Render();
+		GetRenderWindow()->GetInteractor()->Render();
 }
 
 void QVTKStructure::SaveCamData()
@@ -765,7 +778,7 @@ void QVTKStructure::RestoreCamData(bool render)
 	Camera->Modified();
 
 	if (render)
-		VTKWidget->GetRenderWindow()->GetInteractor()->Render();
+		GetRenderWindow()->GetInteractor()->Render();
 }
 
 
@@ -777,7 +790,7 @@ void QVTKStructure::ExportView2Image()
 		return;
 
 	vtkWindowToImageFilter* filter = vtkWindowToImageFilter::New();
-	filter->SetInput(VTKWidget->GetRenderWindow());
+	filter->SetInput(GetRenderWindow());
 
 	vtkPNGWriter* png_writer= vtkPNGWriter::New();
 	png_writer->SetInputConnection(filter->GetOutputPort());
@@ -885,7 +898,7 @@ void QVTKStructure::SetCallback(vtkRenderWindowInteractor *iren)
 	cb->SetCallback(KeyPress);
 	cb->SetClientData((void *)cbData);
 	iren->AddObserver(vtkCommand::KeyReleaseEvent, cb);
-	//VTKWidget->GetRenderWindow()->GetInteractor()->AddObserver(vtkCommand::KeyReleaseEvent, cb);
+	//GetRenderWindow()->GetInteractor()->AddObserver(vtkCommand::KeyReleaseEvent, cb);
 
 	cb->Delete();
 	//	free(cbData);
