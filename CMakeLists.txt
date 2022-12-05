@@ -95,6 +95,11 @@ find_package(TinyXML REQUIRED)
 ADD_DEFINITIONS(  -DTIXML_USE_STL )
 INCLUDE_DIRECTORIES( ${TinyXML_INCLUDE_DIR} )
 
+# vtk 9.1 needs MPI find to fail?????
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+  find_package(MPI)
+endif()
+
 # vtk
 find_package(VTK REQUIRED COMPONENTS vtkIOGeometry NO_MODULE)
 if (${VTK_VERSION} VERSION_GREATER "9")
