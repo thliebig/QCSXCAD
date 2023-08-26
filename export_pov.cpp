@@ -52,17 +52,17 @@ void export_pov::save( QString filename )
 	QTextStream stream(&file);
 	stream.setCodec( "UTF-8" );
 
-	stream << "// povray-file exported by QCSXCAD" << endl;
-	stream << "// render with:" << endl;
-	stream << "// povray -W640 -H480 +A " << QFileInfo(filename).fileName() << endl;
-	stream << endl;
-	stream << "#declare TRANSPARENT = off; // if on, also use the \"+ua\" command line flag" << endl;
-	stream << endl;
-	stream << "#include \"colors.inc\"" << endl;
-	stream << "#include \"metals.inc\"" << endl;
-	stream << "#include \"textures.inc\"" << endl;
-	stream << "#include \"transforms.inc\"" << endl;
-	stream << "background { color rgb<1.000000,1.000000,1.000000> #if(TRANSPARENT) transmit 1.0 #end }" << endl;
+	stream << "// povray-file exported by QCSXCAD" << "\n";
+	stream << "// render with:" << "\n";
+	stream << "// povray -W640 -H480 +A " << QFileInfo(filename).fileName() << "\n";
+	stream << "\n";
+	stream << "#declare TRANSPARENT = off; // if on, also use the \"+ua\" command line flag" << "\n";
+	stream << "\n";
+	stream << "#include \"colors.inc\"" << "\n";
+	stream << "#include \"metals.inc\"" << "\n";
+	stream << "#include \"textures.inc\"" << "\n";
+	stream << "#include \"transforms.inc\"" << "\n";
+	stream << "background { color rgb<1.000000,1.000000,1.000000> #if(TRANSPARENT) transmit 1.0 #end }" << "\n";
 
 	// export material
 	std::vector<CSProperties*> properties = m_CSX->GetPropertyByType( CSProperties::MATERIAL );
@@ -73,10 +73,10 @@ void export_pov::save( QString filename )
 	export_properties( stream, properties, "texture { Copper_Metal }" );
 
 	// create camera
-	stream << get_camera() << endl;
+	stream << get_camera() << "\n";
 
 	// create light
-	stream << get_light() << endl;
+	stream << get_light() << "\n";
 
 	stream.flush();
 	file.close();
@@ -152,7 +152,7 @@ void export_pov::export_box( QTextStream &stream, double start[3], double stop[3
 		}
 	QString box = "box { %1, %2 %3 }";
 	box = box.arg(pov_vect(start),pov_vect(stop),object_modifier);
-	stream << box << endl;
+	stream << box << "\n";
 }
 
 void export_pov::export_polygon( QTextStream &stream, size_t count, double *array, double elevation, int normDir, QString object_modifier )
@@ -176,14 +176,14 @@ void export_pov::export_polygon( QTextStream &stream, size_t count, double *arra
 	str += ", " + pov_vect2( array ); // close the prism
 	str += " " + object_modifier + " rotate<-90,0,0> }";
 
-	stream << str << endl;
+	stream << str << "\n";
 }
 
 void export_pov::export_cylinder( QTextStream &stream, double start[3], double stop[3], double radius, QString object_modifier )
 {
 	QString str = "cylinder { %1, %2, %3 %4 }";
 	str = str.arg(pov_vect(start)).arg(pov_vect(stop)).arg(radius).arg(object_modifier);
-	stream << str << endl;
+	stream << str << "\n";
 }
 
 void export_pov::export_wire( QTextStream &stream, size_t count, double *array, double radius, QString object_modifier )
@@ -195,7 +195,7 @@ void export_pov::export_wire( QTextStream &stream, size_t count, double *array, 
 		str += ", " + pov_vect(array+a*3) + ", " + QString::number(radius);
 	}
 	str += " " + object_modifier + " }";
-	stream << str << endl;
+	stream << str << "\n";
 }
 
 QString export_pov::get_camera()
@@ -209,17 +209,17 @@ QString export_pov::get_camera()
 		return QString();
 
 	double *pos = c->GetPosition();
-//	cout << "Camera position: " << pos[0] << ", " << pos[1] << ", " << pos[2] << endl;
+//	cout << "Camera position: " << pos[0] << ", " << pos[1] << ", " << pos[2] << "\n";
 	double *focalpos = c->GetFocalPoint();
-//	cout << "Camera focal point: " << focalpos[0] << ", " << focalpos[1] << ", " << focalpos[2] << endl;
+//	cout << "Camera focal point: " << focalpos[0] << ", " << focalpos[1] << ", " << focalpos[2] << "\n";
 //	double distance = c->GetDistance();
-//	cout << "Camera distance (position to focal point): " << distance << endl;
+//	cout << "Camera distance (position to focal point): " << distance << "\n";
 //	double roll = c->GetRoll();
-//	cout << "Camera roll angle (about direction of projection): " << roll << "°" << endl;
+//	cout << "Camera roll angle (about direction of projection): " << roll << "°" << "\n";
 	double angle = c->GetViewAngle();
-//	cout << "Camera view angle: " << angle << "°" << endl;
+//	cout << "Camera view angle: " << angle << "°" << "\n";
 	double *up = c->GetViewUp();
-//	cout << "Camera up vector: " << up[0] << ", " << up[1] << ", " << up[2] << endl;
+//	cout << "Camera up vector: " << up[0] << ", " << up[1] << ", " << up[2] << "\n";
 
 	QString camera_str;
 	camera_str = "camera { perspective location %1 look_at %2 sky %3 right -1.33*x angle %4 }";
