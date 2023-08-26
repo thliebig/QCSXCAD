@@ -38,6 +38,12 @@
 #include "CSPrimWire.h"
 #include "CSPrimUserDefined.h"
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+using Qt::SkipEmptyParts;
+#else
+using QString::SkipEmptyParts;
+#endif
+
 QCSPrimEditor::QCSPrimEditor(ContinuousStructure *CS, CSPrimitives* prim, QWidget* parent) : QDialog(parent)
 {
 	clCS=CS;
@@ -591,10 +597,10 @@ void QCSPrimPolygonLayout::SetValues()
 	else ps->SetValue(line.toStdString());
 	
 	clPoly->ClearCoords();
-	
-	QStringList strListX = CoordLineX->text().split(",",QString::SkipEmptyParts);
-	QStringList strListY = CoordLineY->text().split(",",QString::SkipEmptyParts);
-	
+
+	QStringList strListX = CoordLineX->text().split(",",SkipEmptyParts);
+	QStringList strListY = CoordLineY->text().split(",",SkipEmptyParts);
+
 	for (int i=0; (i<strListX.size()) && (i<strListY.size()) ; ++i)
 	{
 
