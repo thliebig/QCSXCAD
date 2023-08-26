@@ -50,7 +50,11 @@ void export_pov::save( QString filename )
 		return;
 	}
 	QTextStream stream(&file);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+	stream.setEncoding(QStringConverter::Utf8);
+#else
 	stream.setCodec( "UTF-8" );
+#endif
 
 	stream << "// povray-file exported by QCSXCAD" << "\n";
 	stream << "// render with:" << "\n";
