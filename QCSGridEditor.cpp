@@ -547,7 +547,7 @@ void QCSGridEditor::SetDeltaUnit(QString val)
 {
 	bool succ=false;
 	double dDal=val.toDouble(&succ);
-	if ((val>0) && succ) clGrid->SetDeltaUnit(dDal);
+	if ((val.length()>0) && succ) clGrid->SetDeltaUnit(dDal);
 }
 
 void QCSGridEditor::Update()
