@@ -715,7 +715,7 @@ void QCSXCAD::New()
 void QCSXCAD::ExportGeometry()
 {
 	QString qFilename=QFileDialog::getSaveFileName(0,"Choose Geometrie File",NULL,"SimGeometryXML (*.xml)");
-	if (qFilename==NULL) return;
+	if (qFilename.isEmpty()) return;
 	if (!qFilename.endsWith(".xml")) qFilename+=".xml";
 
 	if (Write2XML(qFilename.toLatin1().data())==false) QMessageBox::warning(this,tr("Geometry Export"),tr("Unknown error occured! Geometry Export failed"),1,0);
