@@ -96,7 +96,11 @@ void export_X3D::save( QString filename )
 		return;
 	}
 	QTextStream stream(&file);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+	stream.setEncoding(QStringConverter::Utf8);
+#else
 	stream.setCodec( "UTF-8" );
+#endif
 	doc.save( stream, 4, QDomNode::EncodingFromTextStream );
 }
 
