@@ -481,12 +481,20 @@ void QCSGridEditor::Edit(int direct)
 					double* values = GetDoubleArrayFromString(&count,qsValue);
 					if (values) clGrid->AddDiscLines(direct,count,values);
 				}
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+				else if (QRegExp(FloatExp + ":" + FloatExp + ":" + FloatExp).indexIn(qsValue) != -1)
+#else
 				else if (qsValue.contains(QRegExp(FloatExp + ":" + FloatExp + ":" + FloatExp)))
+#endif
 				{
 					qre.indexIn(qsValue);
 					QString seq = qre.cap();
 //					cerr << "found-->" << seq.toStdString() <<  endl;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+					QString function = QRegExp(FloatExp + ":" + FloatExp + ":" + FloatExp).replaceIn(qsValue, GetDirName(direct));
+#else
 					QString function = qsValue.replace(QRegExp(FloatExp + ":" + FloatExp + ":" + FloatExp),GetDirName(direct));
+#endif
 //					cerr << function.toStdString() << endl;
 					int count=0;
 					double* values = GetDoubleArrayFromString(&count,seq);
