@@ -115,11 +115,34 @@ INCLUDE_DIRECTORIES (${VTK_INCLUDE_DIRS})
 # Qt 
 SET(RESOURCES resources.qrc)
 set(CMAKE_AUTOMOC ON)
+
+# Both Qt6 support and the variable VTK_QT_VERSION are introduced in vTK
+# 9.1. Below VTK 9, we don't know the Qt version used by VTK, so we make
+# a guess and hope for the best. Since Qt6 is not officially supported
+# before 9.1, we guess Qt4 or Qt5.
+# https://gitlab.kitware.com/vtk/vtk/-/merge_requests/7483
+if (NOT DEFINED VTK_QT_VERSION)
+    FIND_PACKAGE(Qt4 COMPONENTS QtCore QUIET)
+    if (Qt4_FOUND)
+        SET(VTK_QT_VERSION "4")
+    else()
+        SET(VTK_QT_VERSION "5")
+    # Probably no need to check for Qt6 here, since Qt6 is only supported by VTK 9.1+
+    # which exposes VTK_QT_VERSION
+    endif()
+    message(
+      WARNING
+      "VTK_QT_VERSION is unsupported before VTK 9.1, "
+      "a guess has been made: Qt ${VTK_QT_VERSION}. "
+      "Use -DVTK_QT_VERSION=number to override!"
+    )
+endif()
+
 if(VTK_QT_VERSION VERSION_GREATER "5")
     FIND_PACKAGE(Qt6 COMPONENTS Core Core5Compat Widgets Xml REQUIRED)
     set(QT_LIBRARIES Qt6::Core5Compat Qt6::Widgets Qt6::Xml)
     QT6_ADD_RESOURCES(RESOURCES_SRCS ${RESOURCES})
-elseif(${VTK_VERSION} VERSION_GREATER "6" AND VTK_QT_VERSION VERSION_GREATER "4")
+elseif(VTK_QT_VERSION VERSION_GREATER "4")
     FIND_PACKAGE(Qt5 COMPONENTS Core Widgets Xml REQUIRED)
     set(QT_LIBRARIES Qt5::Widgets Qt5::Xml)
     QT5_ADD_RESOURCES(RESOURCES_SRCS ${RESOURCES})
@@ -129,6 +152,8 @@ else()
     INCLUDE( ${QT_USE_FILE} )
     QT4_ADD_RESOURCES(RESOURCES_SRCS ${RESOURCES})
 endif()
+
+message(STATUS "Found/guessed VTK's Qt version. Using version " ${VTK_QT_VERSION})
 
 if("${VTK_MAJOR_VERSION}" GREATER 5)
     set( vtk_LIBS ${VTK_LIBRARIES} )
