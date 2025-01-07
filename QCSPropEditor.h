@@ -62,7 +62,7 @@ protected slots:
 	void Save();
 	void Cancel();
 
-	void ChangeType(int item);
+	// void ChangeType(int item);
 
 	void Fill2EdgeColor();
 	void Edge2FillColor();
@@ -71,7 +71,7 @@ protected slots:
 	void SetValues();
 
 protected:
-	QComboBox* TypeCB;
+	// QComboBox* TypeCB;
 
 	QGroupBox* BuildGeneral();
 	QLayout* BuildButtons();
@@ -92,7 +92,7 @@ protected:
 	QCSPropertyGroupBox* BuildPropGroupBox(CSProperties* clProp);
 	QCSPropertyGroupBox* propGB;
 
-	int GetIndexOfType();
+	// int GetIndexOfType();
 
 	int m_SimMode;
 };
