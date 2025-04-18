@@ -6,14 +6,15 @@ ELSE()
   SET( CMAKE_BUILD_TYPE Release CACHE STRING "Set to either \"Release\" or \"Debug\"" )
 ENDIF()
 
-PROJECT( QCSXCAD CXX)
+PROJECT( QCSXCAD CXX C)
 
 cmake_minimum_required(VERSION 2.8)
 
+# not supported any more by cmake 4.0?
 # https://cmake.org/cmake/help/v3.0/policy/CMP0020.html
-if(POLICY CMP0020)
-  cmake_policy(SET CMP0020 OLD)
-endif()
+# if(POLICY CMP0020)
+#   cmake_policy(SET CMP0020 NEW)
+# endif()
 
 IF(EXISTS ${PROJECT_SOURCE_DIR}/localConfig.cmake)
    include(${PROJECT_SOURCE_DIR}/localConfig.cmake)
