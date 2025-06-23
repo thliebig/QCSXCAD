@@ -6,12 +6,12 @@ ELSE()
   SET( CMAKE_BUILD_TYPE Release CACHE STRING "Set to either \"Release\" or \"Debug\"" )
 ENDIF()
 
-PROJECT( QCSXCAD CXX C)
-
 # In CMake 4, 3.10 is deprecated and 3.5 has been removed.
 # use 3.0...3.10 so all of these versions are acceptable as min. version.
 # https://cmake.org/cmake/help/latest/command/cmake_minimum_required.html
 cmake_minimum_required(VERSION 3.0...3.10)
+
+PROJECT( QCSXCAD CXX C)
 
 # not supported any more by cmake 4.0?
 # https://cmake.org/cmake/help/v3.0/policy/CMP0020.html
