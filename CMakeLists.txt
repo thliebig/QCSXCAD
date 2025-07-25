@@ -13,12 +13,6 @@ cmake_minimum_required(VERSION 3.0...3.10)
 
 PROJECT( QCSXCAD CXX C)
 
-# not supported any more by cmake 4.0?
-# https://cmake.org/cmake/help/v3.0/policy/CMP0020.html
-# if(POLICY CMP0020)
-#   cmake_policy(SET CMP0020 NEW)
-# endif()
-
 IF(EXISTS ${PROJECT_SOURCE_DIR}/localConfig.cmake)
    include(${PROJECT_SOURCE_DIR}/localConfig.cmake)
 ENDIF()
