@@ -15,6 +15,16 @@
 *	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+// Must be the first include file on MSVC
+#ifndef  __GNUC__
+#define _USE_MATH_DEFINES
+#include <cmath>
+#else
+#include <cmath>
+#endif
+
+#include <iostream>
+
 #include "VTKPrimitives.h"
 #include "vtkRenderer.h"
 #include "vtkActorCollection.h"
@@ -106,7 +116,7 @@ void VTKPrimitives::AddCube(const double *start, const double *stop, double *dRG
 	}
 	if (dim==0)
 	{
-		cerr << "VTKPrimitives::AddCube: Warning, can't draw a Point Box... skipping" << endl;
+		std::cerr << "VTKPrimitives::AddCube: Warning, can't draw a Point Box... skipping" << std::endl;
 		return;
 	}
 	if (dim==1)
@@ -395,7 +405,7 @@ void VTKPrimitives::AddCylinder(const double *dCenter, const double *dExtrusionV
 
 	alpha=VectorAngel(dExtrusionVector[0],sqrt(dExtrusionVector[1]*dExtrusionVector[1]+dExtrusionVector[2]*dExtrusionVector[2]),0,0,1,0);
 	beta=VectorAngel(0,dExtrusionVector[1],dExtrusionVector[2],0,1,0);
-	// cout << alpha << "   "  << beta << endl;  //debuging
+	// std::cout << alpha << "   "  << beta << std::endl;  //debuging
 	if (dExtrusionVector[0]>0) alpha=-alpha;
 	if (dExtrusionVector[2]<0) beta=-beta;
 	transform->Translate(dExtrusionVector[0]/2+dCenter[0],dExtrusionVector[1]/2+dCenter[1],dExtrusionVector[2]/2+dCenter[2]);
@@ -510,7 +520,7 @@ void VTKPrimitives::AddSphericalShell(const double *dCenter, double r_i, double 
 	Source_o->Delete();
 	Source_i->Delete();
 #else
-	cerr << "VTKPrimitives::AddSphericalShell: Error, spherical shell not supported by this vkt version, you require vtk 5.10 or higher." << endl;
+	std::cerr << "VTKPrimitives::AddSphericalShell: Error, spherical shell not supported by this vkt version, you require vtk 5.10 or higher." << std::endl;
 #endif
 }
 
@@ -848,7 +858,7 @@ void VTKPrimitives::SetOpacity2All(double opacity)
 
 void VTKPrimitives::WritePolyData2File(const char* filename, double scale)
 {
-	cout << "VTKPrimitives::WritePolyData2File: Dump to vtk file: " << filename << " -- Using scale: " << scale << endl;
+	std::cout << "VTKPrimitives::WritePolyData2File: Dump to vtk file: " << filename << " -- Using scale: " << scale << std::endl;
 	vtkXMLPolyDataWriter* writer  = vtkXMLPolyDataWriter::New();
 	writer->SetFileName(filename);
 
@@ -890,7 +900,7 @@ void VTKPrimitives::WritePolyData2File(const char* filename, double scale)
 
 void VTKPrimitives::WritePolyData2STL(const char* filename, double scale)
 {
-	cout << "VTKPrimitives::WritePolyData2STL: Dump to stl file: " << filename << " -- Using scale: " << scale << endl;
+	std::cout << "VTKPrimitives::WritePolyData2STL: Dump to stl file: " << filename << " -- Using scale: " << scale << std::endl;
 
 	vtkTriangleFilter* filter = vtkTriangleFilter::New();
 
@@ -932,7 +942,7 @@ void VTKPrimitives::WritePolyData2STL(const char* filename, double scale)
 
 void VTKPrimitives::WritePolyData2PLY(const char* filename, double scale)
 {
-	cout << "VTKPrimitives::WritePolyData2PLY: Dump to ply file: " << filename << " -- Using scale: " << scale << endl;
+	std::cout << "VTKPrimitives::WritePolyData2PLY: Dump to ply file: " << filename << " -- Using scale: " << scale << std::endl;
 
 	vtkTriangleFilter* filter = vtkTriangleFilter::New();
 

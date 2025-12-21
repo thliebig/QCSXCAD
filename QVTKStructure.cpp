@@ -280,7 +280,7 @@ void QVTKStructure::RenderGrid()
 		}
 	}
 	else
-		cerr << "QVTKStructure::RenderGrid(): Error, unknown grid type!" << endl;
+		std::cerr << "QVTKStructure::RenderGrid(): Error, unknown grid type!" << std::endl;
 
 	RenderGridDir(0,0);
 	RenderGridDir(1,0);
@@ -325,7 +325,7 @@ void QVTKStructure::RenderGridDir(int dir, unsigned int plane_pos)
 		uiQty[n]=CSGrid->GetQtyLines(n);
 	if ((int)plane_pos>=uiQty[dir])
 	{
-		cerr << "QVTKStructure::RenderGridDir: requested plane postion is out of range, resetting to max value!" << endl;
+		std::cerr << "QVTKStructure::RenderGridDir: requested plane postion is out of range, resetting to max value!" << std::endl;
 		plane_pos = uiQty[dir]-1;
 	}
 
@@ -336,7 +336,7 @@ void QVTKStructure::RenderGridDir(int dir, unsigned int plane_pos)
 			ActorGridPlane[dir]->Delete();
 			gridMapper->Delete();
 			ActorGridPlane[dir]=NULL;
-			cerr << "QVTKStructure::RenderGridDir: Error, rect grid mesh was not created, skipping drawing..." << endl;
+			std::cerr << "QVTKStructure::RenderGridDir: Error, rect grid mesh was not created, skipping drawing..." << std::endl;
 			return;
 		}
 		vtkRectilinearGridGeometryFilter *grid_plane = vtkRectilinearGridGeometryFilter::New();
@@ -372,7 +372,7 @@ void QVTKStructure::RenderGridDir(int dir, unsigned int plane_pos)
 			ActorGridPlane[dir]->Delete();
 			gridMapper->Delete();
 			ActorGridPlane[dir]=NULL;
-			cerr << "QVTKStructure::RenderGridDir: Error, structured grid mesh was not created, skipping drawing..." << endl;
+			std::cerr << "QVTKStructure::RenderGridDir: Error, structured grid mesh was not created, skipping drawing..." << std::endl;
 			return;
 		}
 
@@ -403,7 +403,7 @@ void QVTKStructure::RenderGridDir(int dir, unsigned int plane_pos)
 		}
 	}
 	else
-		cerr << "QVTKStructure::RenderGrid(): Error, unknown grid type!" << endl;
+		std::cerr << "QVTKStructure::RenderGrid(): Error, unknown grid type!" << std::endl;
 
 	gridMapper->SetInputConnection(plane->GetOutputPort());
 	ActorGridPlane[dir]->SetMapper(gridMapper);
