@@ -15,6 +15,8 @@
 *	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <iostream>
+
 #include "vtkInteractorStyleRubberBand2DPlane.h"
 
 #include "vtkCamera.h"
@@ -56,7 +58,7 @@ void vtkInteractorStyleRubberBand2DPlane::OnMouseMove()
 				n_dir = n;
 		if (n_dir<0)
 		{
-			cerr << __func__ << ": Error, no view in x-, y- or z-direction, skipping panning!";
+			std::cerr << __func__ << ": Error, no view in x-, y- or z-direction, skipping panning!";
 			return;
 		}
 
