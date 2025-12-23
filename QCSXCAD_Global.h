@@ -24,7 +24,7 @@
 #define _QCSXCAD_VERSION_ GIT_VERSION
 #define _QCSXCAD_LICENSE_ "LGPL v3"
 
-#if defined(WIN32)
+#if defined(_WIN32)
 	#ifdef BUILD_QCSXCAD_LIB
 	#define QCSXCAD_EXPORT Q_DECL_EXPORT
 	#else
