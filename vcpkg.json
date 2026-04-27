@@ -1,0 +1,8 @@
+{
+  "dependencies": [
+    "tinyxml",
+    "qtbase",
+    { "name": "qt5compat", "default-features": false, "features": ["textcodec", "codecs"] },
+    { "name": "vtk", "features": ["qt"] }
+  ]
+}
