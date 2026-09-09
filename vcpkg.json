@@ -3,6 +3,6 @@
     "tinyxml",
     "qtbase",
     { "name": "qt5compat", "default-features": false, "features": ["textcodec", "codecs"] },
-    { "name": "vtk", "features": ["qt"] }
+    { "name": "vtk", "default-features": false, "features": ["qt"] }
   ]
 }
