@@ -314,7 +314,18 @@ void QVTKStructure::RenderGridDir(int dir, unsigned int plane_pos)
 		ActorGridPlane[dir]->Delete();
 	}
 
+// vtkLODActor builds its two lower levels of detail with
+// vtkPolyDataMapper::ShallowCopy(), which on VTK 9.0 and 9.1 copies the shader
+// code through the mapper's own deprecated setters. Every actor then prints six
+// deprecation warnings about VTK's own code and buries the output of a run.
+// Fixed in VTK 9.2, and VTK 8 and older never deprecated those setters. The
+// levels of detail only matter while interactively moving a very large
+// structure, so fall back to a plain vtkActor in between.
+#if (VTK_MAJOR_VERSION==9 && VTK_MINOR_VERSION<2)
+	ActorGridPlane[dir] = vtkActor::New();
+#else
 	ActorGridPlane[dir] = vtkLODActor::New();
+#endif
 	vtkPolyDataMapper *gridMapper = vtkPolyDataMapper::New();
 	vtkPolyDataAlgorithm *plane = NULL;
 

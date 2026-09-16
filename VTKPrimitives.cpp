@@ -467,7 +467,18 @@ void VTKPrimitives::AddCylindricalShell(const double *dAxisStart, const double* 
 	vtkPolyDataMapper *mapper = vtkPolyDataMapper::New();
 	mapper->SetInputConnection( transformFilter->GetOutputPort() );
 	mapper->ScalarVisibilityOff();
+// vtkLODActor builds its two lower levels of detail with
+// vtkPolyDataMapper::ShallowCopy(), which on VTK 9.0 and 9.1 copies the shader
+// code through the mapper's own deprecated setters. Every actor then prints six
+// deprecation warnings about VTK's own code and buries the output of a run.
+// Fixed in VTK 9.2, and VTK 8 and older never deprecated those setters. The
+// levels of detail only matter while interactively moving a very large
+// structure, so fall back to a plain vtkActor in between.
+#if (VTK_MAJOR_VERSION==9 && VTK_MINOR_VERSION<2)
+	vtkActor *actor = vtkActor::New();
+#else
 	vtkActor *actor = vtkLODActor::New();
+#endif
 	actor->SetMapper( mapper );
 
 	m_PolyDataCollection->AddInputConnection( transformFilter->GetOutputPort());
@@ -796,7 +807,12 @@ vtkActor* VTKPrimitives::AddPolyData(vtkPolyData* polydata, double *dRGB, double
 	vtkPolyDataMapper *Mapper = vtkPolyDataMapper::New();
 	Mapper->SetInputConnection(filter->GetOutputPort());
 	Mapper->ScalarVisibilityOff();
-	vtkLODActor *Actor = vtkLODActor::New();
+// no vtkLODActor on VTK 9.0/9.1, see AddCylindricalShell()
+#if (VTK_MAJOR_VERSION==9 && VTK_MINOR_VERSION<2)
+	vtkActor *Actor = vtkActor::New();
+#else
+	vtkActor *Actor = vtkLODActor::New();
+#endif
 	Actor->SetMapper(Mapper);
 	Actor->GetProperty()->RemoveAllTextures();
 	Actor->GetProperty()->SetColor(dRGB);
@@ -830,7 +846,12 @@ vtkActor* VTKPrimitives::AddPolyData(vtkAlgorithmOutput* polydata_port, double *
 	vtkPolyDataMapper *Mapper = vtkPolyDataMapper::New();
 	Mapper->SetInputConnection(filter->GetOutputPort());
 	Mapper->ScalarVisibilityOff();
-	vtkLODActor *Actor = vtkLODActor::New();
+// no vtkLODActor on VTK 9.0/9.1, see AddCylindricalShell()
+#if (VTK_MAJOR_VERSION==9 && VTK_MINOR_VERSION<2)
+	vtkActor *Actor = vtkActor::New();
+#else
+	vtkActor *Actor = vtkLODActor::New();
+#endif
 	Actor->SetMapper(Mapper);
 	Actor->GetProperty()->RemoveAllTextures();
 	Actor->GetProperty()->SetColor(dRGB);
