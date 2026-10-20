@@ -41,6 +41,8 @@
 #include "vtkCubeSource.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkCellArray.h"
+#include "vtkPoints.h"
+#include "vtkPolyData.h"
 #include "vtkActor.h"
 #include "vtkLODActor.h"
 #include "vtkFollower.h"
@@ -722,9 +724,26 @@ void QVTKStructure::RenderDiscMaterialModel()
 		CSPropDiscMaterial* dm_prop = prop->ToDiscMaterial();
 		if (dm_prop)
 		{
-			vtkPolyData* polydata = dm_prop->CreatePolyDataModel();
-			if (polydata==NULL)
+			// the surface in mesh coordinates, scale and transform are applied below
+			std::vector<double> coords;
+			std::vector<int> quads;
+			if (!dm_prop->GetPolyDataModel(coords, quads, false))
 				continue;
+			vtkPoints* points = vtkPoints::New();
+			points->SetNumberOfPoints(coords.size()/3);
+			for (size_t n=0;n<coords.size()/3;++n)
+				points->SetPoint(n, &coords[3*n]);
+			vtkCellArray* poly = vtkCellArray::New();
+			for (size_t n=0;n<quads.size();n+=4)
+			{
+				vtkIdType ids[4] = {quads[n], quads[n+1], quads[n+2], quads[n+3]};
+				poly->InsertNextCell(4, ids);
+			}
+			vtkPolyData* polydata = vtkPolyData::New();
+			polydata->SetPoints(points);
+			points->Delete();
+			polydata->SetPolys(poly);
+			poly->Delete();
 
 			VTKDiscModel model;
 			VTKPrimitives* vtkPrims= new VTKPrimitives(ren);
